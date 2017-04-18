@@ -51,7 +51,7 @@ np.random.seed(0)
 
 # initial value 
 initial_theta = 0.0
-n_samples = 500
+n_samples = 10000
 burninperiod = int (n_samples * 0.2)
 
 # set up theta
@@ -63,7 +63,8 @@ i = 1
 
 # loop
 while i < n_samples:
-    theta_star = np.random.uniform(-10.0, 18.0, 1)
+    sigma = 10
+    theta_star = np.random.uniform(4-sigma, 4+sigma, 1)
     alpha = np.minimum( fcn(theta_star) / fcn(theta[i-1]) ,1)
     
     if (np.random.random([1]) < alpha):
@@ -71,7 +72,10 @@ while i < n_samples:
         i+=1
         print("accept!\n")
     else:
+        theta[i] = theta[i-1]
+        i+=1
         print("reject!\n")
+        
 
 
 theta_new = theta[burninperiod:]
