@@ -8,10 +8,11 @@ import numpy as np
 # N: total number of states, i.e. samples
 # target_PDF
 # proposal_PDF
+# LSF: limit state function
 
-def mma(theta0, N, marginal_PDF, proposal_PDF):
+def mma(theta0, N, marginal_PDF, proposal_PDF, LSF):
   # get dimension
-  d = 1
+  d = np.size(theta0)
 
   # initialize theta
   theta = np.zeros((d,N),float)

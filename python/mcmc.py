@@ -5,83 +5,67 @@ Author: Matthias Willer 2017
 import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
-import scipy.stats as npdf
 
 
-def fcn(x): 
-    mu = 4    # mean
-    sigma = 2  # standard deviation
-    result = npdf.norm.pdf(x, mu, sigma)
-    return result
+def mcmc(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod):
+    print("START MCMC-method")
 
-def hist_plot(x):
-    num_bins = 50
+    # set seed
+    np.random.seed(0)
 
-    fig, ax = plt.subplots()
+    # initialize theta
+    theta = np.zeros((n_samples*logPeriod), float)
+    theta[0] = initial_theta
 
-    # the histogram of the data
-    n, bins, patches = ax.hist(x, num_bins, normed=1)
+    # initialization
+    i = 1
+    n_accepted_samples = 0
 
-    # add a 'best fit' line
-    y = mlab.normpdf(bins, 4, 2)
-    ax.plot(bins, y, '--')
-
-    ax.set_xlabel('theta')
-    ax.set_ylabel('p')
-    ax.set_title(r'Histogram of theta')
-
-    # Tweak spacing to prevent clipping of ylabel
-    fig.tight_layout()
-
-
-def n_plot(x):
-    fig, ax = plt.subplots()
-
-    ax.plot(x)
-
-    ax.set_xlabel('n')
-    ax.set_ylabel('theta')
-    ax.set_title(r'Plot of theta')
-
-    fig.tight_layout()
-
-
-# set seed
-np.random.seed(0)
-
-# initial value 
-initial_theta = 0.0
-n_samples = 10000
-burninperiod = int (n_samples * 0.2)
-
-# set up theta
-theta = np.zeros((n_samples), float)
-theta[0] = initial_theta
-
-
-i = 1
-
-# loop
-while i < n_samples:
-    sigma = 10
-    theta_star = np.random.uniform(4-sigma, 4+sigma, 1)
-    alpha = np.minimum( fcn(theta_star) / fcn(theta[i-1]) ,1)
-    
-    if (np.random.random([1]) < alpha):
-        theta[i] = theta_star
-        i+=1
-        print("accept!\n")
-    else:
-        theta[i] = theta[i-1]
-        i+=1
-        print("reject!\n")
+    # loop
+    while i < n_samples*logPeriod:
+        # sample theta_star from proposal_PDF
+        theta_star = proposal_PDF()
+        alpha = np.minimum(target_PDF(theta_star)/ target_PDF(theta[i-1]), 1)
         
+        # accept or reject sample
+        if (np.random.random([1]) <= alpha):
+            theta[i] = theta_star
+            # print("accept!\n")
+            n_accepted_samples +=1
+        else:
+            theta[i] = theta[i-1]
+            # print("reject!\n")
+            
+        i+=1
+    
+    
+    # reduce samples with logPerdiod
+    theta_red = np.zeros((n_samples), float)
 
+    for i in range(0,n_samples):
+        theta_red[i] = theta[i*logPeriod]
+    
+    theta = theta_red
 
-theta_new = theta[burninperiod:]
+    # apply burning-in-period
+    burningInPeriod = int (n_samples * burningInFraction)
+    theta = theta[burningInPeriod:]
+    
+    # TESTS
 
-# plot samples
-hist_plot(theta_new)
-n_plot(theta_new)
-plt.show()
+    # genervece-test
+    start_fractal = int ((n_samples-burningInPeriod) * 0.1)
+    end_fractal = int ((n_samples-burningInPeriod) * 0.5)
+    
+    mu_start = np.mean(theta[:start_fractal])
+    mu_end = np.mean(theta[end_fractal:])
+
+    rel_eps_mu = (mu_start - mu_end)/ mu_end
+    print("rel_eps_mu = ", rel_eps_mu)
+
+    # acceptance rate
+    print("acceptance rate = ", n_accepted_samples/(n_samples*logPeriod), " (optimal if between [0.20;0.44])")
+
+    print("END MCMC-method")
+    return theta
 
