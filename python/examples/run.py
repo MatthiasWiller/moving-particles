@@ -6,8 +6,8 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
-import sus
-import mma
+import algorithms.metropolis as ma
+import plots.user_plot as uplt
 
 np.random.seed(0)
 
@@ -33,7 +33,7 @@ def LSF(x):
   b = 5
   return x-b
 
-theta = mma.mma(theta0, p_0, N, target_PDF, proposal_PDF, LSF)
+theta = ma.metropolis(theta0, p_0, N, target_PDF, proposal_PDF, LSF)
 
 # p_F_SS = sus.subsetsim(p_0, N, target_PDF, proposal_PDF, LSF)
 

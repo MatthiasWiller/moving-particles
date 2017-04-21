@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as npdf
 
-import plot.user_plot as uplt
+import plots.user_plot as uplt
 import algorithms.metropolis as ma
 
 # INPUT 
@@ -15,23 +15,21 @@ import algorithms.metropolis as ma
 def target_PDF(x): 
     mu = 4    # mean
     sigma = 2  # standard deviation
-    result = npdf.norm.pdf(x, mu, sigma)
-    return result
+    return npdf.norm.pdf(x, mu, sigma)
 
 # proposal pdf
 def proposal_PDF():
     mu = 4 #mean
     sigma = 10 # standard deviation
-    result = np.random.uniform(mu-sigma, mu+sigma, 1)
-    return result
+    return np.random.uniform(mu-sigma, mu+sigma, 1)
 
 initial_theta = 0.0         # initial theta
-n_samples = 100           # number of samples
+n_samples = 1000           # number of samples
 burningInFraction = 0.1     # defines burning-in-period of samples
 logPeriod = 10              # only log every n-th value
 
 # apply MCMC
-theta = ma.met(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod)
+theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod)
 
 # OUTPUT
 

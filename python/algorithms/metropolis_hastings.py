@@ -7,8 +7,8 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 
-def metropolis_hastings(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod):
-    print("START MCMC-method")
+def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burningInFraction, logPeriod):
+    print("START Metropols-Hastings-sampling")
 
     # set seed
     np.random.seed(0)
@@ -24,8 +24,8 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, proposal_PDF, burn
     # loop
     while i < n_samples*logPeriod:
         # sample theta_star from proposal_PDF
-        theta_star = proposal_PDF()
-        alpha = np.minimum(target_PDF(theta_star)/ target_PDF(theta[i-1]), 1)
+        theta_star = sample_prop_PDF()
+        alpha = np.minimum((target_PDF(theta_star)*f_prop_PDF(theta[i-1])/ (target_PDF(theta[i-1])*f_prop_PDF(theta_star)), 1)
         
         # accept or reject sample
         if (np.random.random([1]) <= alpha):
@@ -66,5 +66,5 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, proposal_PDF, burn
     # acceptance rate
     print("acceptance rate = ", n_accepted_samples/(n_samples*logPeriod), " (optimal if between [0.20;0.44])")
 
-    print("END MCMC-method")
+    print("END Metropolis-Hastings-sampling")
     return theta
