@@ -68,4 +68,3 @@ def mcmc(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, 
 
     print("END MCMC-method")
     return theta
-
