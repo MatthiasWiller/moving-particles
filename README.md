@@ -32,4 +32,6 @@ https://tobi.oetiker.ch/lshort/lshort.pdf
 
 # Literature
 
-* n.n.
+* The file "Auetal.pdf" is a one page discussion about some nice properties of subset that you must read after understanding SuS.
+
+* The file "Alvarezetal.pdf" is the paper that we recently submitted to a journal; it is a different topic but we did two nice algorithmic versions of SuS and Conditional sampling that can be useful for you.

@@ -10,7 +10,7 @@ import numpy as np
 # proposal_PDF
 # LSF: limit state function
 
-def mma(theta0, N, marginal_PDF, proposal_PDF, LSF):
+def modified_metropolis(theta0, N, marginal_PDF, proposal_PDF, LSF):
   # get dimension
   d = np.size(theta0)
 

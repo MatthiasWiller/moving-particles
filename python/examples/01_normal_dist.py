@@ -6,8 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as npdf
 
-import user_plot as uplt
-import mcmc as mcmc
+import plot.user_plot as uplt
+import algorithms.metropolis as ma
 
 # INPUT 
 
@@ -26,12 +26,12 @@ def proposal_PDF():
     return result
 
 initial_theta = 0.0         # initial theta
-n_samples = 10000           # number of samples
+n_samples = 100           # number of samples
 burningInFraction = 0.1     # defines burning-in-period of samples
 logPeriod = 10              # only log every n-th value
 
 # apply MCMC
-theta = mcmc.mcmc(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod)
+theta = ma.met(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod)
 
 # OUTPUT
 
@@ -39,4 +39,3 @@ theta = mcmc.mcmc(initial_theta, n_samples, target_PDF, proposal_PDF, burningInF
 uplt.hist_plot(theta)
 uplt.n_plot(theta)
 plt.show()
-

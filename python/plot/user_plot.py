@@ -15,8 +15,8 @@ def hist_plot(x):
     n, bins, patches = ax.hist(x, num_bins, normed=1)
 
     # add a 'best fit' line
-    y = mlab.normpdf(bins, 4, 2)
-    ax.plot(bins, y, '--')
+    #y = mlab.normpdf(bins, 4, 2)
+    #ax.plot(bins, y, '--')
 
     ax.set_xlabel('theta')
     ax.set_ylabel('p')

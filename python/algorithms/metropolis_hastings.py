@@ -7,7 +7,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 
-def mcmc(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod):
+def metropolis_hastings(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod):
     print("START MCMC-method")
 
     # set seed
