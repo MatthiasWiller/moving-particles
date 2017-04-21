@@ -11,7 +11,7 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     print("START Metropols-Hastings-sampling")
 
     # set seed
-    np.random.seed(0)
+    np.random.seed(1)
 
     # initialize theta
     theta = np.zeros((n_samples*logPeriod), float)
@@ -24,11 +24,20 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     # loop
     while i < n_samples*logPeriod:
         # sample theta_star from proposal_PDF
-        theta_star = sample_prop_PDF()
-        alpha = np.minimum((target_PDF(theta_star)*f_prop_PDF(theta[i-1])/ (target_PDF(theta[i-1])*f_prop_PDF(theta_star)), 1)
-        
+        theta_star = sample_prop_PDF(theta[i-1])
+
+        p_old = target_PDF(theta[i-1])
+        p_new = target_PDF(theta_star)
+        alpha = p_new / p_old
+
+        q_numer = f_prop_PDF(theta[i-1], theta_star) # q(x,x')
+        q_denom = f_prop_PDF(theta_star, theta[i-1]) # q(x',x)
+        alpha = alpha * q_numer/q_denom
+
+        r = np.minimum(np.absolute(alpha), 1)
+
         # accept or reject sample
-        if (np.random.random([1]) <= alpha):
+        if (np.random.random(1) <= r):
             theta[i] = theta_star
             # print("accept!\n")
             n_accepted_samples +=1

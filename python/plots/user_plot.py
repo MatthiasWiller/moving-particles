@@ -16,7 +16,10 @@ def hist_plot(x):
 
     # add a 'best fit' line
     #y = mlab.normpdf(bins, 4, 2)
-    #ax.plot(bins, y, '--')
+    y = 0.3*mlab.normpdf(bins, 0, 2) + 0.7*mlab.normpdf(bins, 10, 2)
+    ax.plot(bins, y, '--')
+
+
 
     ax.set_xlabel('theta')
     ax.set_ylabel('p')
