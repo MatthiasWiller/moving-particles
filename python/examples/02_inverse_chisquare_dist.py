@@ -24,15 +24,15 @@ def proposal_PDF():
 initial_theta = 1.0         # initial theta
 n_samples = 5000           # number of samples
 burningInFraction = 0.1     # defines burning-in-period of samples
-logPeriod = 10               # only log every n-th value
+lagPeriod = 10               # only log every n-th value
 
 # apply MCMC
-theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod)
+theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, lagPeriod)
 
 # OUTPUT
 
 # plot samples
-uplt.hist_plot(theta)
+uplt.hist_plot(theta, target_PDF)
 uplt.n_plot(theta)
 plt.show()
 

@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
-def hist_plot(x):
+def hist_plot(x, target_PDF=0):
     num_bins = 50
 
     fig, ax = plt.subplots()
@@ -15,9 +15,9 @@ def hist_plot(x):
     n, bins, patches = ax.hist(x, num_bins, normed=1)
 
     # add a 'best fit' line
-    #y = mlab.normpdf(bins, 4, 2)
-    y = 0.3*mlab.normpdf(bins, 0, 2) + 0.7*mlab.normpdf(bins, 10, 2)
-    ax.plot(bins, y, '--')
+    if(target_PDF != 0):
+        y = target_PDF(bins)
+        ax.plot(bins, y, '--')
 
 
 

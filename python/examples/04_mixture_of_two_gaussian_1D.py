@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as npdf
 
 import plots.user_plot as uplt
-import algorithms.metropolis_hastings_var_ex04 as mh
+import algorithms.metropolis_hastings as mh
 
 # INPUT 
 
@@ -24,22 +24,23 @@ def sample_prop_PDF(mu):
     return np.random.normal(mu, sigma, 1)
 
 # proposal pdf
-def f_prop_PDF(mu,x):
+def f_prop_PDF(param,x):
+    mu = param
     sigma = 10
     return npdf.norm.pdf(x, mu, sigma)
 
 np.random.seed(1)
 initial_theta = 20*np.random.uniform(-1.0, 1.0, 1)         # initial theta
-n_samples = 1000           # number of samples
+n_samples = 500           # number of samples
 burningInFraction = 0.0     # defines burning-in-period of samples
-logPeriod = 10               # only log every n-th value
+lagPeriod = 5               # only log every n-th value
 
 # apply MCMC
-theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burningInFraction, logPeriod)
+theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burningInFraction, lagPeriod)
 
 # OUTPUT
 
 # plot samples
-uplt.hist_plot(theta)
+uplt.hist_plot(theta, target_PDF)
 uplt.n_plot(theta)
 plt.show()

@@ -7,14 +7,14 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 
-def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod):
+def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, lagPeriod):
     print("START Metropolis-sampling")
 
     # set seed
     np.random.seed(0)
 
     # initialize theta
-    theta = np.zeros((n_samples*logPeriod), float)
+    theta = np.zeros((n_samples*lagPeriod), float)
     theta[0] = initial_theta
 
     # initialization
@@ -22,7 +22,7 @@ def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFrac
     n_accepted_samples = 0
 
     # loop
-    while i < n_samples*logPeriod:
+    while i < n_samples*lagPeriod:
         # sample theta_star from proposal_PDF
         theta_star = proposal_PDF()
         alpha = np.minimum(target_PDF(theta_star)/ target_PDF(theta[i-1]), 1)
@@ -43,7 +43,7 @@ def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFrac
     theta_red = np.zeros((n_samples), float)
 
     for i in range(0,n_samples):
-        theta_red[i] = theta[i*logPeriod]
+        theta_red[i] = theta[i*lagPeriod]
     
     theta = theta_red
 
@@ -64,7 +64,7 @@ def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFrac
     print("rel_eps_mu = ", rel_eps_mu)
 
     # acceptance rate
-    print("acceptance rate = ", n_accepted_samples/(n_samples*logPeriod), " (optimal if between [0.20;0.44])")
+    print("acceptance rate = ", n_accepted_samples/(n_samples*lagPeriod), " (optimal if between [0.20;0.44])")
 
     print("END Metropolis-method")
     return theta
