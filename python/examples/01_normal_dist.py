@@ -26,10 +26,10 @@ def proposal_PDF():
 initial_theta = 0.0         # initial theta
 n_samples = 1000           # number of samples
 burnInFraction = 0.1     # defines burn-in-period of samples
-logPeriod = 10              # only log every n-th value
+lagPeriod = 10              # only log every n-th value
 
 # apply MCMC
-theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnInFraction, logPeriod)
+theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnInFraction, lagPeriod)
 
 # r = np.correlate(theta, theta, "full")
 
@@ -39,4 +39,6 @@ theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnIn
 # plot samples
 uplt.hist_plot(theta, target_PDF)
 uplt.n_plot(theta)
+uplt.estimated_autocorrelation(theta, n_samples)
+
 plt.show()

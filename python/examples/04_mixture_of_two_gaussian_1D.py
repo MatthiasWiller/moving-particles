@@ -31,8 +31,8 @@ def f_prop_PDF(x, param):
 
 np.random.seed(1)
 initial_theta = 20*np.random.uniform(-1.0, 1.0, 1)         # initial theta
-n_samples = 500           # number of samples
-burnInFraction = 0.0     # defines burn-in-period of samples
+n_samples = 1000           # number of samples
+burnInFraction = 0.1     # defines burn-in-period of samples
 lagPeriod = 1               # only log every n-th value
 
 # apply MCMC
@@ -43,4 +43,6 @@ theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop
 # plot samples
 uplt.hist_plot(theta, target_PDF)
 uplt.n_plot(theta)
+uplt.estimated_autocorrelation(theta, 1000)
+
 plt.show()

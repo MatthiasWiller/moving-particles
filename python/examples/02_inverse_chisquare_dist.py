@@ -34,5 +34,7 @@ theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnin
 # plot samples
 uplt.hist_plot(theta, target_PDF)
 uplt.n_plot(theta)
+uplt.estimated_autocorrelation(theta, n_samples)
+
 plt.show()
 
