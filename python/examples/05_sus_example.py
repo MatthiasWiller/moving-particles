@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as npdf
 
 import plots.user_plot as uplt
-import algorithms.metropolis_hastings as mh
+import algorithms.sus as sus
 
 # INPUT 
 
@@ -29,14 +29,23 @@ def f_prop_PDF(x, param):
     sigma = 10
     return npdf.norm.pdf(x, mu, sigma)
 
+# limit state function g(x) (=LSF) failure at g(x) > b
+def LSF(x):
+    return np.sum(x)
+
 np.random.seed(1)
 initial_theta = 20*np.random.uniform(-1.0, 1.0, 1)         # initial theta
-n_samples = 500           # number of samples
+
 burnInFraction = 0.0     # defines burn-in-period of samples
 lagPeriod = 1               # only log every n-th value
 
-# apply MCMC
-theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burnInFraction, lagPeriod)
+p0 = 0.1
+n_samples = 100         # number of samples per conditional level
+
+# apply subset-simulation
+#theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burnInFraction, lagPeriod)
+
+p_F = sus.subsetsim(p0,n_samples,target_PDF,proposal_PDF, LSF)
 
 # OUTPUT
 

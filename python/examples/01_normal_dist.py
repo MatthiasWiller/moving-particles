@@ -24,12 +24,12 @@ def proposal_PDF():
     return np.random.uniform(mu-sigma, mu+sigma, 1)
 
 initial_theta = 0.0         # initial theta
-n_samples = 100           # number of samples
-burningInFraction = 0.1     # defines burning-in-period of samples
-logPeriod = 5              # only log every n-th value
+n_samples = 1000           # number of samples
+burnInFraction = 0.1     # defines burn-in-period of samples
+logPeriod = 10              # only log every n-th value
 
 # apply MCMC
-theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, logPeriod)
+theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnInFraction, logPeriod)
 
 # r = np.correlate(theta, theta, "full")
 

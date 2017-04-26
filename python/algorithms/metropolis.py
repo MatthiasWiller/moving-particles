@@ -6,9 +6,19 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
+import time as timer
 
-def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFraction, lagPeriod):
-    print("START Metropolis-sampling")
+
+def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnInFraction, lagPeriod):
+    print(">==========================================================================")
+    print("> Properties of Sampling:")
+    print("\n> Algorithm \t\t= Metropolis")
+    print("\n> Number of samples \t=", n_samples)
+    print("\n> Lag-Period \t\t=", lagPeriod)
+    print("\n> Burining-In-Fraction \t=", burnInFraction)
+    
+    print("\n\n> Starting sampling")
+    startTime = timer.time()
 
     # set seed
     np.random.seed(0)
@@ -25,10 +35,15 @@ def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFrac
     while i < n_samples*lagPeriod:
         # sample theta_star from proposal_PDF
         theta_star = proposal_PDF()
-        alpha = np.minimum(target_PDF(theta_star)/ target_PDF(theta[i-1]), 1)
-        
+
+        p_old = target_PDF(theta[i-1])
+        p_new = target_PDF(theta_star)
+        alpha = p_new / p_old
+
+        r = np.minimum(alpha, 1)
+
         # accept or reject sample
-        if (np.random.random([1]) <= alpha):
+        if (np.random.random([1]) <= r):
             theta[i] = theta_star
             # print("accept!\n")
             n_accepted_samples +=1
@@ -47,24 +62,36 @@ def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burningInFrac
     
     theta = theta_red
 
-    # apply burning-in-period
-    burningInPeriod = int (n_samples * burningInFraction)
-    theta = theta[burningInPeriod:]
+    # apply burn-in-period
+    burnInPeriod = int (n_samples * burnInFraction)
+    theta = theta[burnInPeriod:]
     
+    print("> Time needed for sampling =",round(timer.time() - startTime,2),"s")
+
+    startTime = timer.time()
+
+    print("\n\n> Starting tests")
+
     # TESTS
 
     # genervece-test
-    start_fractal = int ((n_samples-burningInPeriod) * 0.1)
-    end_fractal = int ((n_samples-burningInPeriod) * 0.5)
+    start_fractal = int ((n_samples-burnInPeriod) * 0.1)
+    end_fractal = int ((n_samples-burnInPeriod) * 0.5)
     
     mu_start = np.mean(theta[:start_fractal])
     mu_end = np.mean(theta[end_fractal:])
 
     rel_eps_mu = (mu_start - mu_end)/ mu_end
-    print("rel_eps_mu = ", rel_eps_mu)
 
     # acceptance rate
-    print("acceptance rate = ", n_accepted_samples/(n_samples*lagPeriod), " (optimal if between [0.20;0.44])")
+    acceptance_rate = n_accepted_samples/(n_samples*lagPeriod)
+    
 
-    print("END Metropolis-method")
+    print("> Time needed for testing =",round(timer.time() - startTime,2),"s")
+
+    print("\n\n> Test results:")
+    print("\n> rel_eps_mu \t\t=", round(rel_eps_mu,5))
+    print("\n> acceptance rate \t=", round(acceptance_rate,4), "\t(optimal if in [0.20; 0.44])")
+
+    print(">==========================================================================")
     return theta
