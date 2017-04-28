@@ -40,19 +40,11 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
         # sample theta_star from proposal_PDF
         theta_star = sample_prop_PDF(theta[:,i-1])
         print("draw:", theta_star)
-        #p_old = target_PDF(theta[:,i-1])
-        #p_new = target_PDF(theta_star)
-        #alpha = p_new / p_old
-
-        #q_numer = f_prop_PDF(theta[:,i-1], theta_star) # q(x,y) = g(y)
-        #q_denom = f_prop_PDF(theta_star, theta[:,i-1]) # q(y,x) = g(x)
-        #alpha = alpha * q_numer/q_denom
 
         # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
         #         (p(x) * q(x,y))         (p(x) * g(x))
         alpha = (target_PDF(theta_star) * f_prop_PDF(theta[:, i-1], theta_star))/ \
                 (target_PDF(theta[:, i-1]) * f_prop_PDF(theta_star, theta[:, i-1]))
-
 
         # alpha(x,y) = min[p(y)/p(x) * q(y,x) / q(x,y), 1]
         r = np.minimum(alpha, 1)
@@ -60,14 +52,11 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
         # accept or reject sample
         if (np.random.random(1) <= r):
             theta[:, i] = theta_star
-            # print("accept!\n")
             n_accepted_samples +=1
         else:
             theta[:, i] = theta[:, i-1]
-            # print("reject!\n")
             
         i+=1
-    
     
     # reduce samples with lagPerdiod (thinning)
     theta_red = np.zeros((d, n_samples), float)
@@ -89,12 +78,13 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
 
     # TESTS
 
-    # genervece-test
+    # geweke-test
+    rel_eps_mu = np.zeros(d, float)
     start_fractal = int ((n_samples-burnInPeriod) * 0.1)
     end_fractal = int ((n_samples-burnInPeriod) * 0.5)
     
-    mu_start = np.mean(theta[:,:start_fractal])
-    mu_end = np.mean(theta[:,end_fractal:])
+    mu_start = np.mean(theta[0,:start_fractal])
+    mu_end = np.mean(theta[0,end_fractal:])
 
     rel_eps_mu = (mu_start - mu_end)/ mu_end
     

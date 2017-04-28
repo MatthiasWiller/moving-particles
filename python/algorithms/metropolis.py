@@ -74,7 +74,7 @@ def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnInFractio
 
     # TESTS
 
-    # genervece-test
+    # geweke-test
     start_fractal = int ((n_samples-burnInPeriod) * 0.1)
     end_fractal = int ((n_samples-burnInPeriod) * 0.5)
     

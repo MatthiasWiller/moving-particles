@@ -31,7 +31,7 @@ def get_marginal_PDF(target_PDF, bins):
 
 # histogram plot
 def hist_plot(x, target_PDF=0):
-    num_bins = 100 # default = 50
+    num_bins = 50 # default = 50
 
     fig, ax = plt.subplots()
 
