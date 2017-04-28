@@ -33,19 +33,27 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     i = 1
     n_accepted_samples = 0
 
+    N = n_samples*lagPeriod
+
     # loop
-    while i < n_samples*lagPeriod:
+    while i < N:
         # sample theta_star from proposal_PDF
         theta_star = sample_prop_PDF(theta[:,i-1])
         print("draw:", theta_star)
-        p_old = target_PDF(theta[:,i-1])
-        p_new = target_PDF(theta_star)
-        alpha = p_new / p_old
+        #p_old = target_PDF(theta[:,i-1])
+        #p_new = target_PDF(theta_star)
+        #alpha = p_new / p_old
 
-        q_denom = f_prop_PDF(theta[:,i-1], theta_star) # q(x,y) = g(y)
-        q_numer = f_prop_PDF(theta_star, theta[:,i-1]) # q(y,x) = g(x)
-        alpha = alpha * q_numer/q_denom
-        
+        #q_numer = f_prop_PDF(theta[:,i-1], theta_star) # q(x,y) = g(y)
+        #q_denom = f_prop_PDF(theta_star, theta[:,i-1]) # q(y,x) = g(x)
+        #alpha = alpha * q_numer/q_denom
+
+        # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
+        #         (p(x) * q(x,y))         (p(x) * g(x))
+        alpha = (target_PDF(theta_star) * f_prop_PDF(theta[:, i-1], theta_star))/ \
+                (target_PDF(theta[:, i-1]) * f_prop_PDF(theta_star, theta[:, i-1]))
+
+
         # alpha(x,y) = min[p(y)/p(x) * q(y,x) / q(x,y), 1]
         r = np.minimum(alpha, 1)
 

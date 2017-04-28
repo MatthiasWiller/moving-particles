@@ -43,6 +43,6 @@ theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop
 # plot samples
 uplt.hist_plot(theta, target_PDF)
 uplt.n_plot(theta)
-uplt.estimated_autocorrelation(theta, 1000)
+uplt.estimated_autocorrelation(theta[0, :], 1000)
 
 plt.show()
