@@ -6,113 +6,118 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
+import plots.help_plot as hplt
+
+from matplotlib.pyplot import *
+from matplotlib import rcParams
+from matplotlib import ticker
+from matplotlib.ticker import NullFormatter
+
 from mpl_toolkits.mplot3d import Axes3D
 
-def get_marginal_PDF(target_PDF, bins):
-    x_from = -10
-    x_till = 10
-    n_steps = 50.0
-    dx = (x_till - x_from) / n_steps
-    x = np.linspace(x_from, x_till, n_steps)
-
-    len_x = len(x)
-    len_bins = len(bins)
-
-    y = np.zeros((len_bins), float)
-    for i in range(0, len_bins):
-        for j in range(0, len_x):
-            temp_x = bins[i]
-            temp_y = x[j]
-            y[i] += target_PDF([temp_x, temp_y])
-        
-        y[i] = y[i]*dx
-
-    return y
-
 # histogram plot
-def hist_plot(x, target_PDF=0):
+def plot_hist(x, target_PDF=0, dimension=1):
     num_bins = 50 # default = 50
+    len_x = len(x)
+    n = np.sqrt(len_x)
+    num_bins = np.math.ceil(n)
 
-    fig, ax = plt.subplots()
+    #fig, ax = plt.subplots()
+
+    fig = plt.figure()
+    # create figure object with LaTeX font
+    #matplotlib.rcParams['text.usetex'] = True
+    #matplotlib.rcParams['text.latex.unicode'] = False
+    #matplotlib.rcParams['font.size'] = 22
+    #matplotlib.rcParams.update({'font.size': 22, 'text.usetex': True, 'text.latex.unicode': True})
+    #plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+    #plt.rc('text', usetex=True)
 
     # the histogram of the data
-    n, bins, patches = ax.hist(x[0,:], num_bins, normed=1)
-
-    # dimension of the problem
-    d = x.shape[0]
+    n, bins, patches = plt.hist(x, num_bins, normed=1)
 
     # add a 'best fit' line
-    if((target_PDF != 0) and (d != 2)):
+    if((target_PDF != 0) and (dimension == 1)):
+        # for 1D case
         y = target_PDF(bins)
-        ax.plot(bins, y, '--')
+        plt.plot(bins, y, '--')
     
-    if((target_PDF != 0) and (d == 2)):
-        y = get_marginal_PDF(target_PDF, bins)
-        ax.plot(bins, y, '--')
+    if((target_PDF != 0) and (dimension == 2)):
+        # for 2D case
+        y = hplt.compute_marginal_PDF(target_PDF, bins)
+        plt.plot(bins, y, '--')
 
-    ax.set_xlabel('theta')
-    ax.set_ylabel('p')
-    ax.set_title(r'Histogram of theta')
+    plt.xlabel('$\theta$')
+    plt.ylabel('$p$')
+    plt.title('Histogram of $\theta$')
 
     # Tweak spacing to prevent clipping of ylabel
-    fig.tight_layout()
+    #plt.tight_layout()
+    #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # plot values of index
-def n_plot(x):
+def plot_mixing(x):
     fig, ax = plt.subplots()
-    if np.size(x) > 1:
-        ax.plot(x[0,:])
-    else:
-        ax.plot(x)
+
+    # create figure object with LaTeX font
+    #matplotlib.rcParams.update({'font.size': 22, 'text.usetex': True})
+    #plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+    #plt.rc('text', usetex=True)
+
+    ax.plot(x)
     
     ax.set_xlabel('n')
     ax.set_ylabel('theta')
     ax.set_title(r'Plot of theta')
 
     fig.tight_layout()
+    #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 # plot of the estimated autocorrelation of samples
-def estimated_autocorrelation(x, n_samples):
-    """
-    http://stackoverflow.com/q/14297012/190597
-    http://en.wikipedia.org/wiki/Autocorrelation#Estimation
-    """
-
+def plot_autocorr(x, n_samples):
+    
     # number of samples to use
     n = np.minimum(len(x),n_samples)
     x = x[:n]
 
-    # compute variance and mean-value
-    variance = x.var()
-    x = x-x.mean()
-
-    # compute autocorrelation (for explanation see stackoverflow/wikipedia)
-    r = np.correlate(x, x, mode = 'full')[-n:]
-    assert np.allclose(r, np.array([(x[:n-k]*x[-(n-k):]).sum() for k in range(n)]))
-    result = r/(variance*(np.arange(n, 0, -1)))
+    # compute autocorrelation estimator
+    y = hplt.compute_autocorrelation(x)    
 
     fig, ax = plt.subplots()
 
+    # create figure object with LaTeX font
+    #matplotlib.rcParams.update({'font.size': 22, 'text.usetex': True})
+    #plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+    #plt.rc('text', usetex=True)
+
     # plot results
-    ax.stem(result)
+    ax.stem(y)
     ax.set_title(r'Autocorrelation')
     ax.set_xlabel('n')
     ax.set_ylabel('autocorrelation')
 
     # Tweak spacing to prevent clipping of ylabel
     fig.tight_layout()
+    #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # make a nice contour plot    
-def contour_plot(theta, target_PDF=0):
+def plot_scatter_with_contour(theta, target_PDF):
     fig, ax = plt.subplots()
     
+    # create figure object with LaTeX font
+    #matplotlib.rcParams.update({'font.size': 22, 'text.usetex': True})
+    #plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+    #plt.rc('text', usetex=True)
+
     #fig =  plt.figure()
     #ax = fig.gca(projection='3d')
 
     # plot results
-    ax.scatter(theta[0,:], theta[1,:])
+    #mymarker = matplotlib.markers.MarkerStyle(marker=None,fillstyle=None)
+    ax.scatter(theta[0,:], theta[1,:], marker='o', facecolors='None', color='navy', linewidths=1, label='Circles')
+    
     #ax.plot_surface(theta[0,:], theta[1,:], target_PDF(theta) )
     ax.set_title(r'Contour plot')
     #ax.set_xlabel('n')
@@ -124,13 +129,13 @@ def contour_plot(theta, target_PDF=0):
     ylen = len(Y)
     X, Y = np.meshgrid(X, Y)
     Z = target_PDF([X,Y])
-    ax.contour(X,Y,Z)
-
+    ax.contour(X, Y, Z)
 
     # Tweak spacing to prevent clipping of ylabel
     fig.tight_layout()
+    #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
-def surface_plot(target_PDF):
+def plot_surface_custom(target_PDF):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
@@ -141,4 +146,50 @@ def surface_plot(target_PDF):
     X, Y = np.meshgrid(X, Y)
     Z = target_PDF([X,Y])
     ax.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, antialiased=False)
-    
+
+# plot combination of Scatter plot with histogram
+def plot_scatter_hist(x, target_PDF):
+
+    # the random data
+    x = np.random.randn(1000)
+    y = np.random.randn(1000)
+
+    nullfmt = NullFormatter()         # no labels
+
+    # definitions for the axes
+    left, width = 0.1, 0.65
+    bottom, height = 0.1, 0.65
+    bottom_h = left_h = left + width + 0.02
+
+    rect_scatter = [left, bottom, width, height]
+    rect_histx = [left, bottom_h, width, 0.2]
+    rect_histy = [left_h, bottom, 0.2, height]
+
+    # start with a rectangular Figure
+    plt.figure(1, figsize=(8, 8))
+
+    axScatter = plt.axes(rect_scatter)
+    axHistx = plt.axes(rect_histx)
+    axHisty = plt.axes(rect_histy)
+
+    # no labels
+    axHistx.xaxis.set_major_formatter(nullfmt)
+    axHisty.yaxis.set_major_formatter(nullfmt)
+
+    # the scatter plot:
+    axScatter.scatter(x, y)
+
+    # now determine nice limits by hand:
+    binwidth = 0.25
+    xymax = np.max([np.max(np.fabs(x)), np.max(np.fabs(y))])
+    lim = (int(xymax/binwidth) + 1) * binwidth
+
+    axScatter.set_xlim((-lim, lim))
+    axScatter.set_ylim((-lim, lim))
+
+    bins = np.arange(-lim, lim + binwidth, binwidth)
+    axHistx.hist(x, bins=bins)
+    axHisty.hist(y, bins=bins, orientation='horizontal')
+
+    axHistx.set_xlim(axScatter.get_xlim())
+    axHisty.set_ylim(axScatter.get_ylim())

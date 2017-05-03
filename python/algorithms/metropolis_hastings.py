@@ -15,7 +15,7 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     print("\n> Algorithm \t\t= Metropolis-Hastings")
     print("\n> Number of samples \t=", n_samples)
     print("\n> Lag-Period \t\t=", lagPeriod)
-    print("\n> Burn-In-Fraction \t=", burnInFraction)
+    print("\n> Burning-In-Fraction \t=", burnInFraction)
     
     print("\n\n> Starting sampling")
     startTime = timer.time()
@@ -50,7 +50,7 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
         r = np.minimum(alpha, 1)
 
         # accept or reject sample
-        if (np.random.random(1) <= r):
+        if (np.random.uniform(0,1,1) <= r):
             theta[:, i] = theta_star
             n_accepted_samples +=1
         else:
