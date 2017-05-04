@@ -78,15 +78,27 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
 
     # TESTS
 
-    # geweke-test
-    rel_eps_mu = np.zeros(d, float)
+    # Geweke-test
     start_fractal = int ((n_samples-burnInPeriod) * 0.1)
     end_fractal = int ((n_samples-burnInPeriod) * 0.5)
-    
-    mu_start = np.mean(theta[0,:start_fractal])
-    mu_end = np.mean(theta[0,end_fractal:])
 
-    rel_eps_mu = (mu_start - mu_end)/ mu_end
+    if (d == 1):
+        # 1D
+        mu_start = np.mean(theta[0,:start_fractal])
+        mu_end = np.mean(theta[0,end_fractal:])
+
+        rel_eps_mu = (mu_start - mu_end)/ mu_end
+    else:
+        # multi-dimensional
+
+        rel_eps_mu_list = np.zeros(d, float)
+        for i in range(0,d):
+            mu_start = np.mean(theta[i, :start_fractal])
+            mu_end = np.mean(theta[i, end_fractal:])
+            
+            rel_eps_mu_list[i] = (mu_start - mu_end)/ mu_end
+
+        rel_eps_mu = np.mean(rel_eps_mu_list)
     
 
     # acceptance rate

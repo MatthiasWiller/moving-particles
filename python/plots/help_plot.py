@@ -7,7 +7,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 
-def compute_marginal_PDF(target_PDF, bins):
+def compute_marginal_PDF(target_PDF, bins, dimension):
     x_from = -10
     x_till = 10
     n_steps = 50.0
@@ -18,14 +18,27 @@ def compute_marginal_PDF(target_PDF, bins):
     len_bins = len(bins)
 
     y = np.zeros((len_bins), float)
-    for i in range(0, len_bins):
-        for j in range(0, len_x):
-            temp_x = bins[i]
-            temp_y = x[j]
-            y[i] += target_PDF([temp_x, temp_y])
-        
-        y[i] = y[i]*dx
+    # integrate over x1 to obtain marginal of x0
+    if dimension == 0:
+        for i in range(0, len_bins):
+            for j in range(0, len_x):
+                temp_x = bins[i]
+                temp_y = x[j]
+                y[i] += target_PDF([temp_x, temp_y])
+            
+            y[i] = y[i]*dx
 
+    # integrate over x2 to obtain marginal of x1
+    if dimension == 1:
+        for i in range(0, len_bins):
+            for j in range(0, len_x):
+                temp_y = bins[i]
+                temp_x = x[j]
+                y[i] += target_PDF([temp_x, temp_y])
+            
+            y[i] = y[i]*dx
+    
+    # return y
     return y
 
 def estimate_autocorrelation(x):

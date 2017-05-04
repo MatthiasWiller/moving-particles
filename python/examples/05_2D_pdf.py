@@ -32,7 +32,7 @@ def f_prop_PDF(x, param):
 
 np.random.seed(1)
 initial_theta = [1.5, 1.5]         # initial theta
-n_samples = 100         # number of samples
+n_samples = 5000         # number of samples
 burnInFraction = 0.1     # defines burn-in-period of samples
 lagPeriod = 1              # only log every n-th value
 
@@ -46,9 +46,10 @@ print('E[X1] =', round(theta[0,:].mean(), 5))
 print('E[X2] =', round(theta[1,:].mean(), 5))
 
 # plot samples
-uplt.plot_hist(theta[0,:], target_PDF, 2)
+#uplt.plot_hist(theta[0,:], target_PDF, 2)
 uplt.plot_scatter_with_contour(theta, target_PDF)
-#uplt.plot_mixing(theta[0,:])
+uplt.plot_mixing(theta[0,:])
 #uplt.plot_surface_custom(target_PDF)
-#uplt.plot_autocorr(theta[0,:], 1000)
+uplt.plot_autocorr(theta[0,:], 400)
+uplt.plot_scatter_with_hist(theta, target_PDF)
 plt.show()
