@@ -15,6 +15,8 @@ from matplotlib.ticker import NullFormatter
 
 from mpl_toolkits.mplot3d import Axes3D
 
+
+# -----------------------------------------------------------------------------------------
 # histogram plot
 def plot_hist(x, target_PDF=0, dimension=1):
     num_bins = 50 # default = 50
@@ -25,13 +27,12 @@ def plot_hist(x, target_PDF=0, dimension=1):
     #fig, ax = plt.subplots()
 
     fig = plt.figure()
+
     # create figure object with LaTeX font
-    #matplotlib.rcParams['text.usetex'] = True
-    #matplotlib.rcParams['text.latex.unicode'] = False
-    #matplotlib.rcParams['font.size'] = 22
-    #matplotlib.rcParams.update({'font.size': 22, 'text.usetex': True, 'text.latex.unicode': True})
-    #plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
-    #plt.rc('text', usetex=True)
+    matplotlib.rcParams['text.usetex'] = True
+    matplotlib.rcParams['font.size'] = 22
+    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+    plt.rc('text', usetex=True)
 
     # the histogram of the data
     n, bins, patches = plt.hist(x, num_bins, normed=1)
@@ -46,34 +47,40 @@ def plot_hist(x, target_PDF=0, dimension=1):
         # for 2D case
         y = hplt.compute_marginal_PDF(target_PDF, bins)
         plt.plot(bins, y, '--')
+    
+    plt.title(r'Histogram of $\theta$')
+    plt.xlabel(r'$\theta$')
+    plt.ylabel(r'$p$')
 
-    plt.xlabel('$\theta$')
-    plt.ylabel('$p$')
-    plt.title('Histogram of $\theta$')
 
     # Tweak spacing to prevent clipping of ylabel
-    #plt.tight_layout()
+    plt.tight_layout()
     #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
+# -----------------------------------------------------------------------------------------
 # plot values of index
 def plot_mixing(x):
-    fig, ax = plt.subplots()
+    #fig, ax = plt.subplots()
+    fig = plt.figure()
 
     # create figure object with LaTeX font
-    #matplotlib.rcParams.update({'font.size': 22, 'text.usetex': True})
-    #plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
-    #plt.rc('text', usetex=True)
+    matplotlib.rcParams['text.usetex'] = True
+    matplotlib.rcParams['font.size'] = 22
+    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+    plt.rc('text', usetex=True)
 
-    ax.plot(x)
+    plt.plot(x)
     
-    ax.set_xlabel('n')
-    ax.set_ylabel('theta')
-    ax.set_title(r'Plot of theta')
+    plt.title(r'Plot of $\theta$')
+    plt.xlabel(r'n')
+    plt.ylabel(r'$\theta$')
 
-    fig.tight_layout()
+
+    plt.tight_layout()
     #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
+# -----------------------------------------------------------------------------------------
 # plot of the estimated autocorrelation of samples
 def plot_autocorr(x, n_samples):
     
@@ -82,46 +89,49 @@ def plot_autocorr(x, n_samples):
     x = x[:n]
 
     # compute autocorrelation estimator
-    y = hplt.compute_autocorrelation(x)    
+    y = hplt.estimate_autocorrelation(x)    
 
-    fig, ax = plt.subplots()
+    #fig, ax = plt.subplots()
+    fig = plt.figure()
 
     # create figure object with LaTeX font
-    #matplotlib.rcParams.update({'font.size': 22, 'text.usetex': True})
-    #plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
-    #plt.rc('text', usetex=True)
+    matplotlib.rcParams['text.usetex'] = True
+    matplotlib.rcParams['font.size'] = 22
+    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+    plt.rc('text', usetex=True)
 
     # plot results
-    ax.stem(y)
-    ax.set_title(r'Autocorrelation')
-    ax.set_xlabel('n')
-    ax.set_ylabel('autocorrelation')
+    plt.stem(y)
+    plt.title(r'Estimaed Autocorrelation')
+    plt.xlabel(r'n')
+    plt.ylabel(r'autocorrelation')
 
     # Tweak spacing to prevent clipping of ylabel
-    fig.tight_layout()
+    plt.tight_layout()
     #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
-
-# make a nice contour plot    
+# -----------------------------------------------------------------------------------------
+# make a nice scatter plot with contour lines of the pdf and samples    
 def plot_scatter_with_contour(theta, target_PDF):
-    fig, ax = plt.subplots()
+    #fig, ax = plt.subplots()
+    fig = plt.figure()
     
     # create figure object with LaTeX font
-    #matplotlib.rcParams.update({'font.size': 22, 'text.usetex': True})
-    #plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
-    #plt.rc('text', usetex=True)
+    matplotlib.rcParams['text.usetex'] = True
+    matplotlib.rcParams['font.size'] = 22
+    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+    plt.rc('text', usetex=True)
 
     #fig =  plt.figure()
     #ax = fig.gca(projection='3d')
 
     # plot results
-    #mymarker = matplotlib.markers.MarkerStyle(marker=None,fillstyle=None)
-    ax.scatter(theta[0,:], theta[1,:], marker='o', facecolors='None', color='navy', linewidths=1, label='Circles')
+    plt.scatter(theta[0,:], theta[1,:], marker='o', facecolors='None', color='navy', linewidths=1, label='Circles')
     
     #ax.plot_surface(theta[0,:], theta[1,:], target_PDF(theta) )
-    ax.set_title(r'Contour plot')
-    #ax.set_xlabel('n')
-    #ax.set_ylabel('autocorrelation')
+    plt.title(r'Contour plot')
+    plt.xlabel(r'$x_1$')
+    plt.ylabel(r'$x_2$')
 
     X = np.arange(-2, 8, 0.25)
     xlen = len(X)
@@ -129,15 +139,18 @@ def plot_scatter_with_contour(theta, target_PDF):
     ylen = len(Y)
     X, Y = np.meshgrid(X, Y)
     Z = target_PDF([X,Y])
-    ax.contour(X, Y, Z)
+    plt.contour(X, Y, Z)
 
     # Tweak spacing to prevent clipping of ylabel
-    fig.tight_layout()
+    plt.tight_layout()
     #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
+
+# -----------------------------------------------------------------------------------------
+# plot the surface of a 2D pdf in 3D
 def plot_surface_custom(target_PDF):
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    plt = fig.gca(projection='3d')
 
     X = np.arange(-2, 8, 0.25)
     xlen = len(X)
@@ -145,8 +158,10 @@ def plot_surface_custom(target_PDF):
     ylen = len(Y)
     X, Y = np.meshgrid(X, Y)
     Z = target_PDF([X,Y])
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, antialiased=False)
+    plt.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, antialiased=False)
 
+
+# -----------------------------------------------------------------------------------------
 # plot combination of Scatter plot with histogram
 def plot_scatter_hist(x, target_PDF):
 

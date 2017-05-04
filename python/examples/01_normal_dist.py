@@ -31,9 +31,6 @@ lagPeriod = 10              # only log every n-th value
 # apply MCMC
 theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnInFraction, lagPeriod)
 
-# r = np.correlate(theta, theta, "full")
-
-
 # OUTPUT
 
 # plot samples

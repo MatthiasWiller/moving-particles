@@ -46,7 +46,7 @@ print('E[X1] =', round(theta[0,:].mean(), 5))
 print('E[X2] =', round(theta[1,:].mean(), 5))
 
 # plot samples
-#uplt.plot_hist(theta[0,:], target_PDF, 2)
+uplt.plot_hist(theta[0,:], target_PDF, 2)
 uplt.plot_scatter_with_contour(theta, target_PDF)
 #uplt.plot_mixing(theta[0,:])
 #uplt.plot_surface_custom(target_PDF)

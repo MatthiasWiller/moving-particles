@@ -28,7 +28,7 @@ def compute_marginal_PDF(target_PDF, bins):
 
     return y
 
-def compute_autocorrelation(x):
+def estimate_autocorrelation(x):
     """
     http://stackoverflow.com/q/14297012/190597
     http://en.wikipedia.org/wiki/Autocorrelation#Estimation
