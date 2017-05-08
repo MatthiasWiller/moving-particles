@@ -39,7 +39,7 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     while i < N:
         # sample theta_star from proposal_PDF
         theta_star = sample_prop_PDF(theta[:,i-1])
-        print("draw:", theta_star)
+        #print("draw:", theta_star)
 
         # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
         #         (p(x) * q(x,y))         (p(x) * g(x))

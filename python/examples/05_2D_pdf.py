@@ -9,7 +9,7 @@ import scipy.stats as sps
 import plots.user_plot as uplt
 import algorithms.metropolis_hastings as mh
 
-# INPUT 
+# INPUT
 
 # target pdf (two weighted gaussian)
 def target_PDF(x):
@@ -20,21 +20,21 @@ def target_PDF(x):
 # proposal pdf 
 def sample_prop_PDF(mu):
     mu = [0, 0]
-    cov = [[4, 0],[0, 4]]
+    cov = [[1, 0],[0, 1]]
     #return sps.multivariate_normal(mu, cov, 1)
     return sps.multivariate_normal.rvs(mu, cov, 1)
 
 # proposal pdf
 def f_prop_PDF(x, param):
     mu = [0, 0]
-    cov = [[4, 0],[0, 4]]
+    cov = [[1, 0],[0, 1]]
     return sps.multivariate_normal.pdf(x, mu, cov)
 
 np.random.seed(1)
 initial_theta = [1.5, 1.5]         # initial theta
-n_samples = 5000         # number of samples
+n_samples = 10000         # number of samples
 burnInFraction = 0.1     # defines burn-in-period of samples
-lagPeriod = 1              # only log every n-th value
+lagPeriod = 10              # only log every n-th value
 
 
 # apply mcmc-method
@@ -48,8 +48,8 @@ print('E[X2] =', round(theta[1,:].mean(), 5))
 # plot samples
 #uplt.plot_hist(theta[0,:], target_PDF, 2)
 uplt.plot_scatter_with_contour(theta, target_PDF)
-uplt.plot_mixing(theta[0,:])
+uplt.plot_mixing(theta[0, :1000])
 #uplt.plot_surface_custom(target_PDF)
 uplt.plot_autocorr(theta[0,:], 400)
-uplt.plot_scatter_with_hist(theta, target_PDF)
+uplt.plot_scatter_with_hist(theta[:, :5000], target_PDF)
 plt.show()

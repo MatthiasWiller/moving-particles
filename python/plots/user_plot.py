@@ -55,7 +55,7 @@ def plot_hist(x, target_PDF=0, dimension=1):
 
     # Tweak spacing to prevent clipping of ylabel
     plt.tight_layout()
-    #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    #plt.savefig('plot_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # -----------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ def plot_mixing(x):
 
 
     plt.tight_layout()
-    #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    #plt.savefig('plot_mixing.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 # -----------------------------------------------------------------------------------------
 # plot of the estimated autocorrelation of samples
@@ -111,7 +111,7 @@ def plot_autocorr(x, n_samples):
 
     # Tweak spacing to prevent clipping of ylabel
     plt.tight_layout()
-    #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    #plt.savefig('plot_autocorr.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 # -----------------------------------------------------------------------------------------
 # make a nice scatter plot with contour lines of the pdf and samples    
@@ -146,7 +146,7 @@ def plot_scatter_with_contour(theta, target_PDF):
 
     # Tweak spacing to prevent clipping of ylabel
     plt.tight_layout()
-    #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    #plt.savefig('plot_scatter_with_contour.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # -----------------------------------------------------------------------------------------
@@ -230,4 +230,4 @@ def plot_scatter_with_hist(x, target_PDF=0):
 
     # tight layout not possible here !
 
-    #plt.savefig('chain_evol.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    #plt.savefig('plot_scatter_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')

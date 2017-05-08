@@ -45,11 +45,11 @@ print('\n\n> START Plotting')
 # OUTPUT
 
 # plot samples
-#uplt.plot_hist(theta[0,:], target_PDF_1D)
-#uplt.plot_mixing(theta[0,:])
+uplt.plot_hist(theta[0,:], target_PDF_1D)
+uplt.plot_mixing(theta[0,:])
 uplt.plot_autocorr(theta[0,:], n_samples)
 #uplt.plot_scatter_with_contour(theta, target_PDF_2D)
-#uplt.plot_scatter_with_hist(theta, target_PDF_2D)
+uplt.plot_scatter_with_hist(theta, target_PDF_2D)
 
 print("> Time needed for Plotting =", round(timer.time() - startTime, 2), "s")
 plt.show()
