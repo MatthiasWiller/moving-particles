@@ -6,55 +6,62 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as scps
 
+import time as timer
+
 import plots.user_plot as uplt
 import algorithms.sus as sus
 
+print("RUN 06_sus_example.py")
+
+
 # INPUT 
 
-
-np.random.seed(1)
-
-#burnInFraction = 0.0     # defines burn-in-period of samples
-#lagPeriod = 1               # only log every n-th value
+np.random.seed(0) # set seed for randomization
 
 # parameters
-n_samples_per_level = 100         # number of samples per conditional level
-d  = 10      # number of dimensions
-p0 = 0.1     # Probability of each subset, chosen adaptively
+n_samples_per_level = 1000          # number of samples per conditional level
+d                   = 10            # number of dimensions
+p0                  = 0.1           # Probability of each subset, chosen adaptively
 
 # limit-state function
 beta = 3.5
-LSF    = lambda u: -u.sum(axis=0)/np.sqrt(d) + beta  
+LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta  
 
-# target pdf (two weighted gaussian)
-def marginal_PDF(x):
-    mu = 0
-    sigma = 1
-    return scps.norm.pdf(x, mu, sigma)
+# distributions
+mu      = 0.0
+sigma   = 1.0
 
-# proposal pdf 
-def sample_prop_PDF(param):
-    mu = 0
-    sigma = 1
-    return scps.norm.rvs(mu, sigma, 1)
+# marginal pdf / target pdf
+#marginal_PDF    = lambda x: scps.norm.pdf(x, mu, sigma)
+marginal_PDF    = lambda x: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
 
-# proposal pdf
-def f_prop_PDF(x, param):
-    mu = 0
-    sigma = 1
-    return scps.norm.pdf(x, mu, sigma)
+# proposal distribution
+#f_prop_PDF      = lambda x, param: scps.norm.pdf(x, mu, sigma)
+f_prop_PDF      = lambda x, param: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
+
+# sample from proposal distribution
+#sample_prop_PDF = lambda param: scps.norm.rvs(mu, sigma, 1)
+sample_prop_PDF = lambda param: np.random.normal(mu, sigma, 1)
+
 
 # apply subset-simulation
-#theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burnInFraction, lagPeriod)
+
+print('\n\n> START Sampling')
+startTime = timer.time()
 
 p_F_SS, theta = sus.subsetsim(p0, n_samples_per_level, d, marginal_PDF, sample_prop_PDF, f_prop_PDF, LSF)
+print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 
 
-print("finished simulation")
+# RESULTS
+
+print("\nEND Simulation - See results:")
 
 p_F = scps.norm.cdf(-beta)
-print("> Subset Simulation Estimator =", p_F_SS)
-print("> Analytical probability of Failure =", p_F)
+print("> Subset Simulation Estimator \t\t=", p_F_SS)
+print("> Analytical probability of Failure \t=", p_F)
+
+
 # OUTPUT
 
 # plot samples
