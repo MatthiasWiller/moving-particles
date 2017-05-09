@@ -16,10 +16,10 @@ print("RUN 06_sus_example.py")
 
 # INPUT 
 
-np.random.seed(0) # set seed for randomization
+#np.random.seed(0) # set seed for randomization
 
 # parameters
-n_samples_per_level = 1000          # number of samples per conditional level
+n_samples_per_level = 5000          # number of samples per conditional level
 d                   = 10            # number of dimensions
 p0                  = 0.1           # Probability of each subset, chosen adaptively
 
@@ -45,11 +45,16 @@ sample_prop_PDF = lambda param: np.random.normal(mu, sigma, 1)
 
 
 # apply subset-simulation
+n_loops = 10
+p_F_SS_array = np.zeros(n_loops)
 
 print('\n\n> START Sampling')
 startTime = timer.time()
+for i in range(0, n_loops):
+    p_F_SS, theta = sus.subsetsim(p0, n_samples_per_level, d, marginal_PDF, sample_prop_PDF, f_prop_PDF, LSF)
+    p_F_SS_array[i] = p_F_SS
+    print("> [", i, "] Subset Simulation Estimator \t=", p_F_SS)
 
-p_F_SS, theta = sus.subsetsim(p0, n_samples_per_level, d, marginal_PDF, sample_prop_PDF, f_prop_PDF, LSF)
 print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 
 
@@ -58,7 +63,7 @@ print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 print("\nEND Simulation - See results:")
 
 p_F = scps.norm.cdf(-beta)
-print("> Subset Simulation Estimator \t\t=", p_F_SS)
+print("> Subset Simulation Estimator mean\t=", np.mean(p_F_SS_array))
 print("> Analytical probability of Failure \t=", p_F)
 
 
