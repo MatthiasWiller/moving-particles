@@ -14,7 +14,7 @@ import algorithms.modified_metropolis as mmh
 # proposal_PDF
 # LSF: limit state function g(x)
 
-def subsetsim(p0, n_samples_per_level, d, marginal_PDF, sample_prop_PDF, f_prop_PDF, LSF):
+def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF):
     # initialization and constants
     max_it  = 20
     theta   = []
@@ -24,16 +24,16 @@ def subsetsim(p0, n_samples_per_level, d, marginal_PDF, sample_prop_PDF, f_prop_
     Nf      = np.zeros(max_it)
     b       = np.zeros(max_it)
 
-    n_seeds_per_level   = int(n_samples_per_level*p0)
-    n_samples_per_seed  = int(1/p0) # including the seed
+    Nc      = int(n_samples_per_level*p0) # number of chains / number of seeds per level 
+    Ns      = int(1/p0) # number of samples per chain / number of samples per 
 
     
     print('\n> > Start STEP 0 : Monte Carlo Simulation')
     startTime = timer.time()
 
     # sample initial step (MCS)
-    j = 0 # set j = 0 (number of conditional level)
-    theta0  = np.random.randn(n_samples_per_level, d)
+    j       = 0 # set j = 0 (number of conditional level)
+    theta0  = sample_marg_PDF((n_samples_per_level, d))
     g0      = np.zeros((n_samples_per_level), float)
 
     for i in range(0, n_samples_per_level):
@@ -46,7 +46,7 @@ def subsetsim(p0, n_samples_per_level, d, marginal_PDF, sample_prop_PDF, f_prop_
     g.append(g0)
 
     # Subset Simulation steps
-    while Nf[j] < n_seeds_per_level:
+    while Nf[j] < Nc:
         j += 1 # move to next conditional level
 
         print('\n> > Start STEP', j, ': Subset Simulation')
@@ -63,40 +63,35 @@ def subsetsim(p0, n_samples_per_level, d, marginal_PDF, sample_prop_PDF, f_prop_
 
         thresholdTime = timer.time()
         # compute intermediate threshold level
-        # define b(j) = (g(i_(N - N*p_0) + g(i_(N - N*p0 + 1)) / 2
-        #b[j] = (g_prime[n_samples_per_level- n_seeds_per_level] + g_prime[n_samples_per_level - n_seeds_per_level + 1]) /2
-        b[j] = (g_prime[n_seeds_per_level] + g_prime[n_seeds_per_level + 1]) /2
+        # define b(j) = (g(i_(N*p_0) + g(i_(N*p0 + 1)) / 2
+        b[j] = 0.5* (g_prime[Nc] + g_prime[Nc + 1])
         print("> > b =", b[j])
         print('> > Computing Threshold: Time needed =', round(timer.time() - thresholdTime, 2), 's')
 
         seedTime = timer.time()
         # select seeds for the MCMC sampler
-        #theta_seed = theta_prime[-n_seeds_per_level:, :]
-        theta_seed = theta_prime[:n_seeds_per_level, :]
+        theta_seed = theta_prime[:Nc, :]
         theta_seed = np.random.permutation(theta_seed) # shuffle to prevent bias
         print('> > Selecting seeds: Time needed =', round(timer.time() - seedTime, 2), 's')
 
-        theta_star = []
+        # re-initialize theta0 and g0 to prevent old values
+        theta0  = np.zeros((n_samples_per_level, d), float)
+        g0      = np.zeros(n_samples_per_level, float)
+
         sampleTime = timer.time()
-        for k in range(0, n_seeds_per_level):
+        for k in range(0, Nc):
             # generate states of Markov chain using MMA/MMH
-            theta_temp = mmh.modified_metropolis(theta_seed[k, :], n_samples_per_seed, marginal_PDF, sample_prop_PDF, f_prop_PDF, LSF, b[j])
-            theta_star.append(theta_temp)
+            theta_temp, g_temp = mmh.modified_metropolis(theta_seed[k, :], Ns, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b[j])
+            theta0[Ns*(k):Ns*(k+1), :] = theta_temp[:,:]
+            g0[Ns*(k):Ns*(k+1)] = g_temp[:]
         print('> > Sampling MMH: Time needed =', round(timer.time() - sampleTime, 2), 's')
 
-        renumberTime = timer.time()
-        theta0 = np.zeros((n_samples_per_level, d), float)
-
-        # renumber theta(j,i,k) ...
-        for k in range(0, n_seeds_per_level):
-           theta0[n_samples_per_seed*(k):n_samples_per_seed*(k+1), :] = theta_star[k][:, :]
         theta.append(theta0)
-        print('> > Renumber Samples: Time needed =', round(timer.time() - renumberTime, 2), 's')
+        g.append(g0)
 
         countTime = timer.time()
         # count failure samples
         for i in range(0, n_samples_per_level):
-            g0[i] = LSF(theta0[i, :])
             if g0[i] <= 0:
                 Nf[j] += 1
         print('> > Counting failure samples: Time needed =', round(timer.time() - countTime, 2), 's')
@@ -107,4 +102,4 @@ def subsetsim(p0, n_samples_per_level, d, marginal_PDF, sample_prop_PDF, f_prop_
     # estimate of p_F
     p_F_SS = (p0**j) * Nf[j]/n_samples_per_level
 
-    return p_F_SS, theta
+    return p_F_SS, theta, g

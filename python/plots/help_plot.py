@@ -41,7 +41,7 @@ def compute_marginal_PDF(target_PDF, bins, dimension):
     # return y
     return y
 
-def estimate_autocorrelation(x):
+def estimate_autocorrelation(x, lag):
     """
     http://stackoverflow.com/q/14297012/190597
     http://en.wikipedia.org/wiki/Autocorrelation#Estimation
@@ -57,13 +57,13 @@ def estimate_autocorrelation(x):
     #result = r/(variance*(np.arange(n, 0, -1)))
 
     N = len(x)
-    p = np.zeros(N, float)
+    p = np.zeros(lag, float)
 
     sigma_square = x.var()
     mu = x.mean()
     #x = x - x.mean()
 
-    for j in range(0, N):
+    for j in range(0, lag):
         temp = 0
         for n in range(0, N-j):
             temp = temp + (x[n]-mu)*(x[n+j]-mu)

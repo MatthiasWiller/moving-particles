@@ -82,14 +82,14 @@ def plot_mixing(x):
 
 # -----------------------------------------------------------------------------------------
 # plot of the estimated autocorrelation of samples
-def plot_autocorr(x, n_samples):
+def plot_autocorr(x, lag):
     
     # number of samples to use
-    n = np.minimum(len(x), n_samples)
-    x = x[:n] # use first n samples
+    #n = np.minimum(len(x), n_samples)
+    #x = x[:n] # use first n samples
 
     # compute autocorrelation estimator
-    y = hplt.estimate_autocorrelation(x)    
+    y = hplt.estimate_autocorrelation(x, lag)    
 
     #fig, ax = plt.subplots()
     fig = plt.figure()
