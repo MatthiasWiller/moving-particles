@@ -175,7 +175,7 @@ def plot_scatter_with_hist(x, target_PDF=0):
     bottom, height = 0.1, 0.65
     bottom_h = left_h = left + width + 0.02
 
-    # make rectangulars 
+    # make rectangulars
     rect_scatter = [left, bottom, width, height]
     rect_histx = [left, bottom_h, width, 0.2]
     rect_histy = [left_h, bottom, 0.2, height]
@@ -202,17 +202,18 @@ def plot_scatter_with_hist(x, target_PDF=0):
     axScatter.scatter(x[0, :], x[1, :], marker='o', facecolors='None', color='navy', linewidths=1, label='Circles')
 
     # now determine nice limits by hand:
-    binwidth = 0.25
+    binwidth = 0.10
     xymax = np.max([np.max(np.fabs(x[0,:])), np.max(np.fabs(x[1,:]))])
     # compute limits of the plot
-    lim = (int(xymax/binwidth) + 1) * binwidth
-
+    #lim = (int(xymax/binwidth) + 1) * binwidth
+    lowerlim = -1
+    upperlim = 7
     # set limits of scatter plot
-    axScatter.set_xlim((-lim, lim))
-    axScatter.set_ylim((-lim, lim))
+    axScatter.set_xlim((lowerlim, upperlim))
+    axScatter.set_ylim((lowerlim, upperlim))
 
     # create bins and plot histograms
-    bins = np.arange(-lim, lim + binwidth, binwidth)
+    bins = np.arange(lowerlim, upperlim + binwidth, binwidth)
     axHistx.hist(x[0,:], bins=bins, normed=1, color='navy')
     axHisty.hist(x[1,:], bins=bins, orientation='horizontal', normed=1, color='navy')
     

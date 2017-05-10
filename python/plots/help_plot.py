@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 def compute_marginal_PDF(target_PDF, bins, dimension):
     x_from = -10
     x_till = 10
-    n_steps = 50.0
+    n_steps = 100.0
     dx = (x_till - x_from) / n_steps
     x = np.linspace(x_from, x_till, n_steps)
 
@@ -65,7 +65,7 @@ def estimate_autocorrelation(x):
 
     for j in range(0, N):
         temp = 0
-        for n in range(1, N-j):
+        for n in range(0, N-j):
             temp = temp + (x[n]-mu)*(x[n+j]-mu)
         p[j] = 1/sigma_square * 1/(N-j) * temp
 
