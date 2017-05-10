@@ -6,52 +6,55 @@ import numpy as np
 
 import time as timer
 
-# theta0: inital state of a Markov chain
-# N: total number of states, i.e. samples
+# theta0  : inital state of a Markov chain 
+# N       : total number of states, i.e. samples
 # target_PDF
 # proposal_PDF
-# LSF: limit state function
+# LSF     : limit state function g(x)
 
-def modified_metropolis(theta0, N, marginal_PDF, proposal_PDF, LSF,b):
+def modified_metropolis(theta0, N, marginal_PDF, sample_prop_PDF, f_prop_PDF, LSF, b):
+  #startTime = timer.time()  
+  
   # get dimension
   d = np.size(theta0)
 
   # initialize theta
-  theta = np.zeros((d,N), float)
+  theta       = np.zeros((N, d), float)
+  theta[0, :] = theta0
 
-  for i in range(1,N-1):
+  xi = np.zeros((d), float)
+
+  for i in range(1, N):
     # generate a candidate state xi:
-    for k in range(1,d):
+    for k in range(0, d):
       # sample xi from proposal_PDF
-      xi = proposal_PDF(theta[i-1])
+      xi[k] = sample_prop_PDF(theta[i-1, k])
 
       # compute acceptance ratio
-      p_new = marginal_PDF(xi)
-      p_old = marginal_PDF(theta[i-1])
-      alpha = p_new/p_old
 
-      # for MMH, if proposal PDFs are not symmetric (i.e. q(x,y) != q(y,x))
-      q_denom = f_prop_PDF(theta[i-1], xi) # q(x,y) = g(y)
-      q_numer = f_prop_PDF(xi, theta[i-1]) # q(y,x) = g(x)
-      alpha = alpha * q_numer/q_denom
+      # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
+      #         (p(x) * q(x,y))         (p(x) * g(x))
+      alpha = (marginal_PDF(xi[k])          * f_prop_PDF(theta[i-1, k], xi[k]))/ \
+              (marginal_PDF(theta[i-1, k])  * f_prop_PDF(xi[k], theta[i-1, k]))
 
-      r = min(alpha, 1)
+      r     = np.minimum(alpha, 1)
 
       # accept or reject xi by setting ...
-      if np.uniform(0, 1) <= r:
+      if np.random.uniform(0, 1) <= r:
         # accept
-        xi = xi
+        xi[k] = xi[k]
       else:
         # reject
-        xi = theta[i]
+        xi[k] = theta[i, k]
     
-    # check whether xi is in Failure domain system analysis and accept or reject xi
-    if LSF(xi) > b:
+    # check whether xi is in Failure domain (system analysis) and accept or reject xi
+    if LSF(xi) <= b:
       # in failure domain -> accept
-      theta[i] = xi
+      theta[i, :] = xi
     else:
-      # not in failure domain ->reject
-      theta[i] = theta[i-1]
+      # not in failure domain -> reject
+      theta[i, :] = theta[i-1, :]
   
   # output
+  #print("> > > Time needed for MMH =", round(timer.time() - startTime, 2), "s")
   return theta

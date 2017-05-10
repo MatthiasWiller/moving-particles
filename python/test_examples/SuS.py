@@ -22,6 +22,8 @@
 import scipy as sp
 import numpy as np
 
+import CS as CS
+
 def SuS(G, N, d, p0):
 
     # initializations and constants

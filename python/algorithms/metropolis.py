@@ -15,7 +15,7 @@ def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnInFractio
     print("\n> Algorithm \t\t= Metropolis")
     print("\n> Number of samples \t=", n_samples)
     print("\n> Lag-Period \t\t=", lagPeriod)
-    print("\n> Burining-In-Fraction \t=", burnInFraction)
+    print("\n> Burning-In-Fraction \t=", burnInFraction)
     
     print("\n\n> Starting sampling")
     startTime = timer.time()
@@ -31,8 +31,10 @@ def metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnInFractio
     i = 1
     n_accepted_samples = 0
 
+    N = n_samples*lagPeriod
+
     # loop
-    while i < n_samples*lagPeriod:
+    while i < N:
         # sample theta_star from proposal_PDF
         theta_star = proposal_PDF()
 

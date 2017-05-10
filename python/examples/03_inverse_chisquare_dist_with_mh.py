@@ -40,8 +40,8 @@ theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop
 # OUTPUT
 
 # plot samples
-uplt.hist_plot(theta, target_PDF)
-uplt.n_plot(theta)
-uplt.estimated_autocorrelation(theta[0,:], n_samples)
+uplt.plot_hist(theta[0,:], target_PDF, 1)
+uplt.plot_mixing(theta[0,:])
+uplt.plot_autocorr(theta[0,:], n_samples)
 
 plt.show()

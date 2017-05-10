@@ -12,10 +12,10 @@ import time as timer
 def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burnInFraction, lagPeriod):
     print(">==========================================================================")
     print("> Properties of Sampling:")
-    print("\n> Algorithm \t\t= Metropolis-Hastings")
-    print("\n> Number of samples \t=", n_samples)
-    print("\n> Lag-Period \t\t=", lagPeriod)
-    print("\n> Burn-In-Fraction \t=", burnInFraction)
+    print("> Algorithm \t\t= Metropolis-Hastings")
+    print("> Number of samples \t=", n_samples)
+    print("> Lag-Period \t\t=", lagPeriod)
+    print("> Burning-In-Fraction \t=", burnInFraction)
     
     print("\n\n> Starting sampling")
     startTime = timer.time()
@@ -23,34 +23,35 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     # set seed
     np.random.seed(1)
 
-    d = np.size(initial_theta)
+    d                   = np.size(initial_theta)
+    burnInPeriod        = int(n_samples * burnInFraction)
+    N                   = (n_samples + burnInPeriod)*lagPeriod
 
     # initialize theta
-    theta = np.zeros((d, n_samples*lagPeriod), float)
-    theta[:, 0] = initial_theta
+    theta               = np.zeros((d, N), float)
+    theta[:, 0]         = initial_theta
 
     # initialization
-    i = 1
-    n_accepted_samples = 0
-
-    N = n_samples*lagPeriod
+    i                   = 1
+    n_accepted_samples  = 0
+    
 
     # loop
     while i < N:
         # sample theta_star from proposal_PDF
         theta_star = sample_prop_PDF(theta[:,i-1])
-        print("draw:", theta_star)
+        #print("draw:", theta_star)
 
         # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
         #         (p(x) * q(x,y))         (p(x) * g(x))
-        alpha = (target_PDF(theta_star) * f_prop_PDF(theta[:, i-1], theta_star))/ \
-                (target_PDF(theta[:, i-1]) * f_prop_PDF(theta_star, theta[:, i-1]))
+        alpha = (target_PDF(theta_star)     * f_prop_PDF(theta[:, i-1], theta_star))/ \
+                (target_PDF(theta[:, i-1])  * f_prop_PDF(theta_star, theta[:, i-1]))
 
         # alpha(x,y) = min[p(y)/p(x) * q(y,x) / q(x,y), 1]
         r = np.minimum(alpha, 1)
 
         # accept or reject sample
-        if (np.random.random(1) <= r):
+        if (np.random.uniform(0,1,1) <= r):
             theta[:, i] = theta_star
             n_accepted_samples +=1
         else:
@@ -58,13 +59,16 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
             
         i+=1
     
-    # reduce samples with lagPerdiod (thinning)
-    theta_red = np.zeros((d, n_samples), float)
+    print('n_accepted_samples =', n_accepted_samples)
 
-    for i in range(0, n_samples):
-        theta_red[:, i] = theta[:, i*lagPeriod]
-    
-    theta = theta_red
+    # reduce samples with lagPerdiod (thinning)
+    if lagPeriod != 1:
+        theta_red = np.zeros((d, n_samples), float)
+
+        for i in range(0, n_samples):
+            theta_red[:, i] = theta[:, i*lagPeriod]
+        
+        theta = theta_red
 
     # apply burn-in-period
     burnInPeriod = int (n_samples * burnInFraction)
@@ -78,15 +82,27 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
 
     # TESTS
 
-    # geweke-test
-    rel_eps_mu = np.zeros(d, float)
-    start_fractal = int ((n_samples-burnInPeriod) * 0.1)
-    end_fractal = int ((n_samples-burnInPeriod) * 0.5)
-    
-    mu_start = np.mean(theta[0,:start_fractal])
-    mu_end = np.mean(theta[0,end_fractal:])
+    # Geweke-test
+    start_fractal   = int ((n_samples-burnInPeriod) * 0.1)
+    end_fractal     = int ((n_samples-burnInPeriod) * 0.5)
 
-    rel_eps_mu = (mu_start - mu_end)/ mu_end
+    if (d == 1):
+        # 1D
+        mu_start    = np.mean(theta[0,:start_fractal])
+        mu_end      = np.mean(theta[0,end_fractal:])
+
+        rel_eps_mu  = (mu_start - mu_end)/ mu_end
+    else:
+        # multi-dimensional
+
+        rel_eps_mu_list = np.zeros(d, float)
+        for i in range(0,d):
+            mu_start    = np.mean(theta[i, :start_fractal])
+            mu_end      = np.mean(theta[i, end_fractal:])
+            
+            rel_eps_mu_list[i] = (mu_start - mu_end)/ mu_end
+
+        rel_eps_mu = np.mean(rel_eps_mu_list)
     
 
     # acceptance rate

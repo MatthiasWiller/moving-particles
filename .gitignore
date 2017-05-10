@@ -1,4 +1,6 @@
-/python/__pycache__
 /.vscode
+/python/__pycache__
 /python/algorithms/__pycache__
+/python/examples/__pycache__
 /python/plots/__pycache__
+/python/test_examples/__pycache__
