@@ -1,5 +1,19 @@
 """
-Author: Matthias Willer 2017
+# ---------------------------------------------------------------------------
+# Metropolis-Hastings algorithm 2D example: Example 6.4 Ref. [1]
+# ---------------------------------------------------------------------------
+# Created by:
+# Matthias Willer (matthias.willer@tum.de)
+# Engineering Risk Analysis Group
+# Technische Universitat Munchen
+# www.era.bgu.tum.de
+# ---------------------------------------------------------------------------
+# Version 2017-05
+# ---------------------------------------------------------------------------
+# References:
+# 1."Simulation and the Monte Carlo method"
+#    Rubinstein and Kroese (2017)
+# ---------------------------------------------------------------------------
 """
 
 import numpy as np

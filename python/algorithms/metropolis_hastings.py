@@ -1,5 +1,31 @@
 """
-Author: Matthias Willer 2017
+# ---------------------------------------------------------------------------
+# Metropolis-Hastings algorithm function
+# ---------------------------------------------------------------------------
+# Created by:
+# Matthias Willer (matthias.willer@tum.de)
+# Engineering Risk Analysis Group
+# Technische Universitat Munchen
+# www.era.bgu.tum.de
+# ---------------------------------------------------------------------------
+# Version 2017-05
+# ---------------------------------------------------------------------------
+# Input:
+# * target_PDF      : function to be sampled
+# * f_prop_PDF      : proposal PDF function
+# * sample_prop_PDF : proposal PDF sampling
+# * initial_theta   : initial sample to run the Markov chain
+# * n_samples       : total number of simulated samples
+# * burnInFraction  : fraction of burn-in samples
+# * lagPeriod       : to perform thinning of the Markov chain sequence
+# ---------------------------------------------------------------------------
+# Output:
+# * theta : samples distributed according to 'target_PDF'
+# ---------------------------------------------------------------------------
+# References:
+# 1."Simulation and the Monte Carlo method"
+#    Rubinstein and Kroese (2017)
+# ---------------------------------------------------------------------------
 """
 
 import numpy as np
@@ -19,9 +45,6 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     
     print("\n\n> Starting sampling")
     startTime = timer.time()
-
-    # set seed
-    np.random.seed(1)
 
     d                   = np.size(initial_theta)
     burnInPeriod        = int(n_samples * burnInFraction)
@@ -94,7 +117,6 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
         rel_eps_mu  = (mu_start - mu_end)/ mu_end
     else:
         # multi-dimensional
-
         rel_eps_mu_list = np.zeros(d, float)
         for i in range(0,d):
             mu_start    = np.mean(theta[i, :start_fractal])

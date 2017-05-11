@@ -1,19 +1,44 @@
 """
-Author: Matthias Willer 2017
+# ---------------------------------------------------------------------------
+# Subset Simulation algorithm function
+# ---------------------------------------------------------------------------
+# Created by:
+# Matthias Willer (matthias.willer@tum.de)
+# Engineering Risk Analysis Group
+# Technische Universitat Munchen
+# www.era.bgu.tum.de
+# ---------------------------------------------------------------------------
+# Version 2017-05
+# ---------------------------------------------------------------------------
+# Input:
+# * p0                  : conditional failure probability
+# * n_samples_per_level : number of samples per conditional level
+# * d                   : number of dimensions
+# * sample_marg_PDF     : function to sample from marginal pdf
+# * f_marg_PDF          : marginal pdf
+# * sample_prop_PDF     : function to sample from proposal pdf
+# * f_prop_PDF          : proposal pdf
+# * LSF                 : limit state function
+# ---------------------------------------------------------------------------
+# Output:
+# * p_F_SS  : estimator of the failure probability
+# * theta   : list of samples distributed according to 'marginal pdf'
+# * g       : list of corresponding evaluations of the limit-state function g(theta)
+# ---------------------------------------------------------------------------
+# References:
+# 1."Bayesian post-processor and other enhancements of Subset Simulation
+#    for estimating failure probabilites in high dimension"
+#    Zuev, Beck, Au, Katafygiotis (2012)
+# ---------------------------------------------------------------------------
 """
 
-import numpy as np
-
 import time as timer
+import numpy as np
 
 import algorithms.modified_metropolis as mmh
 
-# p0: conditional failure probability
-# n_samples_per_level: number of samples per conditional level
-# target_PDF
-# proposal_PDF
-# LSF: limit state function g(x)
-
+# ---------------------------------------------------------------------------
+# Subset Simulation function
 def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF):
     # initialization and constants
     max_it  = 20
@@ -45,7 +70,12 @@ def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_pr
     theta.append(theta0)
     g.append(g0)
 
+    last_loop = False
+
     # Subset Simulation steps
+    #while last_loop != True:
+        #if Nf[j] >= Nc:
+        #    last_loop = True
     while Nf[j] < Nc:
         j += 1 # move to next conditional level
 
@@ -100,6 +130,6 @@ def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_pr
         print('> > End STEP', j, ': Time needed =', round(timer.time() - startTime, 2), 's')
 
     # estimate of p_F
-    p_F_SS = (p0**j) * Nf[j]/n_samples_per_level
+    p_F_SS = (p0**(j-1)) * Nf[j-1]/n_samples_per_level
 
     return p_F_SS, theta, g

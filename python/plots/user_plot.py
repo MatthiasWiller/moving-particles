@@ -1,5 +1,15 @@
 """
-Author: Matthias Willer 2017
+# ---------------------------------------------------------------------------
+# Several plotting functions
+# ---------------------------------------------------------------------------
+# Created by:
+# Matthias Willer (matthias.willer@tum.de)
+# Engineering Risk Analysis Group
+# Technische Universitat Munchen
+# www.era.bgu.tum.de
+# ---------------------------------------------------------------------------
+# Version 2017-05
+# ---------------------------------------------------------------------------
 """
 
 import numpy as np
@@ -23,8 +33,6 @@ def plot_hist(x, target_PDF=0, dimension=1):
     len_x = len(x)
     n = np.sqrt(len_x)
     num_bins = np.math.ceil(n)
-
-    #fig, ax = plt.subplots()
 
     fig = plt.figure()
 

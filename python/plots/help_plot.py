@@ -1,12 +1,23 @@
 """
-Author: Matthias Willer 2017
+# ---------------------------------------------------------------------------
+# Several helper functions for plotting
+# ---------------------------------------------------------------------------
+# Created by:
+# Matthias Willer (matthias.willer@tum.de)
+# Engineering Risk Analysis Group
+# Technische Universitat Munchen
+# www.era.bgu.tum.de
+# ---------------------------------------------------------------------------
+# Version 2017-05
+# ---------------------------------------------------------------------------
 """
 
 import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
-
+# ---------------------------------------------------------------------------
+# Integrate 2D-multivariate pdf to get marginal pdf
 def compute_marginal_PDF(target_PDF, bins, dimension):
     x_from = -10
     x_till = 10
@@ -38,9 +49,10 @@ def compute_marginal_PDF(target_PDF, bins, dimension):
             
             y[i] = y[i]*dx
     
-    # return y
     return y
 
+# ---------------------------------------------------------------------------
+# estimate the autocorrelation of samples
 def estimate_autocorrelation(x, lag):
     """
     http://stackoverflow.com/q/14297012/190597
