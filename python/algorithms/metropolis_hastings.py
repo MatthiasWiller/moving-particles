@@ -42,7 +42,7 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     print("> Number of samples \t=", n_samples)
     print("> Lag-Period \t\t=", lagPeriod)
     print("> Burning-In-Fraction \t=", burnInFraction)
-    
+
     print("\n\n> Starting sampling")
     startTime = timer.time()
 
@@ -57,13 +57,15 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     # initialization
     i                   = 1
     n_accepted_samples  = 0
-    
+
 
     # loop
     while i < N:
+        msg = 'Sample ' + repr(i) + '/' + repr(N) + '...\n'
+        print(msg, sep=' ', end='', flush=True)
+
         # sample theta_star from proposal_PDF
-        theta_star = sample_prop_PDF(theta[:,i-1])
-        #print("draw:", theta_star)
+        theta_star = sample_prop_PDF(theta[:, i-1])
 
         # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
         #         (p(x) * q(x,y))         (p(x) * g(x))
@@ -74,7 +76,7 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
         r = np.minimum(alpha, 1)
 
         # accept or reject sample
-        if (np.random.uniform(0,1,1) <= r):
+        if (np.random.uniform(0, 1, 1) <= r):
             theta[:, i] = theta_star
             n_accepted_samples +=1
         else:
@@ -82,26 +84,26 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
             
         i+=1
     
-    print('n_accepted_samples =', n_accepted_samples)
+    print('Acceptance rate =', n_accepted_samples/N)
 
     # reduce samples with lagPerdiod (thinning)
     if lagPeriod != 1:
-        theta_red = np.zeros((d, n_samples), float)
+        theta_red = np.zeros((d, n_samples + burnInPeriod), float)
 
-        for i in range(0, n_samples):
+        for i in range(0, n_samples + burnInPeriod):
             theta_red[:, i] = theta[:, i*lagPeriod]
-        
+
         theta = theta_red
 
     # apply burn-in-period
-    burnInPeriod = int (n_samples * burnInFraction)
-    theta = theta[:, burnInPeriod:]
+    burnInPeriod    = int (n_samples * burnInFraction)
+    theta           = theta[:, burnInPeriod:]
     
     print("> Time needed for sampling =",round(timer.time() - startTime,2),"s")
 
     startTime = timer.time()
 
-    print("\n\n> Starting tests")
+    print("\n> Starting tests")
 
     # TESTS
 
@@ -128,13 +130,13 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
     
 
     # acceptance rate
-    acceptance_rate = n_accepted_samples/(n_samples*lagPeriod)
+    acceptance_rate = n_accepted_samples/N
     
-    print("> Time needed for testing =",round(timer.time() - startTime,2),"s")
+    print("> Time needed for testing =", round(timer.time() - startTime,2), "s")
 
-    print("\n\n> Test results:")
-    print("\n> rel_eps_mu \t\t=", round(rel_eps_mu,5))
-    print("\n> acceptance rate \t=", round(acceptance_rate,4), "\t(optimal if in [0.20; 0.44])")
+    print("\n> Test results:")
+    print("> rel_eps_mu \t\t=", round(rel_eps_mu,5))
+    print("> acceptance rate \t=", round(acceptance_rate,4), "\t(optimal if in [0.20; 0.44])")
 
     print(">==========================================================================")
     return theta
