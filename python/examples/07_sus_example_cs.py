@@ -37,13 +37,13 @@ np.random.seed(0)
 n_samples_per_level = 1000          # number of samples per conditional level
 d                   = 10            # number of dimensions
 p0                  = 0.1           # Probability of each subset, chosen adaptively
-sampler             = 'mmh'         # Sampling algorithm:
+sampler             = 'cs'          # Sampling algorithm:
                                     # 'cs' = Conditional Sampling,
                                     # 'mmh' = Modified Metropolis Hastings
 
 # limit-state function
-#beta = 3.71901  # for pf = 10^-4
-beta = 3.08899        # for pf = 10^-2
+beta = 3.71901        # for pf = 10^-4
+#beta = 3.08899        # for pf = 10^-2
 LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta  
 
 # distributions
@@ -102,10 +102,8 @@ print("> Analytical probability of Failure \t=", round(p_F, 8))
 analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 
 # plot samples
-#splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
+splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
 #uplt.plot_mixing(theta)
-#plt.show()
-#delta = sus.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
-#print("cov = ", delta)
+plt.show()
 
 

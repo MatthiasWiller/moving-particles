@@ -19,6 +19,8 @@
 # * sample_prop_PDF     : function to sample from proposal pdf
 # * f_prop_PDF          : proposal pdf
 # * LSF                 : limit state function
+# * sampler             : sampling algorithm (cs = Cond. Sampling, 
+#                         mmh = Modified Metropolis Hastings)
 # ---------------------------------------------------------------------------
 # Output:
 # * p_F_SS  : estimator of the failure probability
@@ -36,10 +38,11 @@ import time as timer
 import numpy as np
 
 import algorithms.modified_metropolis as mmh
+import algorithms.cond_sampling as cs
 
 # ---------------------------------------------------------------------------
 # Subset Simulation function
-def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF):
+def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, sampler):
     # initialization and constants
     max_it  = 20
     theta   = []
@@ -53,7 +56,7 @@ def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_pr
     Ns      = int(1/p0) # number of samples per chain / number of samples per 
 
     
-    print('\n> > Start STEP 0 : Monte Carlo Simulation')
+    print('\n> > Start LEVEL 0 : Monte Carlo Simulation')
     startTime = timer.time()
 
     # sample initial step (MCS)
@@ -66,7 +69,7 @@ def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_pr
         if (g0[i] <= 0):
             Nf[j] += 1
     print('> > Nf =', Nf[j], '/', n_samples_per_level)
-    print('> > End STEP 0 : Time needed =', round(timer.time() - startTime, 2), 's')
+    print('> > End LEVEL 0 : Time needed =', round(timer.time() - startTime, 2), 's')
     theta.append(theta0)
     g.append(g0)
 
@@ -111,10 +114,20 @@ def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_pr
 
         sampleTime = timer.time()
         for k in range(0, Nc):
-            msg = "> > Sampling MMH Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
-            print(msg)
-            # generate states of Markov chain using MMA/MMH
-            theta_temp, g_temp = mmh.modified_metropolis(theta_seed[k, :], Ns, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b[j])
+            if sampler == 'mmh':
+                msg = "> > Sampling MMH Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
+                print(msg)
+                # generate states of Markov chain using MMA/MMH
+                theta_temp, g_temp = mmh.modified_metropolis(theta_seed[k, :], Ns, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b[j])
+            elif sampler == 'cs':
+                msg = "> > Sampling CS Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
+                print(msg)
+                # generate states of Markov chain using Conditional Sampling
+                theta_temp, g_temp = cs.cond_sampling(theta_seed[k, :], Ns, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b[j])
+            else:
+                print('> > ### ERROR! Sampler \"', sampler, '\" not found! ###')
+                return [], [], []
+
             theta0[Ns*(k):Ns*(k+1), :] = theta_temp[:,:]
             g0[Ns*(k):Ns*(k+1)] = g_temp[:]
         print('> > Sampling MMH: Time needed =', round(timer.time() - sampleTime, 2), 's')
@@ -130,7 +143,7 @@ def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_pr
         print('> > Counting failure samples: Time needed =', round(timer.time() - countTime, 2), 's')
 
         print('> > Nf =', Nf[j], '/', n_samples_per_level)
-        print('> > End STEP', j, ': Time needed =', round(timer.time() - startTime, 2), 's')
+        print('> > End LEVEL', j, ': Time needed =', round(timer.time() - startTime, 2), 's')
 
     # estimate of p_F
     p_F_SS = (p0**(j-1)) * Nf[j-1]/n_samples_per_level
@@ -153,7 +166,7 @@ def cov_analytical(theta, g, p0, N, pf_sus):
     for j in range(0, m):
         g_sort  = np.sort(g[j])
         b[j]    = np.percentile(g_sort, p0*100)
-    print("> > Last threshold =", b[m-1], "-> is now corrected to 0!")
+    #print("> > Last threshold =", b[m-1], "-> is now corrected to 0!")
     b[m-1] = 0    # set last threshold to 0
 
     # compute coefficient of variation for level 0 (MCS)
