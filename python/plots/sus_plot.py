@@ -10,13 +10,17 @@
 # ---------------------------------------------------------------------------
 # Version 2017-05
 # ---------------------------------------------------------------------------
+# References:
+# 1."Bayesian post-processor and other enhancements of Subset Simulation
+#   for estimating failure probabilities in high dimensions"
+#    Konstantin M. Zuev, James L. Beck, Siu-Kui Au, Lambros S. Katafygiotis
+#    Computers and Structures 92-93 (2015) 283-296
+# ---------------------------------------------------------------------------
 """
 
 import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
-
-import plots.help_plot as hplt
 
 from matplotlib.pyplot import *
 from matplotlib import rcParams
@@ -95,19 +99,16 @@ def plot_sus(g, p0, N, pf_sus, analytical_CDF=0):
     plt.plot(0, pf_sus, 'x', label=r'Pf SuS')
 
     # * plot exact point
-    if analytical_CDF != 0: 
+    if analytical_CDF != 0:
         plt.plot(0, pf_exact_point, 'x', label=r'Pf Exact')
 
     # add legend
     matplotlib.rcParams['legend.fontsize'] = 12
     plt.legend(loc='lower right')
-    
 
     # set titles
     plt.title(r'Failure probability estimate')
     plt.xlabel(r'Limit state function $g$')
     plt.ylabel(r'Failure probability $P_f$')
-
-    # Tweak spacing to prevent clipping of ylabel
     plt.tight_layout()
     #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')

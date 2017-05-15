@@ -66,7 +66,7 @@ sample_prop_PDF = lambda param: np.random.uniform(param-1, param+1, 1)
 n_loops = 1
 p_F_SS_array = np.zeros(n_loops)
 
-print('\n\n> START Sampling')
+print('\n> START Sampling')
 startTime = timer.time()
 for i in range(0, n_loops):
     p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF)
@@ -75,15 +75,20 @@ for i in range(0, n_loops):
 
 print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 
+# computing cov
+print('\n> START Computing C.O.V')
+startTime = timer.time()
+delta = sus.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2), "s")
 
 # RESULTS
 
 print("\nEND Simulation - See results:")
-
 p_F = scps.norm.cdf(-beta)
 print("> Subset Simulation Estimator mean\t=", np.mean(p_F_SS_array))
-print("> Subset Coefficient of Variation\t=", np.sqrt(np.var(p_F_SS_array))/np.mean(p_F_SS_array))
-print("> Analytical probability of Failure \t=", p_F)
+#print("> Subset Coefficient of Variation\t=", np.sqrt(np.var(p_F_SS_array))/np.mean(p_F_SS_array))
+print("> Subset Coefficient of Variation\t=", round(delta, 8))
+print("> Analytical probability of Failure \t=", round(p_F, 8))
 
 
 
@@ -92,8 +97,11 @@ print("> Analytical probability of Failure \t=", p_F)
 # analytical CDF
 analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 
-
 # plot samples
-splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
+#splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
 #uplt.plot_mixing(theta)
-plt.show()
+#plt.show()
+#delta = sus.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+#print("cov = ", delta)
+
+
