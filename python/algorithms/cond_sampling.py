@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Modified Metropolis Hastings algorithm function
+# Conditional Sampling algorithm function
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -33,11 +33,11 @@
 import time as timer
 import numpy as np
 
-def modified_metropolis(theta0, N, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b):
+def cond_sampling(theta0, N, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b):
     #startTime = timer.time()
 
     # get dimension
-    d = np.size(theta0)
+    d           = np.size(theta0)
 
     # initialize theta and g(x)
     theta       = np.zeros((N, d), float)
@@ -45,42 +45,32 @@ def modified_metropolis(theta0, N, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF,
     g           = np.zeros((N), float)
     g[0]        = LSF(theta0)
 
-    xi = np.zeros((d), float)
+    # set correlation parameter rho_k
+    rho_k       = 0.2
+    sigma       = np.sqrt(1 - rho_k**2)
 
     for i in range(1, N):
+        theta_star = np.zeros(d, float)
         # generate a candidate state xi:
         for k in range(0, d):
-            # sample xi from proposal_PDF
-            xi[k] = sample_prop_PDF(theta[i-1, k])
+            # sample theta from proposal_PDF
+            #theta_star[k] = sample_prop_PDF(theta[i-1, k])
 
-            # compute acceptance ratio
+            # sample the candidate state
+            mu = rho_k * theta[i-1, k]
+            theta_star[k] = np.random.normal(mu, sigma, 1)
 
-            # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
-            #         (p(x) * q(x,y))         (p(x) * g(x))
-            alpha = (f_marg_PDF(xi[k])          * f_prop_PDF(theta[i-1, k], xi[k]))/ \
-                    (f_marg_PDF(theta[i-1, k])  * f_prop_PDF(xi[k], theta[i-1, k]))
-
-            r     = np.minimum(alpha, 1)
-
-            # accept or reject xi by setting ...
-            if np.random.uniform(0, 1) <= r:
-                # accept
-                xi[k] = xi[k]
-            else:
-                # reject
-                xi[k] = theta[i, k]
-
-        # check whether xi is in Failure domain (system analysis) and accept or reject xi
-        g_temp = LSF(xi)
-        if g_temp <= b:
+        # check whether theta_star is in Failure domain (system analysis) and accept or reject it
+        g_star = LSF(theta_star)
+        if g_star <= b:
             # in failure domain -> accept
-            theta[i, :] = xi
-            g[i] = g_temp
+            theta[i, :] = theta_star
+            g[i] = g_star
         else:
             # not in failure domain -> reject
             theta[i, :] = theta[i-1, :]
             g[i] = g[i-1]
 
     # output
-    #print("> > > Time needed for MMH =", round(timer.time() - startTime, 2), "s")
+    #print("> > > Time needed for CS =", round(timer.time() - startTime, 2), "s")
     return theta, g

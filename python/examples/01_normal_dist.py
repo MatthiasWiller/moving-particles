@@ -1,32 +1,39 @@
 """
-Author: Matthias Willer 2017
+# ---------------------------------------------------------------------------
+# Metropolis algorithm 1D example: sample Gaussian from Uniform
+# ---------------------------------------------------------------------------
+# Created by:
+# Matthias Willer (matthias.willer@tum.de)
+# Engineering Risk Analysis Group
+# Technische Universitat Munchen
+# www.era.bgu.tum.de
+# ---------------------------------------------------------------------------
+# Version 2017-05
+# ---------------------------------------------------------------------------
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.stats as npdf
+import scipy.stats as scps
 
 import plots.user_plot as uplt
 import algorithms.metropolis as ma
 
 # INPUT 
 
-# target pdf
-def target_PDF(x): 
-    mu = 4    # mean
-    sigma = 2  # standard deviation
-    return npdf.norm.pdf(x, mu, sigma)
+mu      = 4
+sigma   = 2
+
+# target pdf 
+target_PDF      = lambda x: scps.norm.pdf(x, mu, sigma)
 
 # proposal pdf
-def proposal_PDF():
-    mu = 4 #mean
-    sigma = 10 # standard deviation
-    return np.random.uniform(mu-sigma, mu+sigma, 1)
+proposal_PDF    = lambda: np.random.uniform(mu-10, mu+10, 1)
 
-initial_theta = 0.0         # initial theta
-n_samples = 1000           # number of samples
-burnInFraction = 0.1     # defines burn-in-period of samples
-lagPeriod = 10              # only log every n-th value
+initial_theta   = 0.0           # initial theta
+n_samples       = 1000          # number of samples
+burnInFraction  = 0.1           # defines burn-in-period of samples
+lagPeriod       = 10            # only log every n-th value (thinning)
 
 # apply MCMC
 theta = ma.metropolis(initial_theta, n_samples, target_PDF, proposal_PDF, burnInFraction, lagPeriod)

@@ -1,5 +1,15 @@
 """
-Author: Matthias Willer 2017
+# ---------------------------------------------------------------------------
+# Test function to test plots
+# ---------------------------------------------------------------------------
+# Created by:
+# Matthias Willer (matthias.willer@tum.de)
+# Engineering Risk Analysis Group
+# Technische Universitat Munchen
+# www.era.bgu.tum.de
+# ---------------------------------------------------------------------------
+# Version 2017-05
+# ---------------------------------------------------------------------------
 """
 import time as timer
 
@@ -18,9 +28,9 @@ print("> Time needed for Importing =", round(timer.time() - startTime, 2), "s")
 startTime = timer.time()
 print('\n\n> START Sampling')
 
-n_samples = 500
-mu = 0
-sigma = 3
+n_samples   = 500
+mu          = 0
+sigma       = 3
 
 # target pdf 2D (Example from 05_2D_pdf.py)
 def target_PDF_2D(x):
@@ -34,9 +44,9 @@ def target_PDF_1D(x):
     return sps.norm.pdf(x, mu, sigma)
 
 # theta 2D
-theta = np.zeros((2, n_samples), float)
-theta[0,:] = sps.norm.rvs(mu, sigma, n_samples)
-theta[1,:] = sps.norm.rvs(mu, 2*sigma, n_samples)
+theta       = np.zeros((2, n_samples), float)
+theta[0,:]  = sps.norm.rvs(mu, sigma, n_samples)
+theta[1,:]  = sps.norm.rvs(mu, 2*sigma, n_samples)
 
 print("> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 startTime = timer.time()
@@ -45,9 +55,9 @@ print('\n\n> START Plotting')
 # OUTPUT
 
 # plot samples
-uplt.plot_hist(theta[0,:], target_PDF_1D)
-uplt.plot_mixing(theta[0,:])
-uplt.plot_autocorr(theta[0,:], n_samples)
+uplt.plot_hist(theta[0, :], target_PDF_1D)
+uplt.plot_mixing(theta[0, :])
+uplt.plot_autocorr(theta[0, :], n_samples)
 #uplt.plot_scatter_with_contour(theta, target_PDF_2D)
 uplt.plot_scatter_with_hist(theta, target_PDF_2D)
 
