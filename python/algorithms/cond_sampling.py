@@ -33,7 +33,6 @@ import time as timer
 import numpy as np
 
 class CondSampling:
-
     def __init__(self, sample_marg_PDF, sample_cond_PDF, rho_k):
         self.sample_marg_PDF = sample_marg_PDF
         self.sample_cond_PDF = sample_cond_PDF

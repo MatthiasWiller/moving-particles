@@ -108,7 +108,7 @@ def plot_sus(g, p0, N, pf_sus, analytical_CDF=0):
 
     # set titles
     plt.title(r'Failure probability estimate')
-    plt.xlabel(r'Limit state function $g$')
-    plt.ylabel(r'Failure probability $P_f$')
+    plt.xlabel(r'Limit state function values $b$')
+    plt.ylabel(r'$P(g(x) \leq b)$')
     plt.tight_layout()
     #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')

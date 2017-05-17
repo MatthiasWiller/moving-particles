@@ -34,7 +34,6 @@ import time as timer
 import numpy as np
 
 class ModifiedMetropolisHastings:
-
     def __init__(self, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF,):
         self.f_marg_PDF      = f_marg_PDF
         self.sample_marg_PDF = sample_marg_PDF

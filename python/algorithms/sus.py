@@ -47,7 +47,6 @@ def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
     max_it  = 20
     theta   = []
     g       = []
-    #g       = np.zeros((N), float)
 
     Nf      = np.zeros(max_it)
     b       = np.zeros(max_it)
@@ -61,7 +60,7 @@ def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
 
     # sample initial step (MCS)
     j       = 0 # set j = 0 (number of conditional level)
-    #theta0  = sample_marg_PDF((n_samples_per_level, d))
+
     mcs_sampling_function = sampler.get_mcs_samples()
     theta0  = mcs_sampling_function((n_samples_per_level, d))
 
@@ -76,66 +75,52 @@ def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
     theta.append(theta0)
     g.append(g0)
 
-    #last_loop = False
-
-    # Subset Simulation steps
-    #while last_loop != True:
-        #if Nf[j] >= Nc:
-        #    last_loop = True
+    # loop while pF <= Nc/N
     while Nf[j] < Nc:
         j += 1 # move to next conditional level
 
         print('\n> > Start LEVEL', j, ': Subset Simulation')
         startTime = timer.time()
 
-        #sortTime = timer.time()
         # sort {g(i)} : g(i1) <= g(i2) <= ... <= g(iN)
         g_prime = np.sort(g0) # sorted g
         idx = sorted(range(len(g0)), key=lambda x: g0[x])
 
         # order samples according to the previous order
         theta_prime = theta0[(idx)] # sorted theta
-        #print('> > Sorting: Time needed =', round(timer.time() - sortTime, 2), 's')
 
-        #thresholdTime = timer.time()
         # compute intermediate threshold level
         # define b(j) = (g(i_(N*p_0) + g(i_(N*p0 + 1)) / 2
-        #b[j] = 0.5* (g_prime[Nc] + g_prime[Nc - 1])
         b[j] = np.percentile(g_prime, p0*100)
         print("> > b =", b[j])
-        #print('> > Computing Threshold: Time needed =', round(timer.time() - thresholdTime, 2), 's')
 
-        #seedTime = timer.time()
         # select seeds for the MCMC sampler
         theta_seed = theta_prime[:Nc, :]
         theta_seed = np.random.permutation(theta_seed) # shuffle to prevent bias (important for CS)
-        #print('> > Selecting seeds: Time needed =', round(timer.time() - seedTime, 2), 's')
 
         # re-initialize theta0 and g0 to prevent old values
         theta0  = np.zeros((n_samples_per_level, d), float)
         g0      = np.zeros(n_samples_per_level, float)
 
-        sampleTime = timer.time()
+        #sampleTime = timer.time()
         for k in range(0, Nc):
-            msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
-            print(msg)  
+            #msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
+            #print(msg)  
 
             # generate states of Markov chain using sampler
             theta_temp, g_temp = sampler.sample_markov_chain(theta_seed[k, :], Ns, LSF, b[j])
 
             theta0[Ns*(k):Ns*(k+1), :] = theta_temp[:, :]
             g0[Ns*(k):Ns*(k+1)] = g_temp[:]
-        print('> > Sampling: Time needed =', round(timer.time() - sampleTime, 2), 's')
+        #print('> > Sampling: Time needed =', round(timer.time() - sampleTime, 2), 's')
 
         theta.append(theta0)
         g.append(g0)
 
-        #countTime = timer.time()
         # count failure samples
         for i in range(0, n_samples_per_level):
             if g0[i] <= 0:
                 Nf[j] += 1
-        #print('> > Counting failure samples: Time needed =', round(timer.time() - countTime, 2), 's')
 
         print('> > Nf =', Nf[j], '/', n_samples_per_level)
         print('> > End LEVEL', j, ': Time needed =', round(timer.time() - startTime, 2), 's')
@@ -144,6 +129,7 @@ def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
     p_F_SS = (p0**(j-1)) * Nf[j-1]/n_samples_per_level
 
     return p_F_SS, theta, g
+
 
 # ---------------------------------------------------------------------------
 # compute cov analytically
@@ -170,7 +156,7 @@ def cov_analytical(theta, g, p0, N, pf_sus):
     # compute coefficient of variation for other levels
     for j in range(1, m):
 
-        # compute indicator function for the failure samples
+        # compute indicator function matrix for the failure samples
         I_Fj = np.reshape(g[j] <= b[j], (Ns, Nc))
 
         # sample conditional probability (~= p0)

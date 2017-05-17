@@ -43,7 +43,7 @@ d                   = 10            # number of dimensions
 p0                  = 0.1           # Probability of each subset, chosen adaptively
 
 # limit-state function
-Ca = 0
+Ca = 135
 Cb = 0
 LSF_A  = lambda u: Ca - u.sum(axis=0)
 LSF_B  = lambda u: -Cb + u.sum(axis=0)
@@ -122,7 +122,7 @@ print("\nSTART Results:")
 print("> Subset Simulation Estimator mean\t=", np.mean(p_F_SS_array))
 print("> Coefficient of Variation (Estimation)\t=", sigma_pf_ss/mu_pf_ss)
 print("> Coefficient of Variation (Analytical)\t=", round(delta, 8))
-print("> Analytical probability of Failure \t=", round(scps.norm.cdf(-beta), 8))
+print("> Analytical probability of Failure \t=", round(scps.gamma.cdf(Ca, d, 1), 8))
 
 
 # ---------------------------------------------------------------------------
@@ -130,7 +130,8 @@ print("> Analytical probability of Failure \t=", round(scps.norm.cdf(-beta), 8))
 # ---------------------------------------------------------------------------
 
 # analytical CDF
-analytical_CDF = lambda x: scps.norm.cdf(x, beta)
+lam = 1
+analytical_CDF = lambda x: 1 - scps.gamma.cdf(Ca - x, d, lam)
 
 # plot samples
 splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
