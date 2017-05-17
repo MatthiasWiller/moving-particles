@@ -33,54 +33,65 @@
 import time as timer
 import numpy as np
 
-def modified_metropolis(theta0, N, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b):
-    #startTime = timer.time()
+class ModifiedMetropolisHastings:
 
-    # get dimension
-    d = np.size(theta0)
+    def __init__(self, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF,):
+        self.f_marg_PDF      = f_marg_PDF
+        self.sample_marg_PDF = sample_marg_PDF
+        self.f_prop_PDF      = f_prop_PDF
+        self.sample_prop_PDF = sample_prop_PDF
 
-    # initialize theta and g(x)
-    theta       = np.zeros((N, d), float)
-    theta[0, :] = theta0
-    g           = np.zeros((N), float)
-    g[0]        = LSF(theta0)
+    def get_mcs_samples(self):
+        return self.sample_marg_PDF
 
-    xi = np.zeros((d), float)
+    def sample_markov_chain(self, theta0, N, LSF, b):
+        #startTime = timer.time()
 
-    for i in range(1, N):
-        # generate a candidate state xi:
-        for k in range(0, d):
-            # sample xi from proposal_PDF
-            xi[k] = sample_prop_PDF(theta[i-1, k])
+        # get dimension
+        d = np.size(theta0)
 
-            # compute acceptance ratio
+        # initialize theta and g(x)
+        theta       = np.zeros((N, d), float)
+        theta[0, :] = theta0
+        g           = np.zeros((N), float)
+        g[0]        = LSF(theta0)
 
-            # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
-            #         (p(x) * q(x,y))         (p(x) * g(x))
-            alpha = (f_marg_PDF(xi[k])          * f_prop_PDF(theta[i-1, k], xi[k]))/ \
-                    (f_marg_PDF(theta[i-1, k])  * f_prop_PDF(xi[k], theta[i-1, k]))
+        xi          = np.zeros((d), float)
 
-            r     = np.minimum(alpha, 1)
+        for i in range(1, N):
+            # generate a candidate state xi:
+            for k in range(0, d):
+                # sample xi from proposal_PDF
+                xi[k] = self.sample_prop_PDF(theta[i-1, k])
 
-            # accept or reject xi by setting ...
-            if np.random.uniform(0, 1) <= r:
-                # accept
-                xi[k] = xi[k]
+                # compute acceptance ratio
+
+                # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
+                #         (p(x) * q(x,y))         (p(x) * g(x))
+                alpha = (self.f_marg_PDF(xi[k])          * self.f_prop_PDF(theta[i-1, k], xi[k]))/ \
+                        (self.f_marg_PDF(theta[i-1, k])  * self.f_prop_PDF(xi[k], theta[i-1, k]))
+
+                r     = np.minimum(alpha, 1)
+
+                # accept or reject xi by setting ...
+                if np.random.uniform(0, 1) <= r:
+                    # accept
+                    xi[k] = xi[k]
+                else:
+                    # reject
+                    xi[k] = theta[i, k]
+
+            # check whether xi is in Failure domain (system analysis) and accept or reject xi
+            g_temp = LSF(xi)
+            if g_temp <= b:
+                # in failure domain -> accept
+                theta[i, :] = xi
+                g[i] = g_temp
             else:
-                # reject
-                xi[k] = theta[i, k]
+                # not in failure domain -> reject
+                theta[i, :] = theta[i-1, :]
+                g[i] = g[i-1]
 
-        # check whether xi is in Failure domain (system analysis) and accept or reject xi
-        g_temp = LSF(xi)
-        if g_temp <= b:
-            # in failure domain -> accept
-            theta[i, :] = xi
-            g[i] = g_temp
-        else:
-            # not in failure domain -> reject
-            theta[i, :] = theta[i-1, :]
-            g[i] = g[i-1]
-
-    # output
-    #print("> > > Time needed for MMH =", round(timer.time() - startTime, 2), "s")
-    return theta, g
+        # output
+        #print("> > > Time needed for MMH =", round(timer.time() - startTime, 2), "s")
+        return theta, g
