@@ -33,54 +33,81 @@
 import time as timer
 import numpy as np
 
-def modified_metropolis(theta0, N, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b):
-    #startTime = timer.time()
+class ModifiedMetropolisHastings:
+    def __init__(self, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF,):
+        self.f_marg_PDF      = f_marg_PDF
+        self.sample_marg_PDF = sample_marg_PDF
+        self.f_prop_PDF      = f_prop_PDF
+        self.sample_prop_PDF = sample_prop_PDF
 
-    # get dimension
-    d = np.size(theta0)
+    def sample_mcs_level(self, dim):
+        return self.sample_marg_PDF(dim)
 
-    # initialize theta and g(x)
-    theta       = np.zeros((N, d), float)
-    theta[0, :] = theta0
-    g           = np.zeros((N), float)
-    g[0]        = LSF(theta0)
+    def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
+        # get dimension
+        d       = np.size(theta_seed, axis=1)
 
-    xi = np.zeros((d), float)
+        # initialize theta0 and g0
+        theta0  = np.zeros((Ns*Nc, d), float)
+        g0      = np.zeros(Ns*Nc, float)
 
-    for i in range(1, N):
-        # generate a candidate state xi:
-        for k in range(0, d):
-            # sample xi from proposal_PDF
-            xi[k] = sample_prop_PDF(theta[i-1, k])
+        for k in range(0, Nc):
+            #msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
+            #print(msg)
 
-            # compute acceptance ratio
+            # generate states of Markov chain
+            theta_temp, g_temp = self.sample_markov_chain(theta_seed[k, :], Ns, LSF, b)
 
-            # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
-            #         (p(x) * q(x,y))         (p(x) * g(x))
-            alpha = (f_marg_PDF(xi[k])          * f_prop_PDF(theta[i-1, k], xi[k]))/ \
-                    (f_marg_PDF(theta[i-1, k])  * f_prop_PDF(xi[k], theta[i-1, k]))
+            # save Markov chain in sample array
+            theta0[Ns*(k):Ns*(k+1), :]  = theta_temp[:, :]
+            g0[Ns*(k):Ns*(k+1)]         = g_temp[:]
 
-            r     = np.minimum(alpha, 1)
+        return theta0, g0
 
-            # accept or reject xi by setting ...
-            if np.random.uniform(0, 1) <= r:
-                # accept
-                xi[k] = xi[k]
+    def sample_markov_chain(self, theta0, N, LSF, b):
+        # get dimension
+        d = np.size(theta0)
+
+        # initialize theta and g(x)
+        theta       = np.zeros((N, d), float)
+        theta[0, :] = theta0
+        g           = np.zeros((N), float)
+        g[0]        = LSF(theta0)
+
+        xi          = np.zeros((d), float)
+
+        for i in range(1, N):
+            # generate a candidate state xi:
+            for k in range(0, d):
+                # sample xi from proposal_PDF
+                xi[k] = self.sample_prop_PDF(theta[i-1, k])
+
+                # compute acceptance ratio
+
+                # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
+                #         (p(x) * q(x,y))         (p(x) * g(x))
+                alpha = (self.f_marg_PDF(xi[k])          * self.f_prop_PDF(theta[i-1, k], xi[k]))/ \
+                        (self.f_marg_PDF(theta[i-1, k])  * self.f_prop_PDF(xi[k], theta[i-1, k]))
+
+                r     = np.minimum(alpha, 1)
+
+                # accept or reject xi by setting ...
+                if np.random.uniform(0, 1) <= r:
+                    # accept
+                    xi[k] = xi[k]
+                else:
+                    # reject
+                    xi[k] = theta[i, k]
+
+            # check whether xi is in Failure domain (system analysis) and accept or reject xi
+            g_temp = LSF(xi)
+            if g_temp <= b:
+                # in failure domain -> accept
+                theta[i, :] = xi
+                g[i] = g_temp
             else:
-                # reject
-                xi[k] = theta[i, k]
+                # not in failure domain -> reject
+                theta[i, :] = theta[i-1, :]
+                g[i] = g[i-1]
 
-        # check whether xi is in Failure domain (system analysis) and accept or reject xi
-        g_temp = LSF(xi)
-        if g_temp <= b:
-            # in failure domain -> accept
-            theta[i, :] = xi
-            g[i] = g_temp
-        else:
-            # not in failure domain -> reject
-            theta[i, :] = theta[i-1, :]
-            g[i] = g[i-1]
-
-    # output
-    #print("> > > Time needed for MMH =", round(timer.time() - startTime, 2), "s")
-    return theta, g
+        return theta, g

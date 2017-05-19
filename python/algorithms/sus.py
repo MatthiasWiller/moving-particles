@@ -19,7 +19,7 @@
 # * sample_prop_PDF     : function to sample from proposal pdf
 # * f_prop_PDF          : proposal pdf
 # * LSF                 : limit state function
-# * sampler             : sampling algorithm (cs = Cond. Sampling, 
+# * sampler             : sampling algorithm (cs = Cond. Sampling,
 #                         mmh = Modified Metropolis Hastings)
 # ---------------------------------------------------------------------------
 # Output:
@@ -42,12 +42,11 @@ import algorithms.cond_sampling as cs
 
 # ---------------------------------------------------------------------------
 # Subset Simulation function
-def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, sampler):
+def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
     # initialization and constants
     max_it  = 20
     theta   = []
     g       = []
-    #g       = np.zeros((N), float)
 
     Nf      = np.zeros(max_it)
     b       = np.zeros(max_it)
@@ -55,13 +54,15 @@ def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_pr
     Nc      = int(n_samples_per_level*p0) # number of chains / number of seeds per level 
     Ns      = int(1/p0) # number of samples per chain / number of samples per 
 
-    
+
     print('\n> > Start LEVEL 0 : Monte Carlo Simulation')
     startTime = timer.time()
 
     # sample initial step (MCS)
     j       = 0 # set j = 0 (number of conditional level)
-    theta0  = sample_marg_PDF((n_samples_per_level, d))
+
+    theta0 = sampler.sample_mcs_level((n_samples_per_level, d))
+
     g0      = np.zeros((n_samples_per_level), float)
 
     for i in range(0, n_samples_per_level):
@@ -73,74 +74,38 @@ def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_pr
     theta.append(theta0)
     g.append(g0)
 
-    last_loop = False
-
-    # Subset Simulation steps
-    #while last_loop != True:
-        #if Nf[j] >= Nc:
-        #    last_loop = True
+    # loop while pF <= Nc/N
     while Nf[j] < Nc:
         j += 1 # move to next conditional level
 
         print('\n> > Start LEVEL', j, ': Subset Simulation')
         startTime = timer.time()
 
-        sortTime = timer.time()
         # sort {g(i)} : g(i1) <= g(i2) <= ... <= g(iN)
         g_prime = np.sort(g0) # sorted g
         idx = sorted(range(len(g0)), key=lambda x: g0[x])
 
         # order samples according to the previous order
         theta_prime = theta0[(idx)] # sorted theta
-        print('> > Sorting: Time needed =', round(timer.time() - sortTime, 2), 's')
 
-        thresholdTime = timer.time()
         # compute intermediate threshold level
         # define b(j) = (g(i_(N*p_0) + g(i_(N*p0 + 1)) / 2
-        #b[j] = 0.5* (g_prime[Nc] + g_prime[Nc - 1])
         b[j] = np.percentile(g_prime, p0*100)
         print("> > b =", b[j])
-        print('> > Computing Threshold: Time needed =', round(timer.time() - thresholdTime, 2), 's')
 
-        seedTime = timer.time()
         # select seeds for the MCMC sampler
         theta_seed = theta_prime[:Nc, :]
-        theta_seed = np.random.permutation(theta_seed) # shuffle to prevent bias (important for CS)
-        print('> > Selecting seeds: Time needed =', round(timer.time() - seedTime, 2), 's')
 
-        # re-initialize theta0 and g0 to prevent old values
-        theta0  = np.zeros((n_samples_per_level, d), float)
-        g0      = np.zeros(n_samples_per_level, float)
-
-        sampleTime = timer.time()
-        for k in range(0, Nc):
-            if sampler == 'mmh':
-                msg = "> > Sampling MMH Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
-                print(msg)
-                # generate states of Markov chain using MMA/MMH
-                theta_temp, g_temp = mmh.modified_metropolis(theta_seed[k, :], Ns, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b[j])
-            elif sampler == 'cs':
-                msg = "> > Sampling CS Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
-                print(msg)
-                # generate states of Markov chain using Conditional Sampling
-                theta_temp, g_temp = cs.cond_sampling(theta_seed[k, :], Ns, f_marg_PDF, sample_prop_PDF, f_prop_PDF, LSF, b[j])
-            else:
-                print('> > ### ERROR! Sampler \"', sampler, '\" not found! ###')
-                return [], [], []
-
-            theta0[Ns*(k):Ns*(k+1), :] = theta_temp[:,:]
-            g0[Ns*(k):Ns*(k+1)] = g_temp[:]
-        print('> > Sampling MMH: Time needed =', round(timer.time() - sampleTime, 2), 's')
+        # sample level using the sampler/sampling-method
+        theta0, g0 = sampler.sample_subsim_level(theta_seed, Ns, Nc, LSF, b[j])
 
         theta.append(theta0)
         g.append(g0)
 
-        countTime = timer.time()
         # count failure samples
         for i in range(0, n_samples_per_level):
             if g0[i] <= 0:
                 Nf[j] += 1
-        print('> > Counting failure samples: Time needed =', round(timer.time() - countTime, 2), 's')
 
         print('> > Nf =', Nf[j], '/', n_samples_per_level)
         print('> > End LEVEL', j, ': Time needed =', round(timer.time() - startTime, 2), 's')
@@ -149,6 +114,7 @@ def subsetsim(p0, n_samples_per_level, d, sample_marg_PDF, f_marg_PDF, sample_pr
     p_F_SS = (p0**(j-1)) * Nf[j-1]/n_samples_per_level
 
     return p_F_SS, theta, g
+
 
 # ---------------------------------------------------------------------------
 # compute cov analytically
@@ -175,7 +141,7 @@ def cov_analytical(theta, g, p0, N, pf_sus):
     # compute coefficient of variation for other levels
     for j in range(1, m):
 
-        # compute indicator function for the failure samples
+        # compute indicator function matrix for the failure samples
         I_Fj = np.reshape(g[j] <= b[j], (Ns, Nc))
 
         # sample conditional probability (~= p0)
@@ -191,18 +157,20 @@ def cov_analytical(theta, g, p0, N, pf_sus):
             for ip in range(1, Ns):
                 sums += (I_Fj[ip, k] * I_Fj[ip, k])   # sums inside [Ref. 1 Eq. (22)]
         R_0 = (1/N)*sums - p_j**2    # autocovariance at lag 0 [Ref. 1 Eq. (22)]
+        print("R_0 =", R_0)
 
         # correlation factor calculation
         R = np.zeros(Ns, float)
-        for i in range(1, Ns):
+        for i in range(0, Ns-1):
             sums = 0
             for k in range(0, Nc):
-                for ip in range(0, Ns-i):
-                    sums += (I_Fj[ip, k] * I_Fj[ip+i, k])         # sums inside [Ref. 1 Eq. (22)]
-            R[i] = (1/(N-i*Nc)) * sums - p_j**2                   # autocovariance at lag i [Ref. 1 Eq. (22)]
-            gamma[i] = (1-(i/Ns)) * (R[i]/R_0)                    # correlation factor [Ref. 1 Eq. (20)]
+                for ip in range(0, Ns - (i+1)):
+                    sums += (I_Fj[ip, k] * I_Fj[ip + i, k])         # sums inside [Ref. 1 Eq. (22)]
+            R[i]     = (1/(N - (i+1)*Nc)) * sums - p_j**2               # autocovariance at lag i [Ref. 1 Eq. (22)]
+            gamma[i] = (1 - ((i+1)/Ns)) * (R[i]/R_0)                    # correlation factor [Ref. 1 Eq. (20)]
 
         gamma_j = 2*np.sum(gamma)                                 # [Ref. 1 Eq. (20)]
+        print("gamma_j =", gamma_j)
 
         delta[j] = np.sqrt(((1 - p_j)/(N * p_j)) * (1 + gamma_j)) # [Ref. 2 Eq. (9)]
 
