@@ -61,8 +61,7 @@ def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
     # sample initial step (MCS)
     j       = 0 # set j = 0 (number of conditional level)
 
-    mcs_sampling_function = sampler.get_mcs_samples()
-    theta0  = mcs_sampling_function((n_samples_per_level, d))
+    theta0 = sampler.sample_mcs_level((n_samples_per_level, d))
 
     g0      = np.zeros((n_samples_per_level), float)
 
@@ -96,23 +95,9 @@ def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
 
         # select seeds for the MCMC sampler
         theta_seed = theta_prime[:Nc, :]
-        theta_seed = np.random.permutation(theta_seed) # shuffle to prevent bias (important for CS)
 
-        # re-initialize theta0 and g0 to prevent old values
-        theta0  = np.zeros((n_samples_per_level, d), float)
-        g0      = np.zeros(n_samples_per_level, float)
-
-        #sampleTime = timer.time()
-        for k in range(0, Nc):
-            #msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
-            #print(msg)  
-
-            # generate states of Markov chain using sampler
-            theta_temp, g_temp = sampler.sample_markov_chain(theta_seed[k, :], Ns, LSF, b[j])
-
-            theta0[Ns*(k):Ns*(k+1), :] = theta_temp[:, :]
-            g0[Ns*(k):Ns*(k+1)] = g_temp[:]
-        #print('> > Sampling: Time needed =', round(timer.time() - sampleTime, 2), 's')
+        # sample level using the sampler/sampling-method
+        theta0, g0 = sampler.sample_subsim_level(theta_seed, Ns, Nc, LSF, b[j])
 
         theta.append(theta0)
         g.append(g0)
@@ -172,18 +157,20 @@ def cov_analytical(theta, g, p0, N, pf_sus):
             for ip in range(1, Ns):
                 sums += (I_Fj[ip, k] * I_Fj[ip, k])   # sums inside [Ref. 1 Eq. (22)]
         R_0 = (1/N)*sums - p_j**2    # autocovariance at lag 0 [Ref. 1 Eq. (22)]
+        print("R_0 =", R_0)
 
         # correlation factor calculation
         R = np.zeros(Ns, float)
-        for i in range(1, Ns):
+        for i in range(0, Ns-1):
             sums = 0
             for k in range(0, Nc):
-                for ip in range(0, Ns-i):
-                    sums += (I_Fj[ip, k] * I_Fj[ip+i, k])         # sums inside [Ref. 1 Eq. (22)]
-            R[i] = (1/(N-i*Nc)) * sums - p_j**2                   # autocovariance at lag i [Ref. 1 Eq. (22)]
-            gamma[i] = (1-(i/Ns)) * (R[i]/R_0)                    # correlation factor [Ref. 1 Eq. (20)]
+                for ip in range(0, Ns - (i+1)):
+                    sums += (I_Fj[ip, k] * I_Fj[ip + i, k])         # sums inside [Ref. 1 Eq. (22)]
+            R[i]     = (1/(N - (i+1)*Nc)) * sums - p_j**2               # autocovariance at lag i [Ref. 1 Eq. (22)]
+            gamma[i] = (1 - ((i+1)/Ns)) * (R[i]/R_0)                    # correlation factor [Ref. 1 Eq. (20)]
 
         gamma_j = 2*np.sum(gamma)                                 # [Ref. 1 Eq. (20)]
+        print("gamma_j =", gamma_j)
 
         delta[j] = np.sqrt(((1 - p_j)/(N * p_j)) * (1 + gamma_j)) # [Ref. 2 Eq. (9)]
 
