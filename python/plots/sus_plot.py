@@ -75,7 +75,8 @@ def plot_sus(g, p0, N, pf_sus, analytical_CDF=0):
 
     # exact line and exact point (with analytical_CDF) 
     if analytical_CDF!=0:
-        b_exact_line    = np.linspace(0, 7, 140)
+        max_lim         = np.max(np.asarray(g))
+        b_exact_line    = np.linspace(0, max_lim, 140)
         pf_exact_line   = analytical_CDF(b_exact_line)
 
         pf_exact_point  = analytical_CDF(0)        
@@ -181,7 +182,8 @@ def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0):
 
     # exact line and exact point (with analytical_CDF) 
     if analytical_CDF!=0:
-        b_exact_line    = np.linspace(0, 7, 140)
+        max_lim         = np.max(np.asarray(g))
+        b_exact_line    = np.linspace(0, max_lim, 140)
         pf_exact_line   = analytical_CDF(b_exact_line)
 
         pf_exact_point  = analytical_CDF(0)        
