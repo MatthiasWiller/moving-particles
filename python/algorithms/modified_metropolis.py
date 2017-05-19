@@ -40,12 +40,31 @@ class ModifiedMetropolisHastings:
         self.f_prop_PDF      = f_prop_PDF
         self.sample_prop_PDF = sample_prop_PDF
 
-    def get_mcs_samples(self):
-        return self.sample_marg_PDF
+    def sample_mcs_level(self, dim):
+        return self.sample_marg_PDF(dim)
+
+    def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
+        # get dimension
+        d       = np.size(theta_seed, axis=1)
+
+        # initialize theta0 and g0
+        theta0  = np.zeros((Ns*Nc, d), float)
+        g0      = np.zeros(Ns*Nc, float)
+
+        for k in range(0, Nc):
+            #msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
+            #print(msg)
+
+            # generate states of Markov chain
+            theta_temp, g_temp = self.sample_markov_chain(theta_seed[k, :], Ns, LSF, b)
+
+            # save Markov chain in sample array
+            theta0[Ns*(k):Ns*(k+1), :]  = theta_temp[:, :]
+            g0[Ns*(k):Ns*(k+1)]         = g_temp[:]
+
+        return theta0, g0
 
     def sample_markov_chain(self, theta0, N, LSF, b):
-        #startTime = timer.time()
-
         # get dimension
         d = np.size(theta0)
 
@@ -91,6 +110,4 @@ class ModifiedMetropolisHastings:
                 theta[i, :] = theta[i-1, :]
                 g[i] = g[i-1]
 
-        # output
-        #print("> > > Time needed for MMH =", round(timer.time() - startTime, 2), "s")
         return theta, g

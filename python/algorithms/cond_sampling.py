@@ -12,7 +12,7 @@
 # ---------------------------------------------------------------------------
 # Input:
 # * theta0          : seed of the Markov-chain
-# * N               : number of samples of Markov-chain (including seed)
+# * Ns              : number of samples of Markov-chain (including seed)
 # * sample_marg_PDF : function to sample from marginal pdf
 # * LSF             : limit state function
 # * b               : threshold level of the limit state function
@@ -38,25 +38,47 @@ class CondSampling:
         self.sample_cond_PDF = sample_cond_PDF
         self.rho_k           = rho_k
 
-    def get_mcs_samples(self):
-        return self.sample_marg_PDF
+    def sample_mcs_level(self, dim):
+        return self.sample_marg_PDF(dim)
 
-    def sample_markov_chain(self, theta0, N, LSF, b):
-        #startTime = timer.time()
+    def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
+        # get dimension
+        d       = np.size(theta_seed, axis=1)
 
+        # initialize theta0 and g0
+        theta0  = np.zeros((Ns*Nc, d), float)
+        g0      = np.zeros(Ns*Nc, float)
+
+        # shuffle seeds to prevent bias 
+        theta_seed = np.random.permutation(theta_seed) 
+
+        for k in range(0, Nc):
+            #msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
+            #print(msg)
+
+            # generate states of Markov chain
+            theta_temp, g_temp = self.sample_markov_chain(theta_seed[k, :], Ns, LSF, b)
+
+            # save Markov chain in sample array
+            theta0[Ns*(k):Ns*(k+1), :]  = theta_temp[:, :]
+            g0[Ns*(k):Ns*(k+1)]         = g_temp[:]
+
+        return theta0, g0
+
+    def sample_markov_chain(self, theta0, Ns, LSF, b):
         # get dimension
         d           = np.size(theta0)
 
         # initialize theta and g(x)
-        theta       = np.zeros((N, d), float)
+        theta       = np.zeros((Ns, d), float)
         theta[0, :] = theta0
-        g           = np.zeros((N), float)
+        g           = np.zeros((Ns), float)
         g[0]        = LSF(theta0)
 
         # compute sigma from correlation parameter rho_k
         sigma       = np.sqrt(1 - self.rho_k**2)
 
-        for i in range(1, N):
+        for i in range(1, Ns):
             theta_star = np.zeros(d, float)
             # generate a candidate state xi:
             for k in range(0, d):
@@ -76,5 +98,4 @@ class CondSampling:
                 g[i] = g[i-1]
 
         # output
-        #print("> > > Time needed for CS =", round(timer.time() - startTime, 2), "s")
         return theta, g
