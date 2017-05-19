@@ -37,6 +37,7 @@ class AdaptiveCondSampling:
         self.sample_marg_PDF = sample_marg_PDF
         self.sample_cond_PDF = sample_cond_PDF
         self.pa           = pa
+        self.lambda_0      = 0.6
 
 
     def sample_mcs_level(self, dim):
@@ -47,12 +48,12 @@ class AdaptiveCondSampling:
         a_star       = 0.44 
 
         # initial scaling parameter lambda0
-        lambda0       = 0.6
+        #lambda0       = 0.6
 
         # number of chains for adaption
         Na          = int(self.pa*Ns)
         lambda_t    = np.zeros(int(Nc/Na), float)
-        lambda_t[0] = lambda0
+        lambda_t[0] = self.lambda_0
 
         # get dimension
         d       = np.size(theta_seed, axis=1)
@@ -70,7 +71,7 @@ class AdaptiveCondSampling:
         # (1) estimate sigma and mu from the seeds
         for k in range(0, d):
             # set sigma_k = min(1, lambda0*sigma)
-            sigma_k[k]  = np.minimum(1.0, lambda0*sigma_tilde[k])
+            sigma_k[k]  = np.minimum(1.0, lambda_t[0]*sigma_tilde[k])
             rho_k[k]    = np.sqrt(1.0-sigma_k[k]**2)
 
         # shuffle seeds to prevent bias 
@@ -108,6 +109,7 @@ class AdaptiveCondSampling:
                     sigma_k[k]  = np.minimum(1.0, lambda_t[t]*sigma_tilde[k])
                     rho_k[k]    = np.sqrt(1.0 - sigma_k[k]**2)
         
+        self.lambda_0 = lambda_t[t] # safe last lambda_t for next level
         theta_array = np.asarray(theta_list).reshape((-1, d))
         g_array     = np.asarray(g_list).reshape(-1)
         return theta_array, g_array

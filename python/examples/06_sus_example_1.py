@@ -111,10 +111,10 @@ pa = 0.1
 sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF, sample_cond_PDF, pa)
 
 # apply subset-simulation
-n_loops      = 1
-p_F_SS_array = np.zeros(n_loops)
+n_loops      = 10
+#p_F_SS_array = np.zeros(n_loops)
 
-#p_F_SS_list  = []
+p_F_SS_list  = []
 theta_list   = []
 g_list       = []
 
@@ -123,9 +123,9 @@ startTime = timer.time()
 for i in range(0, n_loops):
     # perform SubSim
     p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, d, LSF, sampling_method)
-    p_F_SS_array[i] = p_F_SS
+    #p_F_SS_array = p_F_SS
     # save values in lists
-    #p_F_SS_list.append(p_F_SS)
+    p_F_SS_list.append(p_F_SS)
     theta_list.append(theta)
     g_list.append(g)
     print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
@@ -142,6 +142,7 @@ print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2),
 # RESULTS
 # --------------------------------------------------------------------------
 
+p_F_SS_array = np.asarray(p_F_SS_list).reshape(-1)
 sigma_pf_ss = np.std(p_F_SS_array)
 mu_pf_ss = np.mean(p_F_SS_array)
 
@@ -162,5 +163,5 @@ analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 
 # plot samples
 #splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
-#splt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
-#plt.show()
+splt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
+plt.show()
