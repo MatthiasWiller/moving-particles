@@ -41,7 +41,8 @@ class AdaptiveCondSampling:
 
 
     def sample_mcs_level(self, dim):
-        return self.sample_marg_PDF(dim)
+        #return self.sample_marg_PDF(dim)
+        return np.random.randn(dim[0], dim[1])
 
     def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
         # optimal acceptance rate

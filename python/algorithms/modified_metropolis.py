@@ -42,6 +42,7 @@ class ModifiedMetropolisHastings:
 
     def sample_mcs_level(self, dim):
         return self.sample_marg_PDF(dim)
+        #return np.random.randn(dim[0], dim[1])
 
     def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
         # get dimension
@@ -52,8 +53,8 @@ class ModifiedMetropolisHastings:
         g0      = np.zeros(Ns*Nc, float)
 
         for k in range(0, Nc):
-            #msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
-            #print(msg)
+            msg = "> > Sampling Level ... [" + repr(int(k/Nc*100)) + "%]"
+            print(msg)
 
             # generate states of Markov chain
             theta_temp, g_temp = self.sample_markov_chain(theta_seed[k, :], Ns, LSF, b)
@@ -86,8 +87,17 @@ class ModifiedMetropolisHastings:
 
                 # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
                 #         (p(x) * q(x,y))         (p(x) * g(x))
+                # tmp1 = self.f_marg_PDF(xi[k])
+                # tmp2 = self.f_marg_PDF(theta[i-1, k])
+                # tmp3 = self.f_prop_PDF(theta[i-1, k], xi[k])
+                # tmp4 = self.f_prop_PDF(xi[k], theta[i-1, k])
+
+                # print('Control Values: alpha = (', tmp1, '*', tmp3, ') / (', tmp2, '*', tmp4, ')')
+
                 alpha = (self.f_marg_PDF(xi[k])          * self.f_prop_PDF(theta[i-1, k], xi[k]))/ \
                         (self.f_marg_PDF(theta[i-1, k])  * self.f_prop_PDF(xi[k], theta[i-1, k]))
+
+
 
                 r     = np.minimum(alpha, 1)
 
@@ -97,7 +107,7 @@ class ModifiedMetropolisHastings:
                     xi[k] = xi[k]
                 else:
                     # reject
-                    xi[k] = theta[i, k]
+                    xi[k] = theta[i-1, k]
 
             # check whether xi is in Failure domain (system analysis) and accept or reject xi
             g_temp = LSF(xi)

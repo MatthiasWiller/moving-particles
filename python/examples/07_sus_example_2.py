@@ -44,10 +44,10 @@ d                   = 100            # number of dimensions
 p0                  = 0.1           # Probability of each subset, chosen adaptively
 
 # limit-state function
-Ca = 135
-Cb = 0
-LSF_A  = lambda u: Ca - u.sum(axis=0)
-LSF_B  = lambda u: -Cb + u.sum(axis=0)
+Ca    = 135
+LSF_A = lambda u: Ca - u.sum(axis=0)
+Cb    = 0
+LSF_B = lambda u: -Cb + u.sum(axis=0)
 
 
 # ---------------------------------------------------------------------------
@@ -60,16 +60,17 @@ lam = 1.0
 
 # marginal pdf / target pdf (exponential)
 #f_marg_PDF      = lambda x: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
-f_marg_PDF      = lambda x: scps.expon.pdf(x, lam)
+f_marg_PDF      = lambda x: scps.expon.pdf(x, scale=1/lam)
 
 # sample from marginal pdf (exponential)
 #sample_marg_PDF = lambda dim: np.random.randn(dim[0], dim[1])
-sample_marg_PDF = lambda dim: np.random.exponential(lam, (dim[0], dim[1]))
+sample_marg_PDF = lambda dim: np.random.exponential(1/lam, (dim[0], dim[1]))
 
 # proposal distribution (uniform)
 #f_prop_PDF      = lambda x, param: 0.5
 #f_prop_PDF      = lambda x, param: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
-f_prop_PDF      = lambda x, param: ( 2.0*np.pi*sigma**2.0 )**-.5 * np.exp( -.5 * (x-param)**2. / sigma**2. )
+f_prop_PDF      = lambda x, param: ( 2.0*np.pi*sigma**2.0 )**-.5 * np.exp( -.5 * (x - param)**2. / sigma**2. )
+#f_prop_PDF      = lambda x, param: scps.random.normal.pdf(x, param, sigma)
 
 # sample from proposal distribution (uniform)
 #sample_prop_PDF = lambda param: np.random.uniform(param-1, param+1, 1)
@@ -84,8 +85,8 @@ sample_prop_PDF = lambda param: np.random.normal(param, sigma, 1)
 
 # sample from marginal pdf (exponential)
 #sample_marg_PDF = lambda dim: np.random.randn(dim[0], dim[1])
-#sample_marg_PDF = lambda dim: np.random.exponential(lam, (dim[0], dim[1]))
-sample_marg_PDF = lambda dim: scps.expon.rvs(0, lam, (dim[0], dim[1]))
+sample_marg_PDF = lambda dim: np.random.exponential(1/lam, (dim[0], dim[1]))
+#sample_marg_PDF = lambda dim: scps.expon.rvs(0, lam, (dim[0], dim[1]))
 
 # sample from conditional PDF
 sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_cond, 1)
@@ -99,7 +100,7 @@ rho_k = 0.8
 # ---------------------------------------------------------------------------
 
 # sample from marginal pdf (exponential)
-sample_marg_PDF = lambda dim: np.random.exponential(lam, (dim[0], dim[1]))
+sample_marg_PDF = lambda dim: np.random.exponential(1/lam, (dim[0], dim[1]))
 
 # sample from conditional PDF
 sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_cond, 1)
@@ -111,20 +112,30 @@ pa = 0.1
 # ---------------------------------------------------------------------------
 
 # initializing sampling method
-#sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF)
+sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF)
 #sampling_method = cs.CondSampling(sample_marg_PDF, sample_cond_PDF, rho_k)
-sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF, sample_cond_PDF, pa)
+#sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF, sample_cond_PDF, pa)
 
 
 # apply subset-simulation
 n_loops = 1
-p_F_SS_array = np.zeros(n_loops)
+#p_F_SS_array = np.zeros(n_loops)
+p_F_SS_list  = []
+theta_list   = []
+g_list       = []
+
 
 print('\n> START Sampling')
 startTime = timer.time()
 for i in range(0, n_loops):
     p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, d, LSF_A, sampling_method)
-    p_F_SS_array[i] = p_F_SS
+    # p_F_SS_array[i] = p_F_SS
+
+    # save values in lists
+    p_F_SS_list.append(p_F_SS)
+    theta_list.append(theta)
+    g_list.append(g)
+
     print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
 
 print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
@@ -139,14 +150,18 @@ print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2),
 # RESULTS
 # --------------------------------------------------------------------------
 
-sigma_pf_ss = np.sqrt(np.var(p_F_SS_array))
+# sigma_pf_ss = np.sqrt(np.var(p_F_SS_array))
+# mu_pf_ss = np.mean(p_F_SS_array)
+
+p_F_SS_array = np.asarray(p_F_SS_list).reshape(-1)
+sigma_pf_ss = np.std(p_F_SS_array)
 mu_pf_ss = np.mean(p_F_SS_array)
 
 print("\nSTART Results:")
-print("> Subset Simulation Estimator mean\t=", np.mean(p_F_SS_array))
+print("> Probability of Failure (SubSim Est.)\t=", np.mean(p_F_SS_array))
+print("> Probability of Failure (Analytical) \t=", round(1 - scps.gamma.cdf(Ca, d, lam), 8))
 print("> Coefficient of Variation (Estimation)\t=", sigma_pf_ss/mu_pf_ss)
 print("> Coefficient of Variation (Analytical)\t=", round(delta, 8))
-print("> Analytical probability of Failure \t=", round(scps.gamma.sf(Ca, d), 8))
 
 
 # ---------------------------------------------------------------------------
@@ -154,9 +169,9 @@ print("> Analytical probability of Failure \t=", round(scps.gamma.sf(Ca, d), 8))
 # ---------------------------------------------------------------------------
 
 # analytical CDF
-lam = 1
-analytical_CDF = lambda x: 1 - scps.gamma.cdf(Ca - x, d)
+analytical_CDF = lambda x: 1 - scps.gamma.cdf(Ca - x, d, lam)
 
 # plot samples
-splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
+#splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
+splt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
 plt.show()

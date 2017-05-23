@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Subset Simulation Method example: Example 1 Ref. [1]
+# Subset Simulation Method example: Example 4.2 Ref. [2]
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -13,6 +13,8 @@
 # References:
 # 1."MCMC algorithms for Subset Simulation"
 #    Papaioannou, Betz, Zwirglmaier, Straub (2015)
+# 2. Efficiency Improvement of Stochastic Simulation by Means of Subset Sampling
+#    Martin Liebscher, Stephan Pannier, Jan-Uwe Sickert, Wolfgang Graf (2006)
 # ---------------------------------------------------------------------------
 """
 
@@ -29,25 +31,22 @@ import algorithms.adaptive_cond_sampling as acs
 
 import plots.sus_plot as splt
 
-print("RUN 06_sus_example_1.py")
+print("RUN 07_sus_example_2.py")
 
 # set seed for randomization
-np.random.seed(3)
+np.random.seed(0)
 
 # ---------------------------------------------------------------------------
 # STANDARD INPUT FOR SUBSET SIMULATION
 # ---------------------------------------------------------------------------
 
 # parameters
-n_samples_per_level = 1000          # number of samples per conditional level
-d                   = 10            # number of dimensions
+n_samples_per_level = 4000          # number of samples per conditional level
+d                   = 2            # number of dimensions
 p0                  = 0.1           # Probability of each subset, chosen adaptively
 
 # limit-state function
-beta = 3.71901        # for pf = 10^-4
-#beta = 3.08899        # for pf = 10^-3
-#beta = 2.326          # for pf = 10^-2
-LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta  
+LSF = lambda x: 7.5 - (8* np.exp(- (x[0]**2 + x[1]**2)) + 2* np.exp(-((x[0]-5)**2 + (x[1]-4)**2)) + 1 + x[0]*x[1]/10)
 
 
 # ---------------------------------------------------------------------------
@@ -55,18 +54,25 @@ LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
 # ---------------------------------------------------------------------------
 # distributions
 mu      = 0.0
-sigma   = 1.0
+sigma   = 2.0
+p       = 6.0
+q       = 6.0
 
-# marginal pdf / target pdf (standard gaussian)
-f_marg_PDF      = lambda x: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
+# marginal pdf / target pdf (beta-distribution)
+#f_marg_PDF      = lambda x: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
+f_marg_PDF      = lambda x: scps.beta.pdf(x, p, q)
 
-# sample from marginal pdf (standard gaussian)
-sample_marg_PDF = lambda dim: np.random.randn(dim[0], dim[1])
+
+# sample from marginal pdf (beta-distribution)
+#sample_marg_PDF = lambda dim: np.random.randn(dim[0], dim[1])
+#sample_marg_PDF = lambda dim: scps.beta.rvs(p, q, dim)
+sample_marg_PDF = lambda dim: np.random.beta(p, q, (dim[0], dim[1]))
 
 # proposal distribution (uniform)
 #f_prop_PDF      = lambda x, param: 0.5
 #f_prop_PDF      = lambda x, param: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
-f_prop_PDF      = lambda x, param: ( 2.*np.pi*sigma**2. )**-.5 * np.exp( -.5 * (x-param)**2. / sigma**2. )
+f_prop_PDF      = lambda x, param: ( 2.0*np.pi*sigma**2.0 )**-.5 * np.exp( -.5 * (x - param)**2. / sigma**2. )
+#f_prop_PDF      = lambda x, param: scps.random.normal.pdf(x, param, sigma)
 
 # sample from proposal distribution (uniform)
 #sample_prop_PDF = lambda param: np.random.uniform(param-1, param+1, 1)
@@ -74,12 +80,15 @@ f_prop_PDF      = lambda x, param: ( 2.*np.pi*sigma**2. )**-.5 * np.exp( -.5 * (
 sample_prop_PDF = lambda param: np.random.normal(param, sigma, 1)
 
 
+
 # ---------------------------------------------------------------------------
 # INPUT FOR CONDITIONAL SAMPLING
 # ---------------------------------------------------------------------------
 
-# sample from marginal pdf (standard gaussian)
-sample_marg_PDF = lambda dim: np.random.randn(dim[0], dim[1])
+# sample from marginal pdf (exponential)
+#sample_marg_PDF = lambda dim: np.random.randn(dim[0], dim[1])
+#sample_marg_PDF = lambda dim: np.random.exponential(1/lam, (dim[0], dim[1]))
+#sample_marg_PDF = lambda dim: scps.expon.rvs(0, lam, (dim[0], dim[1]))
 
 # sample from conditional PDF
 sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_cond, 1)
@@ -92,14 +101,13 @@ rho_k = 0.8
 # INPUT FOR ADAPTIVE CONDITIONAL SAMPLING
 # ---------------------------------------------------------------------------
 
-# sample from marginal pdf (standard gaussian)
-sample_marg_PDF = lambda dim: np.random.randn(dim[0], dim[1])
+# sample from marginal pdf (exponential)
+#sample_marg_PDF = lambda dim: np.random.exponential(1/lam, (dim[0], dim[1]))
 
 # sample from conditional PDF
 sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_cond, 1)
 
 pa = 0.1
-
 
 # ---------------------------------------------------------------------------
 # SUBSET SIMULATION
@@ -110,24 +118,26 @@ sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF, f_marg_PDF, sa
 #sampling_method = cs.CondSampling(sample_marg_PDF, sample_cond_PDF, rho_k)
 #sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF, sample_cond_PDF, pa)
 
-# apply subset-simulation
-n_loops      = 10
-#p_F_SS_array = np.zeros(n_loops)
 
+# apply subset-simulation
+n_loops = 10
+#p_F_SS_array = np.zeros(n_loops)
 p_F_SS_list  = []
 theta_list   = []
 g_list       = []
 
+
 print('\n> START Sampling')
 startTime = timer.time()
 for i in range(0, n_loops):
-    # perform SubSim
     p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, d, LSF, sampling_method)
-    #p_F_SS_array = p_F_SS
+    # p_F_SS_array[i] = p_F_SS
+
     # save values in lists
     p_F_SS_list.append(p_F_SS)
     theta_list.append(theta)
     g_list.append(g)
+
     print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
 
 print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
@@ -142,16 +152,19 @@ print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2),
 # RESULTS
 # --------------------------------------------------------------------------
 
-p_F_SS_array = np.asarray(p_F_SS_list).reshape(-1)
-sigma_pf_ss = np.std(p_F_SS_array)
-mu_pf_ss = np.mean(p_F_SS_array)
+# sigma_pf_ss = np.sqrt(np.var(p_F_SS_array))
+# mu_pf_ss = np.mean(p_F_SS_array)
 
-print("\nRESULTS:")
-print("> Probability of Failure (SubSim Est.)\t=", np.mean(p_F_SS_array))
-print("> Probability of Failure (Analytical) \t=", round(scps.norm.cdf(-beta), 8))
+p_F_SS_array = np.asarray(p_F_SS_list).reshape(-1)
+sigma_pf_ss  = np.std(p_F_SS_array)
+mu_pf_ss     = np.mean(p_F_SS_array)
+mu_pf_mcs    = 0.00405
+
+print("\nSTART Results:")
+print("> Probability of Failure (SubSim Est.)\t=", mu_pf_ss)
+print("> Probability of Failure (Analytical) \t=", mu_pf_mcs)
 print("> Coefficient of Variation (Estimation)\t=", sigma_pf_ss/mu_pf_ss)
 print("> Coefficient of Variation (Analytical)\t=", round(delta, 8))
-
 
 
 # ---------------------------------------------------------------------------
@@ -159,9 +172,9 @@ print("> Coefficient of Variation (Analytical)\t=", round(delta, 8))
 # ---------------------------------------------------------------------------
 
 # analytical CDF
-analytical_CDF = lambda x: scps.norm.cdf(x, beta)
+#analytical_CDF = lambda x: 1 - scps.gamma.cdf(x, d, lam)
 
 # plot samples
-#splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
-splt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
+splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF=0)
+#splt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
 plt.show()

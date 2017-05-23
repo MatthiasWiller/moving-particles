@@ -111,7 +111,9 @@ def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
         print('> > End LEVEL', j, ': Time needed =', round(timer.time() - startTime, 2), 's')
 
     # estimate of p_F
-    p_F_SS = (p0**(j-1)) * Nf[j-1]/n_samples_per_level
+    # TODO: make sure which version is correct
+    # p_F_SS = (p0**(j-1)) * Nf[j-1]/n_samples_per_level
+    p_F_SS = (p0**(j)) * Nf[j]/n_samples_per_level
 
     return p_F_SS, theta, g
 
