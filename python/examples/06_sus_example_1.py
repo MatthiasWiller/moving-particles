@@ -106,12 +106,12 @@ pa = 0.1
 # ---------------------------------------------------------------------------
 
 # initializing sampling method
-sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF)
+#sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF)
 #sampling_method = cs.CondSampling(sample_marg_PDF, sample_cond_PDF, rho_k)
-#sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF, sample_cond_PDF, pa)
+sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF, sample_cond_PDF, pa)
 
 # apply subset-simulation
-n_loops      = 10
+n_loops      = 50
 #p_F_SS_array = np.zeros(n_loops)
 
 p_F_SS_list  = []
@@ -143,8 +143,8 @@ print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2),
 # --------------------------------------------------------------------------
 
 p_F_SS_array = np.asarray(p_F_SS_list).reshape(-1)
-sigma_pf_ss = np.std(p_F_SS_array)
-mu_pf_ss = np.mean(p_F_SS_array)
+sigma_pf_ss  = np.std(p_F_SS_array)
+mu_pf_ss     = np.mean(p_F_SS_array)
 
 print("\nRESULTS:")
 print("> Probability of Failure (SubSim Est.)\t=", np.mean(p_F_SS_array))
@@ -163,5 +163,6 @@ analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 
 # plot samples
 #splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF)
-splt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
+#splt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
+splt.plot_sus_list_dev(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
 plt.show()

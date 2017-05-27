@@ -60,7 +60,8 @@ lam = 1.0
 
 # marginal pdf / target pdf (exponential)
 #f_marg_PDF      = lambda x: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
-f_marg_PDF      = lambda x: scps.expon.pdf(x, scale=1/lam)
+#f_marg_PDF      = lambda x: scps.expon.pdf(x, scale=1/lam)
+f_marg_PDF      = lambda x: int(x > 0) * lam * np.exp(-lam*x)
 
 # sample from marginal pdf (exponential)
 #sample_marg_PDF = lambda dim: np.random.randn(dim[0], dim[1])
@@ -118,7 +119,7 @@ sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF, f_marg_PDF, sa
 
 
 # apply subset-simulation
-n_loops = 1
+n_loops = 10
 #p_F_SS_array = np.zeros(n_loops)
 p_F_SS_list  = []
 theta_list   = []
