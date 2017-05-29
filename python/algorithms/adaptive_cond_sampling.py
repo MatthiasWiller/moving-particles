@@ -40,16 +40,29 @@ class AdaptiveCondSampling:
         self.lambda_0      = 0.6
 
 
-    def sample_mcs_level(self, dim):
-        #return self.sample_marg_PDF(dim)
-        return np.random.randn(dim[0], dim[1])
+    def sample_mcs_level(self, n_samples_per_level, LSF):
+        # get dimension
+        d       = len(self.sample_marg_PDF)
+
+        # initialize theta0 and g0
+        theta0  = np.zeros((n_samples_per_level, d), float)
+        g0      = np.zeros(n_samples_per_level, float)
+
+
+        for i in range(0, n_samples_per_level):
+            # sample theta0
+            for k in range(0, d):
+                theta0[i, k] = self.sample_marg_PDF[k]()
+
+            # evaluate theta0
+            g0[i] = LSF(theta0[i, :])
+
+        return theta0, g0
+
 
     def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
         # optimal acceptance rate
         a_star       = 0.44 
-
-        # initial scaling parameter lambda0
-        #lambda0       = 0.6
 
         # number of chains for adaption
         Na          = int(self.pa*Ns)
@@ -75,7 +88,7 @@ class AdaptiveCondSampling:
             sigma_k[k]  = np.minimum(1.0, lambda_t[0]*sigma_tilde[k])
             rho_k[k]    = np.sqrt(1.0-sigma_k[k]**2)
 
-        # shuffle seeds to prevent bias 
+        # shuffle seeds to prevent bias
         theta_seed = np.random.permutation(theta_seed) 
 
         # initialization

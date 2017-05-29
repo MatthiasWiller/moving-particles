@@ -38,8 +38,25 @@ class CondSampling:
         self.sample_cond_PDF = sample_cond_PDF
         self.rho_k           = rho_k
 
-    def sample_mcs_level(self, dim):
-        return self.sample_marg_PDF(dim)
+    def sample_mcs_level(self, n_samples_per_level, LSF):
+        # get dimension
+        d       = len(self.sample_marg_PDF)
+
+        # initialize theta0 and g0
+        theta0  = np.zeros((n_samples_per_level, d), float)
+        g0      = np.zeros(n_samples_per_level, float)
+
+
+        for i in range(0, n_samples_per_level):
+            # sample theta0
+            for k in range(0, d):
+                theta0[i, k] = self.sample_marg_PDF[k]()
+
+            # evaluate theta0
+            g0[i] = LSF(theta0[i, :])
+
+        return theta0, g0
+
 
     def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
         # get dimension
@@ -49,7 +66,7 @@ class CondSampling:
         theta0  = np.zeros((Ns*Nc, d), float)
         g0      = np.zeros(Ns*Nc, float)
 
-        # shuffle seeds to prevent bias 
+        # shuffle seeds to prevent bias
         theta_seed = np.random.permutation(theta_seed) 
 
         for k in range(0, Nc):

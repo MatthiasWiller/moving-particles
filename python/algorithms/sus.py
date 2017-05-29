@@ -13,7 +13,6 @@
 # Input:
 # * p0                  : conditional failure probability
 # * n_samples_per_level : number of samples per conditional level
-# * d                   : number of dimensions
 # * sample_marg_PDF     : function to sample from marginal pdf
 # * f_marg_PDF          : marginal pdf
 # * sample_prop_PDF     : function to sample from proposal pdf
@@ -42,7 +41,7 @@ import algorithms.cond_sampling as cs
 
 # ---------------------------------------------------------------------------
 # Subset Simulation function
-def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
+def subsetsim(p0, n_samples_per_level, LSF, sampler):
     # initialization and constants
     max_it  = 20
     theta   = []
@@ -61,14 +60,14 @@ def subsetsim(p0, n_samples_per_level, d, LSF, sampler):
     # sample initial step (MCS)
     j       = 0 # set j = 0 (number of conditional level)
 
-    theta0 = sampler.sample_mcs_level((n_samples_per_level, d))
-
-    g0      = np.zeros((n_samples_per_level), float)
+    # sample initial step (MCS)
+    theta0, g0 = sampler.sample_mcs_level(n_samples_per_level, LSF)
 
     for i in range(0, n_samples_per_level):
-        g0[i] = LSF(theta0[i, :])  # evaluate theta0
-        if (g0[i] <= 0):
+        #g0[i] = LSF(theta0[i, :])  # evaluate theta0
+        if g0[i] <= 0:
             Nf[j] += 1
+
     print('> > Nf =', Nf[j], '/', n_samples_per_level)
     print('> > End LEVEL 0 : Time needed =', round(timer.time() - startTime, 2), 's')
     theta.append(theta0)
