@@ -50,7 +50,7 @@ def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0):
     # count number of levels
     for i in range(0, n_sim):
         n_levels[i] = len(g_list[i])
-    
+
     # find most often encountered n_levels
     count_n_levels   = np.bincount(n_levels)
     most_often_level = np.nanargmax(count_n_levels)
