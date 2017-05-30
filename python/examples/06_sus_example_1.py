@@ -47,7 +47,7 @@ p0                  = 0.1           # Probability of each subset, chosen adaptiv
 beta = 3.71901        # for pf = 10^-4
 #beta = 3.08899        # for pf = 10^-3
 #beta = 2.326          # for pf = 10^-2
-LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta  
+LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
 
 # analytical CDF
 analytical_CDF = lambda x: scps.norm.cdf(x, beta)
@@ -98,7 +98,7 @@ sample_prop_PDF = lambda param: np.random.normal(param, sigma, 1)
 # sample from conditional PDF
 sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_cond, 1)
 
-# note: don't set it to 0.2; it is too low; 
+# note: don't set it to 0.2; it is too low;
 rho_k = 0.8         # ~0.7 gives kinda good results
 
 
@@ -109,7 +109,7 @@ rho_k = 0.8         # ~0.7 gives kinda good results
 # sample from conditional PDF
 sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_cond, 1)
 
-# 
+#
 pa = 0.1
 
 
