@@ -29,8 +29,9 @@ import algorithms.cond_sampling as cs
 import algorithms.modified_metropolis as mmh
 import algorithms.adaptive_cond_sampling as acs
 
-import plots.sus_plot as splt
-import plots.user_plot as uplt
+import utilities.plots as uplt
+import utilities.stats as ustat
+import utilities.util as uutil
 
 print("RUN 07_sus_example_2.py")
 
@@ -48,7 +49,7 @@ p0                  = 0.1           # Probability of each subset, chosen adaptiv
 # parameters for beta-distribution
 p = 6.0
 q = 6.0
-beta_distr = scps.betaprime(p, q)
+beta_distr = scps.beta(p, q, loc=-2, scale=8)
 
 # transformation to/from U-space
 phi     = lambda x: scps.norm.cdf(x)
@@ -143,7 +144,7 @@ sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, sample_cond_PDF
 
 
 # apply subset-simulation
-n_loops = 1
+n_sim = 10
 
 # initialization of lists
 p_F_SS_list  = []
@@ -153,26 +154,33 @@ g_list       = []
 
 print('\n> START Sampling')
 startTime = timer.time()
-for i in range(0, n_loops):
-    # perform SubSim
-    p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
 
-    # transform samples from u to x-space
-    for j in range(0, len(theta)):
-        theta[j] = transform_U2X(theta[j])
+n_loops = n_sim
+while n_loops > 0:
+    for i in range(0, n_loops):
+        # perform SubSim
+        p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
 
-    # save values in lists
-    p_F_SS_list.append(p_F_SS)
-    theta_list.append(theta)
-    g_list.append(g)
-    print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
+        # transform samples from u to x-space
+        for j in range(0, len(theta)):
+            theta[j] = transform_U2X(theta[j])
+
+        # save values in lists
+        p_F_SS_list.append(p_F_SS)
+        theta_list.append(theta)
+        g_list.append(g)
+        print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
+
+    # check if we have enough samples yet
+    n_eff_sim = uutil.get_n_eff_sim(g_list)
+    n_loops = n_sim - n_eff_sim
 
 print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 
 # computing cov
 print('\n> START Computing C.O.V')
 startTime = timer.time()
-delta = sus.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+delta     = ustat.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
 print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2), "s")
 
 # ---------------------------------------------------------------------------
@@ -200,8 +208,7 @@ print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
 # ---------------------------------------------------------------------------
 
 # plot samples
-#splt.plot_sus(g, p0, n_samples_per_level, p_F_SS, analytical_CDF=0)
-#splt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF=0)
+uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF=0)
 #plt.show()
 
 for lvl in theta:
