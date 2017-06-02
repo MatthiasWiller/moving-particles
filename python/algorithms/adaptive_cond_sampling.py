@@ -72,11 +72,7 @@ class AdaptiveCondSampling:
         # get dimension
         d       = np.size(theta_seed, axis=1)
 
-        # initialize
-        # sigma_tilde = np.zeros((1, d), float)
-        # mu_tilde    = np.zeros((1, d), float)
-
-        # mu_tilde    = np.mean(theta_seed, axis=0)
+        # get sigma of theta_seed
         sigma_tilde = np.std(theta_seed, axis=0)
 
         sigma_k = np.zeros((d), float)
