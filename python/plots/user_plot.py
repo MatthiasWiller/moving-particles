@@ -163,19 +163,19 @@ def plot_surface_with_samples(theta, f):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
-    ax.plot_surface(X, Y, Z, rstride=5, cstride=5, cmap=cm.pink_r, antialiased=False, alpha=0.2)
-    ax.plot_wireframe(X, Y, Z, rstride=5, cstride=5, linewidth=0.5, color='black', alpha=0.2)
+    ax.plot_surface(X, Y, Z, rstride=5, cstride=5, cmap=cm.pink_r, antialiased=False, alpha=0.9)
+    ax.plot_wireframe(X, Y, Z, rstride=5, cstride=5, linewidth=0.5, color='black', alpha=0.9)
 
-    ax.scatter(theta[:, 0], theta[:, 1], z_samples, label='$z(x_1, x_2)$')
+    ax.scatter(theta[:, 0], theta[:, 1], z_samples, marker='o', color='blue', label='$z(x_1, x_2)$')
 
     ax.plot_surface(X, Y, z_plane, rstride=5, cstride=5, cmap=theCM, antialiased=False, alpha=0.1)
 
-    ax.view_init(elev=30, azim=-130)
+    ax.view_init(elev=24, azim=-40)
 
     # axes and title config
     ax.set_xlabel('$x_1$', labelpad=15)
     ax.yaxis.set_rotate_label(False) # disable automatic rotation
-    ax.set_ylabel('$x_2$', rotation = 0, labelpad=15)
+    ax.set_ylabel('$x_2$', rotation = 15, labelpad=15)
     ax.zaxis.set_rotate_label(False)
     ax.set_zlabel('$z(x)$',rotation=93, labelpad=3)
     ax.set_xlim3d(min_x, max_x)

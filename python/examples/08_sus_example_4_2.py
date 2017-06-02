@@ -48,7 +48,7 @@ p0                  = 0.1           # Probability of each subset, chosen adaptiv
 # parameters for beta-distribution
 p = 6.0
 q = 6.0
-beta_distr = scps.beta(p, q)
+beta_distr = scps.betaprime(p, q)
 
 # transformation to/from U-space
 phi     = lambda x: scps.norm.cdf(x)

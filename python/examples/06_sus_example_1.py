@@ -123,7 +123,7 @@ pa = 0.1
 sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, sample_cond_PDF, pa)
 
 # apply subset-simulation
-n_loops      = 5
+n_loops      = 10
 
 # initialization of lists
 p_F_SS_list  = []

@@ -23,7 +23,7 @@ n_samples = 25000
 # parameters for beta-distribution
 p = 6.0
 q = 6.0
-beta_distr = scps.beta(p, q)
+beta_distr = scps.betaprime(p, q)
 
 # limit-state function
 z   = lambda x: 8* np.exp(-(x[0]**2 + x[1]**2)) + 2* np.exp(-((x[0]-5)**2 + (x[1]-4)**2)) + 1 + x[0]*x[1]/10
