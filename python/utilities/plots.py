@@ -63,7 +63,7 @@ def plot_hist(x, target_PDF=0, dimension=1):
 # -----------------------------------------------------------------------------------------
 # plot values of index
 def plot_mixing(x):
-    
+
     n_samples = len(x)
 
     plt.figure()
@@ -94,7 +94,6 @@ def plot_autocorr(x, lag):
             temp += x[t] * x[t+k]
 
         rho[k] = (1/sigma2) * (1/(n_samples - k)) * temp
-    #rho = hplt.estimate_autocorrelation(x, lag)    
 
     # plot results
     plt.figure()
@@ -121,7 +120,7 @@ def plot_scatter_with_contour(theta, target_PDF):
     plt.contour(X, Y, Z, 7, cmap=cm.jet)
     #plt.scatter(theta[0,:], theta[1,:], marker='o', facecolors='None', color='navy', linewidths=1, label='Circles')
     plt.scatter(theta[0,:], theta[1,:], s=1, color='blue', marker='o', linestyle='None')
-    
+
     #ax.plot_surface(theta[0,:], theta[1,:], target_PDF(theta) )
     plt.title(r'Contour plot')
     plt.xlabel(r'$x_1$')
@@ -143,13 +142,13 @@ def plot_surface_with_samples(theta, f):
 
     z_plane = 7.5 * np.ones(len(x))
 
-    z_samples = f([theta[:, 0], theta[:, 1]])
+    z_samples = f([theta[:, 0], theta[:, 1]]) + 0.01
 
 
     theCM = cm.get_cmap()
     theCM._init()
     alphas = np.abs(np.linspace(-1.0, 1.0, theCM.N))
-    theCM._lut[:-3,-1] = alphas
+    theCM._lut[:-3, -1] = alphas
 
     # 3D Plot
     min_x = min(X.flatten())
@@ -175,9 +174,9 @@ def plot_surface_with_samples(theta, f):
     # axes and title config
     ax.set_xlabel('$x_1$', labelpad=15)
     ax.yaxis.set_rotate_label(False) # disable automatic rotation
-    ax.set_ylabel('$x_2$', rotation = 15, labelpad=15)
+    ax.set_ylabel('$x_2$', rotation=15, labelpad=15)
     ax.zaxis.set_rotate_label(False)
-    ax.set_zlabel('$z(x)$',rotation=93, labelpad=3)
+    ax.set_zlabel('$z(x)$', rotation=93, labelpad=3)
     ax.set_xlim3d(min_x, max_x)
     ax.set_ylim3d(min_y, max_y)
     ax.set_zlim3d(min_z, max_z)
@@ -257,17 +256,17 @@ def plot_scatter_with_hist(x, target_PDF=0):
 
     # create bins and plot histograms
     bins = np.arange(lowerlim, upperlim + binwidth, binwidth)
-    axHistx.hist(x[0,:], bins=bins, normed=1, color='navy')
-    axHisty.hist(x[1,:], bins=bins, orientation='horizontal', normed=1, color='navy')
-    
+    axHistx.hist(x[0, :], bins=bins, normed=1, color='navy')
+    axHisty.hist(x[1, :], bins=bins, orientation='horizontal', normed=1, color='navy')
+
     # plot best-fit line, if target_PDF is given
-    if(target_PDF != 0):
+    if target_PDF != 0:
         f_x0 = compute_marginal_PDF(target_PDF, bins, 0)
         axHistx.plot(bins, f_x0, '--', color='red')
 
         f_x1 = compute_marginal_PDF(target_PDF, bins, 1)
         axHisty.plot(f_x1, bins, '--', color='red')
-    
+
     # limit histograms to limits of scatter-plot
     axHistx.set_xlim(axScatter.get_xlim())
     axHisty.set_ylim(axScatter.get_ylim())
@@ -358,7 +357,7 @@ def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0):
     # loop over all (effective) simulations to get the b_line
     for sim in range(0, n_sim_effective):
         b_line_list = []
-        g = g_list[sim]
+        g           = g_list[sim]
 
         b_line      = np.zeros((n_levels, Nc), float)
 
@@ -377,7 +376,7 @@ def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0):
 
     b_line_matrix = np.asarray(b_line_list_all_levels)
 
-    b_line_mean_array = np.mean(b_line_matrix, axis=0)
+    b_line_mean_array  = np.mean(b_line_matrix, axis=0)
     b_line_sigma_array = np.std(b_line_matrix, axis=0)
 
     b_line_max = b_line_mean_array + 5*b_line_sigma_array
@@ -428,4 +427,39 @@ def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0):
     plt.ylabel(r'$P(g(x) \leq b)$')
     plt.tight_layout()
     #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+
+# ---------------------------------------------------------------------------
+# plot cov over pf
+def plot_cov_over_pf(pf_line, cov_mmh, cov_cs, cov_acs):
+     # create figure
+    fig = plt.figure()
+
     
+    # set x-axis to log-scale
+    plt.xscale('log')
+
+    # plotting
+
+    # * plot point of estimation of failure probability
+    # plt.plot(pf_line, cov_mmh, marker='s', color='navy',\
+    #                 markersize='10', label=r'MMH')
+
+    # * plot point of estimation of failure probability
+    plt.plot(pf_line, cov_cs, marker='o', color='red',\
+                    markersize='10', label=r'CS')
+    
+    # * plot point of estimation of failure probability
+    plt.plot(pf_line, cov_acs, marker='x', color='green',\
+                    markersize='10', label=r'aCS')
+
+    # add legend
+    matplotlib.rcParams['legend.fontsize'] = 12
+    plt.legend(loc='upper right')
+
+    # set titles
+    plt.title(r'Coefficient of Variation')
+    plt.xlabel(r'Target Probability of Failure $P_f$')
+    plt.ylabel(r'Coefficient of Variation $\delta$')
+    plt.tight_layout()
+    #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')

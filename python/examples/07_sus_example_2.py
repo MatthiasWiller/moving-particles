@@ -81,7 +81,7 @@ sample_marg_PDF = lambda: transform_X2U(np.random.exponential(1/lam, 1))
 #sample_marg_PDF = lambda: np.random.exponential(1/lam, 1)
 
 # marginal pdf / target pdf (exponential)
-f_marg_PDF      = lambda u: int(x > 0) * lam * np.exp(-lam*transform_U2X(u))
+f_marg_PDF      = lambda u: int(u > 0) * lam * np.exp(-lam*transform_U2X(u))
 #f_marg_PDF      = lambda x: int(x > 0) * lam * np.exp(-lam*x)
 
 # append distributions to list

@@ -22,7 +22,6 @@ def cov_analytical(theta, g, p0, N, pf_sus):
     Ns  = int(1/p0)      # number of samples per Markov chain
 
     # initialization
-    p       = np.zeros(m, float)
     b       = np.zeros(m, float)
     delta   = np.zeros(m, float)
 

@@ -36,8 +36,8 @@ class AdaptiveCondSampling:
     def __init__(self, sample_marg_PDF, sample_cond_PDF, pa):
         self.sample_marg_PDF = sample_marg_PDF
         self.sample_cond_PDF = sample_cond_PDF
-        self.pa           = pa
-        self.lambda_0      = 0.6
+        self.pa              = pa
+        self.lambda_0        = 0.6
 
 
     def sample_mcs_level(self, n_samples_per_level, LSF):
@@ -62,7 +62,7 @@ class AdaptiveCondSampling:
 
     def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
         # optimal acceptance rate
-        a_star       = 0.44 
+        a_star       = 0.44
 
         # number of chains for adaption
         Na          = int(self.pa*Ns)
@@ -82,10 +82,10 @@ class AdaptiveCondSampling:
         for k in range(0, d):
             # set sigma_k = min(1, lambda0*sigma)
             sigma_k[k]  = np.minimum(1.0, lambda_t[0]*sigma_tilde[k])
-            rho_k[k]    = np.sqrt(1.0-sigma_k[k]**2)
+            rho_k[k]    = np.sqrt(1.0 - sigma_k[k]**2)
 
         # shuffle seeds to prevent bias
-        theta_seed = np.random.permutation(theta_seed) 
+        theta_seed = np.random.permutation(theta_seed)
 
         # initialization
         theta_list = []
@@ -93,7 +93,7 @@ class AdaptiveCondSampling:
         a_list     = []
 
         # empty list to store the acc/rej-values up until adaptation
-        a_bar      = [] 
+        a_bar      = []
 
         for i in range(0, Nc):
             #msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
@@ -118,7 +118,7 @@ class AdaptiveCondSampling:
                 for k in range(0, d):
                     sigma_k[k]  = np.minimum(1.0, lambda_t[t]*sigma_tilde[k])
                     rho_k[k]    = np.sqrt(1.0 - sigma_k[k]**2)
-        
+
         self.lambda_0 = lambda_t[t] # safe last lambda_t for next level
         theta_array = np.asarray(theta_list).reshape((-1, d))
         g_array     = np.asarray(g_list).reshape(-1)
@@ -137,7 +137,7 @@ class AdaptiveCondSampling:
         a           = np.zeros(Ns, float)
         a[0]        = 1
         # compute sigma from correlation parameter rho_k
-        
+
 
         for i in range(1, Ns):
             theta_star = np.zeros(d, float)
