@@ -29,7 +29,6 @@
 # ---------------------------------------------------------------------------
 """
 
-import time as timer
 import numpy as np
 
 class CondSampling:
@@ -55,6 +54,7 @@ class CondSampling:
             # evaluate theta0
             g0[i] = LSF(theta0[i, :])
 
+        # output
         return theta0, g0
 
 
@@ -62,12 +62,12 @@ class CondSampling:
         # get dimension
         d       = np.size(theta_seed, axis=1)
 
-        # initialize theta0 and g0
-        theta0  = np.zeros((Ns*Nc, d), float)
-        g0      = np.zeros(Ns*Nc, float)
+        # initialization
+        theta_list = []
+        g_list     = []
 
         # shuffle seeds to prevent bias
-        theta_seed = np.random.permutation(theta_seed) 
+        theta_seed = np.random.permutation(theta_seed)
 
         for k in range(0, Nc):
             msg = "> > Sampling Level ... [" + repr(int(k/Nc*100)) + "%]"
@@ -76,11 +76,16 @@ class CondSampling:
             # generate states of Markov chain
             theta_temp, g_temp = self.sample_markov_chain(theta_seed[k, :], Ns, LSF, b)
 
-            # save Markov chain in sample array
-            theta0[Ns*(k):Ns*(k+1), :]  = theta_temp[:, :]
-            g0[Ns*(k):Ns*(k+1)]         = g_temp[:]
+            # save Markov chain in list
+            theta_list.append(theta_temp)
+            g_list.append(g_temp)
 
-        return theta0, g0
+         # convert theta_list and g_list to np.array()
+        theta_array = np.asarray(theta_list).reshape((-1, d))
+        g_array     = np.asarray(g_list).reshape(-1)
+
+        # output
+        return theta_array, g_array
 
     def sample_markov_chain(self, theta0, Ns, LSF, b):
         # get dimension
@@ -100,7 +105,7 @@ class CondSampling:
             # generate a candidate state xi:
             for k in range(0, d):
                 # sample the candidate state
-                mu = self.rho_k * theta[i-1, k]
+                mu            = self.rho_k * theta[i-1, k]
                 theta_star[k] = self.sample_cond_PDF(mu, sigma)
 
             # check whether theta_star is in Failure domain (system analysis) and accept or reject it

@@ -46,11 +46,11 @@ d                   = 10            # number of dimensions
 p0                  = 0.1           # Probability of each subset, chosen adaptively
 
 # limit-state function
-beta = 5.1993       # for pf = 10^-7
+#beta = 5.1993       # for pf = 10^-7
 #beta = 4.7534       # for pf = 10^-6
 #beta = 4.2649       # for pf = 10^-5
 #beta = 3.7190       # for pf = 10^-4
-#beta = 3.0902       # for pf = 10^-3
+beta = 3.0902       # for pf = 10^-3
 #beta = 2.3263       # for pf = 10^-2
 LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
 
@@ -92,8 +92,8 @@ f_prop_PDF      = lambda x, param: ( 2.*np.pi*sigma**2. )**-.5 * np.exp( -.5 * (
 
 # sample from proposal distribution (gaussian)
 #sample_prop_PDF = lambda param: np.random.uniform(param-1, param+1, 1)
-sample_prop_PDF = lambda param: scps.norm.rvs(mu, sigma, 1)
-#sample_prop_PDF = lambda param: np.random.normal(param, sigma, 1)
+#sample_prop_PDF = lambda param: scps.norm.rvs(mu, sigma, 1)
+sample_prop_PDF = lambda param: np.random.normal(param, sigma, 1)
 
 
 # ---------------------------------------------------------------------------
@@ -124,11 +124,11 @@ pa = 0.1
 
 # initializing sampling method
 #sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, sample_prop_PDF, f_prop_PDF)
-sampling_method = cs.CondSampling(sample_marg_PDF_list, sample_cond_PDF, rho_k)
-#sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, sample_cond_PDF, pa)
+#sampling_method = cs.CondSampling(sample_marg_PDF_list, sample_cond_PDF, rho_k)
+sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, sample_cond_PDF, pa)
 
 # apply subset-simulation
-n_sim = 50
+n_sim = 10
 
 # initialization of lists
 p_F_SS_list  = []

@@ -438,12 +438,13 @@ def plot_cov_over_pf(pf_line, cov_mmh, cov_cs, cov_acs):
     
     # set x-axis to log-scale
     plt.xscale('log')
+    plt.gca().invert_xaxis()
 
     # plotting
 
     # * plot point of estimation of failure probability
-    # plt.plot(pf_line, cov_mmh, marker='s', color='navy',\
-    #                 markersize='10', label=r'MMH')
+    plt.plot(pf_line, cov_mmh, marker='s', color='navy',\
+                    markersize='10', label=r'MMH')
 
     # * plot point of estimation of failure probability
     plt.plot(pf_line, cov_cs, marker='o', color='red',\
