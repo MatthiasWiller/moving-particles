@@ -134,21 +134,14 @@ def plot_scatter_with_contour(theta, target_PDF):
 
 # -----------------------------------------------------------------------------------------
 # plot surface with samples
-def plot_surface_with_samples(theta, f):
+def plot_surface_with_samples(theta, g, f, g_max_global):
     x       = np.linspace(-2, 6, 100)
     X, Y    = np.meshgrid(x, x)
     Z       = f([X, Y])
 
-
     z_plane = 7.5 * np.ones(len(x))
 
-    z_samples = f([theta[:, 0], theta[:, 1]]) + 0.01
-
-
-    theCM = cm.get_cmap()
-    theCM._init()
-    alphas = np.abs(np.linspace(-1.0, 1.0, theCM.N))
-    theCM._lut[:-3, -1] = alphas
+    z_samples = f([theta[:, 0], theta[:, 1]])
 
     # 3D Plot
     min_x = min(X.flatten())
@@ -162,14 +155,34 @@ def plot_surface_with_samples(theta, f):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
-    ax.plot_surface(X, Y, Z, rstride=5, cstride=5, cmap=cm.pink_r, antialiased=False, alpha=0.9)
-    ax.plot_wireframe(X, Y, Z, rstride=5, cstride=5, linewidth=0.5, color='black', alpha=0.9)
+    # plot z-surface
+    ax.plot_surface(X, Y, Z, rstride=3, cstride=3, cmap=cm.pink_r, antialiased=False, alpha=1.0)
+    ax.plot_wireframe(X, Y, Z, rstride=3, cstride=3, linewidth=0.5, color='black', alpha=1.0)
 
-    ax.scatter(theta[:, 0], theta[:, 1], z_samples, marker='o', color='blue', label='$z(x_1, x_2)$')
+    # custom color map
+    theCM = cm.get_cmap()
+    theCM._init()
+    alphas = np.abs(np.linspace(-1.0, 1.0, theCM.N))
+    theCM._lut[:-3, -1] = alphas
 
-    ax.plot_surface(X, Y, z_plane, rstride=5, cstride=5, cmap=theCM, antialiased=False, alpha=0.1)
+    # plot limit-surface (= 7.5)
+    ax.plot_surface(X, Y, z_plane, rstride=5, cstride=5, cmap=theCM, antialiased=False, alpha=0.4)
 
-    ax.view_init(elev=24, azim=-40)
+    # get colormap
+    colors = []
+
+
+    my_cmap = cm.get_cmap('viridis')
+    for i in range(0, np.size(theta, axis=0)):
+        colors.append( my_cmap(1.0 - g[i]/g_max_global) )  # color will now be an RGBA tuple
+
+    for i in range(0, np.size(theta, axis=0)):
+        # use ax.plot instead of ax.scatter to display the samples in front of the surface
+        ax.plot([theta[i, 0]], [theta[i, 1]], [z_samples[i]],\
+                linestyle='none', marker='+', mfc='none', markeredgecolor=colors[i])
+
+    # set view
+    ax.view_init(elev=42, azim=-40)
 
     # axes and title config
     ax.set_xlabel('$x_1$', labelpad=15)
@@ -462,5 +475,94 @@ def plot_cov_over_pf(pf_line, cov_mmh, cov_cs, cov_acs):
     plt.title(r'Coefficient of Variation')
     plt.xlabel(r'Target Probability of Failure $P_f$')
     plt.ylabel(r'Coefficient of Variation $\delta$')
+    plt.tight_layout()
+    #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+# ---------------------------------------------------------------------------
+# plot cov over pf
+def plot_sus_trails(g_list, p0, N, analytical_CDF):
+    # create figure
+    fig = plt.figure()
+
+    # some constants
+    Nc    = int(N*p0)
+    n_sim = len(g_list)
+
+    # initialization
+    n_levels = np.zeros(n_sim, int)
+
+    # count number of levels
+    for i in range(0, n_sim):
+        n_levels[i] = len(g_list[i])
+
+    # find max n_levels
+    n_levels = np.amax(n_levels)
+
+    # set up Pf_line
+    Pf_line       = np.zeros((n_levels, Nc), float)
+    Pf_line[0, :] = np.linspace(p0, 1, Nc)
+    for i in range(1, n_levels):
+        Pf_line[i, :] = Pf_line[i-1, :]*p0
+    
+    # initialization
+    b_line_list_all_sims = []
+
+    # loop over all (effective) simulations to get the b_line
+    for sim in range(0, n_sim):
+        b_line_list = []
+        g           = g_list[sim]
+
+        n_levels    = len(g)
+
+        b_line      = np.zeros((n_levels, Nc), float)
+
+        # loop over all levels and get b_line
+        for level in range(0, n_levels):
+            g_sorted          = np.sort(g[level])
+            b_line[level, :]  = np.percentile(g_sorted, Pf_line[0, :]*100)
+        
+        b_line_array_temp = b_line.reshape(-1)
+        b_line_array_temp = np.sort(b_line_array_temp)
+        b_line_list_all_sims.append(b_line_array_temp)
+    
+    # reshape and sort the matrices
+    Pf_line = np.asarray(Pf_line).reshape(-1)
+    Pf_line = np.sort(Pf_line)
+        
+    # exact line and (with analytical_CDF) 
+    if analytical_CDF!=0:
+        max_lim         = np.max(np.asarray(g))
+        b_exact_line    = np.linspace(0, max_lim, 140)
+        pf_exact_line   = analytical_CDF(b_exact_line)
+
+        pf_exact_point  = analytical_CDF(0)        
+
+    # set y-axis to log-scale
+    plt.yscale('log')
+
+    # plotting
+
+    # * plot sus trails
+    colors = ['blue', 'fuchsia', 'green', 'red', 'navy', 'skyblue', 'orange', 'yellow']
+
+    for b_line_sim in b_line_list_all_sims:
+        n_elements = len(b_line_sim)
+        n_color = int(n_elements/Nc)
+        plt.plot(b_line_sim, Pf_line[-n_elements:], '--', color=colors[n_color])
+
+    # * plot exact line
+    if analytical_CDF != 0:
+        plt.plot(b_exact_line, pf_exact_line, '-', color='yellow', label=r'Exact')
+
+
+    # * plot exact point
+    if analytical_CDF != 0:
+        plt.plot(0, pf_exact_point, marker='x', color='yellow',\
+                    markersize='10', linestyle='none', label=r'Pf Exact')
+
+    # set titles
+    plt.title(r'Failure probability estimate')
+    plt.xlabel(r'Limit state function values $b$')
+    plt.ylabel(r'$P(g(x) \leq b)$')
     plt.tight_layout()
     #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')

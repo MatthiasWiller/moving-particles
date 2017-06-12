@@ -128,7 +128,7 @@ pa = 0.1
 sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, sample_cond_PDF, pa)
 
 # apply subset-simulation
-n_sim = 10
+n_sim = 30
 
 # initialization of lists
 p_F_SS_list  = []
@@ -191,4 +191,5 @@ print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
 # plot samples
 #uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
 #uplt.plot_cov_over_pf(g_list, p0, n_samples_per_level)
+uplt.plot_sus_trails(g_list, p0, n_samples_per_level, analytical_CDF)
 plt.show()

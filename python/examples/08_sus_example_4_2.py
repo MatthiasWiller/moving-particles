@@ -43,7 +43,7 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-n_samples_per_level = 1000          # number of samples per conditional level
+n_samples_per_level = 500          # number of samples per conditional level
 p0                  = 0.1           # Probability of each subset, chosen adaptively
 
 # parameters for beta-distribution
@@ -144,7 +144,7 @@ sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, sample_cond_PDF
 
 
 # apply subset-simulation
-n_sim = 10
+n_sim = 1
 
 # initialization of lists
 p_F_SS_list  = []
@@ -210,8 +210,8 @@ print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
 # plot samples
 uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF=0)
 #plt.show()
-
-for lvl in theta:
-    uplt.plot_surface_with_samples(lvl, z)
+g_max_global = np.amax(np.asarray(g).reshape(-1))
+for i in range(0, len(theta)):
+    uplt.plot_surface_with_samples(theta[i], g[i], z, g_max_global)
 
 plt.show()
