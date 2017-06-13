@@ -40,8 +40,26 @@ class ModifiedMetropolisHastings:
         self.f_prop_PDF      = f_prop_PDF
         self.sample_prop_PDF = sample_prop_PDF
 
-    def sample_mcs_level(self, dim):
-        return self.sample_marg_PDF(dim)
+
+    def sample_mcs_level(self, n_samples_per_level, LSF):
+        # get dimension
+        d       = len(self.sample_marg_PDF)
+
+        # initialize theta0 and g0
+        theta0  = np.zeros((n_samples_per_level, d), float)
+        g0      = np.zeros(n_samples_per_level, float)
+
+
+        for i in range(0, n_samples_per_level):
+            # sample theta0
+            for k in range(0, d):
+                theta0[i, k] = self.sample_marg_PDF[k]()
+
+            # evaluate theta0
+            g0[i] = LSF(theta0[i, :])
+
+        return theta0, g0
+
 
     def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
         # get dimension
@@ -52,8 +70,8 @@ class ModifiedMetropolisHastings:
         g0      = np.zeros(Ns*Nc, float)
 
         for k in range(0, Nc):
-            #msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
-            #print(msg)
+            msg = "> > Sampling Level ... [" + repr(int(k/Nc*100)) + "%]"
+            print(msg)
 
             # generate states of Markov chain
             theta_temp, g_temp = self.sample_markov_chain(theta_seed[k, :], Ns, LSF, b)
@@ -63,6 +81,7 @@ class ModifiedMetropolisHastings:
             g0[Ns*(k):Ns*(k+1)]         = g_temp[:]
 
         return theta0, g0
+
 
     def sample_markov_chain(self, theta0, N, LSF, b):
         # get dimension
@@ -86,8 +105,17 @@ class ModifiedMetropolisHastings:
 
                 # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
                 #         (p(x) * q(x,y))         (p(x) * g(x))
-                alpha = (self.f_marg_PDF(xi[k])          * self.f_prop_PDF(theta[i-1, k], xi[k]))/ \
-                        (self.f_marg_PDF(theta[i-1, k])  * self.f_prop_PDF(xi[k], theta[i-1, k]))
+                # tmp1 = self.f_marg_PDF[k](xi[k])
+                # tmp2 = self.f_marg_PDF[k](theta[i-1, k])
+                # tmp3 = self.f_prop_PDF(theta[i-1, k], xi[k])
+                # tmp4 = self.f_prop_PDF(xi[k], theta[i-1, k])
+
+                # print('Control Values: alpha = (', tmp1, '*', tmp3, ') / (', tmp2, '*', tmp4, ')')
+
+                alpha = (self.f_marg_PDF[k](xi[k])          * self.f_prop_PDF(theta[i-1, k], xi[k]))/ \
+                        (self.f_marg_PDF[k](theta[i-1, k])  * self.f_prop_PDF(xi[k], theta[i-1, k]))
+
+
 
                 r     = np.minimum(alpha, 1)
 
@@ -97,7 +125,7 @@ class ModifiedMetropolisHastings:
                     xi[k] = xi[k]
                 else:
                     # reject
-                    xi[k] = theta[i, k]
+                    xi[k] = theta[i-1, k]
 
             # check whether xi is in Failure domain (system analysis) and accept or reject xi
             g_temp = LSF(xi)

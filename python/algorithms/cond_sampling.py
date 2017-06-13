@@ -29,7 +29,6 @@
 # ---------------------------------------------------------------------------
 """
 
-import time as timer
 import numpy as np
 
 class CondSampling:
@@ -38,32 +37,55 @@ class CondSampling:
         self.sample_cond_PDF = sample_cond_PDF
         self.rho_k           = rho_k
 
-    def sample_mcs_level(self, dim):
-        return self.sample_marg_PDF(dim)
+    def sample_mcs_level(self, n_samples_per_level, LSF):
+        # get dimension
+        d       = len(self.sample_marg_PDF)
+
+        # initialize theta0 and g0
+        theta0  = np.zeros((n_samples_per_level, d), float)
+        g0      = np.zeros(n_samples_per_level, float)
+
+
+        for i in range(0, n_samples_per_level):
+            # sample theta0
+            for k in range(0, d):
+                theta0[i, k] = self.sample_marg_PDF[k]()
+
+            # evaluate theta0
+            g0[i] = LSF(theta0[i, :])
+
+        # output
+        return theta0, g0
+
 
     def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
         # get dimension
         d       = np.size(theta_seed, axis=1)
 
-        # initialize theta0 and g0
-        theta0  = np.zeros((Ns*Nc, d), float)
-        g0      = np.zeros(Ns*Nc, float)
+        # initialization
+        theta_list = []
+        g_list     = []
 
-        # shuffle seeds to prevent bias 
-        theta_seed = np.random.permutation(theta_seed) 
+        # shuffle seeds to prevent bias
+        theta_seed = np.random.permutation(theta_seed)
 
         for k in range(0, Nc):
-            #msg = "> > Sampling Level " + repr(j) + " ... [" + repr(int(k/Nc*100)) + "%]"
-            #print(msg)
+            msg = "> > Sampling Level ... [" + repr(int(k/Nc*100)) + "%]"
+            print(msg)
 
             # generate states of Markov chain
             theta_temp, g_temp = self.sample_markov_chain(theta_seed[k, :], Ns, LSF, b)
 
-            # save Markov chain in sample array
-            theta0[Ns*(k):Ns*(k+1), :]  = theta_temp[:, :]
-            g0[Ns*(k):Ns*(k+1)]         = g_temp[:]
+            # save Markov chain in list
+            theta_list.append(theta_temp)
+            g_list.append(g_temp)
 
-        return theta0, g0
+         # convert theta_list and g_list to np.array()
+        theta_array = np.asarray(theta_list).reshape((-1, d))
+        g_array     = np.asarray(g_list).reshape(-1)
+
+        # output
+        return theta_array, g_array
 
     def sample_markov_chain(self, theta0, Ns, LSF, b):
         # get dimension
@@ -83,7 +105,7 @@ class CondSampling:
             # generate a candidate state xi:
             for k in range(0, d):
                 # sample the candidate state
-                mu = self.rho_k * theta[i-1, k]
+                mu            = self.rho_k * theta[i-1, k]
                 theta_star[k] = self.sample_cond_PDF(mu, sigma)
 
             # check whether theta_star is in Failure domain (system analysis) and accept or reject it

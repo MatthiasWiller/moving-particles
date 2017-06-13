@@ -133,6 +133,58 @@ def plot_scatter_with_contour(theta, target_PDF):
     #plt.tight_layout()
     #plt.savefig('plot_scatter_with_contour.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
+# -----------------------------------------------------------------------------------------
+# plot surface with samples
+def plot_surface_with_samples(theta, f):
+    x       = np.linspace(-2, 6, 100)
+    X, Y    = np.meshgrid(x, x)
+    Z       = f([X, Y])
+
+
+    z_plane = 7.5 * np.ones(len(x))
+
+    z_samples = f([theta[:, 0], theta[:, 1]])
+
+
+    theCM = cm.get_cmap()
+    theCM._init()
+    alphas = np.abs(np.linspace(-1.0, 1.0, theCM.N))
+    theCM._lut[:-3,-1] = alphas
+
+    # 3D Plot
+    min_x = min(X.flatten())
+    min_y = min(Y.flatten())
+    min_z = min(Z.flatten())
+
+    max_x = max(X.flatten())
+    max_y = max(Y.flatten())
+    max_z = max(Z.flatten())
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    ax.plot_surface(X, Y, Z, rstride=5, cstride=5, cmap=cm.pink_r, antialiased=False, alpha=0.9)
+    ax.plot_wireframe(X, Y, Z, rstride=5, cstride=5, linewidth=0.5, color='black', alpha=0.9)
+
+    ax.scatter(theta[:, 0], theta[:, 1], z_samples, marker='o', color='blue', label='$z(x_1, x_2)$')
+
+    ax.plot_surface(X, Y, z_plane, rstride=5, cstride=5, cmap=theCM, antialiased=False, alpha=0.1)
+
+    ax.view_init(elev=24, azim=-40)
+
+    # axes and title config
+    ax.set_xlabel('$x_1$', labelpad=15)
+    ax.yaxis.set_rotate_label(False) # disable automatic rotation
+    ax.set_ylabel('$x_2$', rotation = 15, labelpad=15)
+    ax.zaxis.set_rotate_label(False)
+    ax.set_zlabel('$z(x)$',rotation=93, labelpad=3)
+    ax.set_xlim3d(min_x, max_x)
+    ax.set_ylim3d(min_y, max_y)
+    ax.set_zlim3d(min_z, max_z)
+    ttl = ax.set_title('Benchmark Study')
+    ttl.set_position([.5, 0.95])
+
+    plt.tight_layout()
 
 # -----------------------------------------------------------------------------------------
 # plot the surface of a 2D pdf in 3D

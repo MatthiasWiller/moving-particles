@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Subset Simulation Method example: Example 1 Ref. [1]
+# Subset Simulation Method example: Example 4.2 Ref. [2]
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -13,6 +13,8 @@
 # References:
 # 1."MCMC algorithms for Subset Simulation"
 #    Papaioannou, Betz, Zwirglmaier, Straub (2015)
+# 2. Efficiency Improvement of Stochastic Simulation by Means of Subset Sampling
+#    Martin Liebscher, Stephan Pannier, Jan-Uwe Sickert, Wolfgang Graf (2006)
 # ---------------------------------------------------------------------------
 """
 
@@ -31,32 +33,43 @@ import utilities.plots as uplt
 import utilities.stats as ustat
 import utilities.util as uutil
 
-print("RUN 06_sus_example_1.py")
+print("RUN 07_sus_example_2.py")
 
 # set seed for randomization
-np.random.seed(3)
+np.random.seed(0)
 
 # ---------------------------------------------------------------------------
 # STANDARD INPUT FOR SUBSET SIMULATION
 # ---------------------------------------------------------------------------
 
 # parameters
-n_samples_per_level = 1000          # number of samples per conditional level
-d                   = 10            # number of dimensions
+n_samples_per_level = 500          # number of samples per conditional level
 p0                  = 0.1           # Probability of each subset, chosen adaptively
 
+# parameters for beta-distribution
+p = 6.0
+q = 6.0
+beta_distr = scps.beta(p, q, loc=-2, scale=8)
+
+# transformation to/from U-space
+phi     = lambda x: scps.norm.cdf(x)
+phi_inv = lambda x: scps.norm.ppf(x)
+
+#CDF     = lambda x: scps.beta.cdf(x, p, q)
+CDF     = lambda x: beta_distr.cdf(x)
+#CDF_inv = lambda x: scps.beta.ppf(x, p, q)
+CDF_inv = lambda x: beta_distr.ppf(x)
+
+transform_U2X = lambda u: CDF_inv(phi(u))
+transform_X2U = lambda x: phi_inv(CDF(x))
+
 # limit-state function
-#beta = 5.1993       # for pf = 10^-7
-#beta = 4.7534       # for pf = 10^-6
-#beta = 4.2649       # for pf = 10^-5
-#beta = 3.7190       # for pf = 10^-4
-beta = 3.0902       # for pf = 10^-3
-#beta = 2.3263       # for pf = 10^-2
-LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
+z   = lambda x: 8* np.exp(-(x[0]**2 + x[1]**2)) + 2* np.exp(-((x[0]-5)**2 + (x[1]-4)**2)) + 1 + x[0]*x[1]/10
+#LSF = lambda x: 7.5 - z(x)
+LSF = lambda u: 7.5 - z(transform_U2X(u))
 
 # analytical CDF
-analytical_CDF = lambda x: scps.norm.cdf(x, beta)
-
+# no analytical CDF available
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
@@ -66,33 +79,37 @@ analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 sample_marg_PDF_list = []
 f_marg_PDF_list      = []
 
-# sample from marginal pdf (standard gaussian)
-sample_marg_PDF = lambda: np.random.randn(1)
 
-# marginal pdf / target pdf (standard gaussian)
-f_marg_PDF      = lambda x: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
+
+# sample from marginal pdf (beta-distribution)
+#sample_marg_PDF = lambda: scps.beta.rvs(p, q, 1)
+#sample_marg_PDF = lambda: np.random.beta(p, q, 1)
+#sample_marg_PDF = lambda: transform_X2U(scps.beta.rvs(p, q, size=1))
+sample_marg_PDF = lambda: transform_X2U(beta_distr.rvs(1))
+
+# marginal pdf / target pdf (beta-distribution)
+#f_marg_PDF      = lambda x: scps.beta.pdf(x, p, q)
+#f_marg_PDF      = lambda u: scps.beta.pdf(transform_U2X(u), p, q)
+f_marg_PDF      = lambda u: beta_distr.pdf(transform_U2X(u))
 
 # append distributions to list
-for i in range(0, d):
-    sample_marg_PDF_list.append(sample_marg_PDF)
-    f_marg_PDF_list.append(f_marg_PDF)
+sample_marg_PDF_list.append(sample_marg_PDF)
+sample_marg_PDF_list.append(sample_marg_PDF)
+f_marg_PDF_list.append(f_marg_PDF)
+f_marg_PDF_list.append(f_marg_PDF)
+
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MODIFIED METROPOLIS HASTINGS
 # ---------------------------------------------------------------------------
-
 # distributions
 mu      = 0.0
-sigma   = 1.0
+sigma   = 2.0
 
 # proposal distribution (gaussian)
-#f_prop_PDF      = lambda x, param: 0.5
-#f_prop_PDF      = lambda x, param: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
-f_prop_PDF      = lambda x, param: ( 2.*np.pi*sigma**2. )**-.5 * np.exp( -.5 * (x-param)**2. / sigma**2. )
+f_prop_PDF      = lambda x, param: ( 2.0*np.pi*sigma**2.0 )**-.5 * np.exp( -.5 * (x - param)**2. / sigma**2. )
 
 # sample from proposal distribution (gaussian)
-#sample_prop_PDF = lambda param: np.random.uniform(param-1, param+1, 1)
-#sample_prop_PDF = lambda param: scps.norm.rvs(mu, sigma, 1)
 sample_prop_PDF = lambda param: np.random.normal(param, sigma, 1)
 
 
@@ -106,7 +123,6 @@ sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_co
 # note: don't set it to 0.2; it is too low;
 rho_k = 0.8         # ~0.7 gives kinda good results
 
-
 # ---------------------------------------------------------------------------
 # INPUT FOR ADAPTIVE CONDITIONAL SAMPLING
 # ---------------------------------------------------------------------------
@@ -117,7 +133,6 @@ sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_co
 #
 pa = 0.1
 
-
 # ---------------------------------------------------------------------------
 # SUBSET SIMULATION
 # ---------------------------------------------------------------------------
@@ -127,13 +142,15 @@ pa = 0.1
 #sampling_method = cs.CondSampling(sample_marg_PDF_list, sample_cond_PDF, rho_k)
 sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, sample_cond_PDF, pa)
 
+
 # apply subset-simulation
-n_sim = 30
+n_sim = 1
 
 # initialization of lists
 p_F_SS_list  = []
 theta_list   = []
 g_list       = []
+
 
 print('\n> START Sampling')
 startTime = timer.time()
@@ -144,6 +161,10 @@ while n_loops > 0:
         # perform SubSim
         p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
 
+        # transform samples from u to x-space
+        for j in range(0, len(theta)):
+            theta[j] = transform_U2X(theta[j])
+
         # save values in lists
         p_F_SS_list.append(p_F_SS)
         theta_list.append(theta)
@@ -152,9 +173,7 @@ while n_loops > 0:
 
     # check if we have enough samples yet
     n_eff_sim = uutil.get_n_eff_sim(g_list)
-    #n_loops = n_sim - n_eff_sim
-    n_loops = 0
-
+    n_loops = n_sim - n_eff_sim
 
 print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 
@@ -168,18 +187,18 @@ print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2),
 # RESULTS
 # --------------------------------------------------------------------------
 
-p_F_SS_array     = np.asarray(p_F_SS_list).reshape(-1)
-sigma_pf_ss      = np.std(p_F_SS_array)
-mu_pf_ss         = np.mean(p_F_SS_array)
+p_F_SS_array    = np.asarray(p_F_SS_list).reshape(-1)
+sigma_pf_ss     = np.std(p_F_SS_array)
+mu_pf_ss        = np.mean(p_F_SS_array)
 
-pf_analytical    = analytical_CDF(0)
+mu_pf_mcs       = 0.00405
 
 delta_analytical = delta
 delta_estimation = sigma_pf_ss/mu_pf_ss
 
-print("\nRESULTS:")
+print("\nSTART Results:")
 print("> Probability of Failure (SubSim Est.)\t=", round(mu_pf_ss, 8))
-print("> Probability of Failure (Analytical) \t=", round(pf_analytical, 8))
+print("> Probability of Failure (MCS) \t\t=", round(mu_pf_mcs, 8))
 print("> Coefficient of Variation (Estimation)\t=", round(delta_estimation, 8))
 print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
 
@@ -189,9 +208,10 @@ print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
 # ---------------------------------------------------------------------------
 
 # plot samples
-#uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
-#uplt.plot_cov_over_pf(g_list, p0, n_samples_per_level)
-#uplt.plot_sus_trails(g_list, p0, n_samples_per_level, analytical_CDF)
-uplt.plot_cov_b_over_pf(g_list, p0, n_samples_per_level)
+uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF=0)
+#plt.show()
+g_max_global = np.amax(np.asarray(g).reshape(-1))
+for i in range(0, len(theta)):
+    uplt.plot_surface_with_samples(theta[i], g[i], z, g_max_global)
 
 plt.show()
