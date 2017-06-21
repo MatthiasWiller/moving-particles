@@ -16,8 +16,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as scps
 
+import algorithms.mp_moving_particles as mp
+
 import algorithms.mp_guyader_sampler as mpgs
 import algorithms.mp_cond_sampler as mpcs
+import algorithms.mp_mh_sampler as mpmhs
+import algorithms.mp_mmh_sampler as mpmmhs
+
 
 print("RUN 10_mp_test_approach.py")
 
@@ -29,14 +34,11 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 1000          # number of samples
+N = 100          # number of samples
 d = 10           # number of dimensions
+b = 30           # burn-in
 
-b     = 20
-#sampler = mpgs.GuyaderSampler(b, 0.3)
-sampler = mpcs.CondSampler(b, 0.8)
-
-m_max = 1e7
+n_simulations = 5
 
 # limit-state function
 beta = 4.7534       # for pf = 10^-6
@@ -69,48 +71,32 @@ for i in range(0, d):
 # MOVING PARTICLES
 # ---------------------------------------------------------------------------
 
+#sampler = mpgs.GuyaderSampler(b, 0.3)
+#sampler = mpcs.CondSampler(b, 0.8)
+#sampler = mpmhs.MHSampler(b, 0.3, f_marg_PDF_list)
+sampler = mpmmhs.MMHSampler(b, 0.3, f_marg_PDF_list)
 
-# initialization
-theta = np.zeros((N, d), float)
-g     = np.zeros(N, float)
-acc   = 0
+pf_list = []
+for sim in range(0, n_simulations):
+    pf_hat, theta_temp, g_temp, acc_rate = mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
+    # save simulation in list
+    pf_list.append(pf_hat)
 
-
-# MCS sampling
-for i in range(0, N):
-    for k in range(0, d):
-        theta[i, k] = sample_marg_PDF_list[k]()
-
-    g[i] = LSF(theta[i, :])
-
-m = 0
-
-while np.max(g) > 0 and m < m_max:
-    # get index of smallest g
-    id_min = np.argmax(g)
-
-    # sampling
-    theta_temp, g_temp = sampler.get_next_sample(theta[id_min], g[id_min], LSF)
-
-    # count acceptance rate
-    if g[id_min] != g_temp:
-        acc = acc + 1
-
-    theta[id_min] = theta_temp
-    g[id_min]     = g_temp
-
-    m = m + 1
-    print('m:', m, ' | g =', g_temp)
-
-pf_hat = (1 - 1/N)**m
-# pf_hat = np.exp(-1/N)**m
+pf_sim_array = np.asarray(pf_list)
+pf_mean = np.mean(pf_sim_array)
+pf_sigma = np.std(pf_sim_array)
 
 # ---------------------------------------------------------------------------
 # RESULTS
 # ---------------------------------------------------------------------------
+
+
 pf_analytical    = analytical_CDF(0)
 
 print("\nRESULTS:")
-print("> Probability of Failure (Moving Particels Est.) =", round(pf_hat, 8))
+print("> Probability of Failure (Moving Particels Est.) =", round(pf_mean, 8))
 print("> Probability of Failure (Analytical) \t\t=", round(pf_analytical, 8))
-print("> Acceptance rate \t\t\t\t=", round(acc/m, 8))
+print("> Acceptance rate \t\t\t\t=", round(acc_rate, 8))
+print("> Pf mean =", pf_mean)
+print("> Pf sigma =", pf_sigma)
+print("> C.O.V. =", pf_sigma/pf_mean)
