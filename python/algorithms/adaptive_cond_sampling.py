@@ -33,9 +33,8 @@ import time as timer
 import numpy as np
 
 class AdaptiveCondSampling:
-    def __init__(self, sample_marg_PDF, sample_cond_PDF, pa):
+    def __init__(self, sample_marg_PDF, pa):
         self.sample_marg_PDF = sample_marg_PDF
-        self.sample_cond_PDF = sample_cond_PDF
         self.pa              = pa
         self.lambda_0        = 0.6
 
@@ -153,11 +152,11 @@ class AdaptiveCondSampling:
             # generate a candidate state xi:
             for k in range(0, d):
                 # compute sigma and mu from rho_k and theta[i-1]
-                sigma = np.sqrt(1 - rho_k[k]**2)
-                mu    = rho_k[k] * theta[i-1, k]
+                sigma_cond = np.sqrt(1 - rho_k[k]**2)
+                mu_cond    = rho_k[k] * theta[i-1, k]
 
                 # sample the candidate state
-                theta_star[k] = self.sample_cond_PDF(mu, sigma)
+                theta_star[k] = np.random.normal(mu_cond, sigma_cond, 1)
 
             # check whether theta_star is in Failure domain (system analysis) and accept/reject it
             g_star = LSF(theta_star)

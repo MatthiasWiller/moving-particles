@@ -32,9 +32,8 @@
 import numpy as np
 
 class CondSampling:
-    def __init__(self, sample_marg_PDF, sample_cond_PDF, rho_k):
+    def __init__(self, sample_marg_PDF, rho_k):
         self.sample_marg_PDF = sample_marg_PDF
-        self.sample_cond_PDF = sample_cond_PDF
         self.rho_k           = rho_k
 
     def sample_mcs_level(self, n_samples_per_level, LSF):
@@ -98,15 +97,15 @@ class CondSampling:
         g[0]        = LSF(theta0)
 
         # compute sigma from correlation parameter rho_k
-        sigma       = np.sqrt(1 - self.rho_k**2)
+        sigma_cond  = np.sqrt(1 - self.rho_k**2)
 
         for i in range(1, Ns):
             theta_star = np.zeros(d, float)
             # generate a candidate state xi:
             for k in range(0, d):
                 # sample the candidate state
-                mu            = self.rho_k * theta[i-1, k]
-                theta_star[k] = self.sample_cond_PDF(mu, sigma)
+                mu_cond       = self.rho_k * theta[i-1, k]
+                theta_star[k] = np.random.normal(mu_cond, sigma_cond, 1)
 
             # check whether theta_star is in Failure domain (system analysis) and accept or reject it
             g_star = LSF(theta_star)

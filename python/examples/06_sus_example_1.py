@@ -100,9 +100,6 @@ sample_prop_PDF = lambda param: np.random.normal(param, sigma, 1)
 # INPUT FOR CONDITIONAL SAMPLING
 # ---------------------------------------------------------------------------
 
-# sample from conditional PDF
-sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_cond, 1)
-
 # note: don't set it to 0.2; it is too low;
 rho_k = 0.8         # ~0.7 gives kinda good results
 
@@ -110,9 +107,6 @@ rho_k = 0.8         # ~0.7 gives kinda good results
 # ---------------------------------------------------------------------------
 # INPUT FOR ADAPTIVE CONDITIONAL SAMPLING
 # ---------------------------------------------------------------------------
-
-# sample from conditional PDF
-sample_cond_PDF = lambda mu_cond, sigma_cond: np.random.normal(mu_cond, sigma_cond, 1)
 
 #
 pa = 0.1
@@ -124,11 +118,11 @@ pa = 0.1
 
 # initializing sampling method
 #sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, sample_prop_PDF, f_prop_PDF)
-#sampling_method = cs.CondSampling(sample_marg_PDF_list, sample_cond_PDF, rho_k)
-sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, sample_cond_PDF, pa)
+#sampling_method = cs.CondSampling(sample_marg_PDF_list, rho_k)
+sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, pa)
 
 # apply subset-simulation
-n_sim = 30
+n_sim = 10
 
 # initialization of lists
 p_F_SS_list  = []
