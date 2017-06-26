@@ -310,3 +310,22 @@ def compute_marginal_PDF(target_PDF, bins, dimension):
             y[i] = y[i]*dx
 
     return y
+
+def plot_2d_contour_with_samples(theta, LSF):
+    x = np.linspace(-8,8,200)
+    X, Y    = np.meshgrid(x, x)
+    Z       = LSF([X, Y])
+
+    plt.figure()
+
+    levels = [0.0]
+    CS = plt.contour(X, Y, Z, levels=levels)
+    for i in range(0, len(theta)):
+        samples = np.transpose(np.asarray(theta[i]))
+        xx = samples[0]
+        yy = samples[1]
+
+        plt.plot(xx, yy, '--+')
+
+    plt.title('title')
+
