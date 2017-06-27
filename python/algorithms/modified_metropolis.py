@@ -34,11 +34,18 @@ import time as timer
 import numpy as np
 
 class ModifiedMetropolisHastings:
-    def __init__(self, sample_marg_PDF, f_marg_PDF, sample_prop_PDF, f_prop_PDF,):
+    def __init__(self, sample_marg_PDF, f_marg_PDF, proposal_dist):
         self.f_marg_PDF      = f_marg_PDF
         self.sample_marg_PDF = sample_marg_PDF
-        self.f_prop_PDF      = f_prop_PDF
-        self.sample_prop_PDF = sample_prop_PDF
+
+        if proposal_dist == 'uniform':
+            self.sample_prop_PDF = lambda mu: np.random.uniform(mu - 1.0, mu + 1.0, 1)
+
+        elif proposal_dist == 'gaussian' or proposal_dist == 'normal':
+            self.sample_prop_PDF = lambda mu: np.random.normal(mu, 1.0, 1)
+
+        else:
+            self.sample_prop_PDF = lambda mu: 0
 
 
     def sample_mcs_level(self, n_samples_per_level, LSF):
@@ -112,10 +119,11 @@ class ModifiedMetropolisHastings:
 
                 # print('Control Values: alpha = (', tmp1, '*', tmp3, ') / (', tmp2, '*', tmp4, ')')
 
-                alpha = (self.f_marg_PDF[k](xi[k])          * self.f_prop_PDF(theta[i-1, k], xi[k]))/ \
-                        (self.f_marg_PDF[k](theta[i-1, k])  * self.f_prop_PDF(xi[k], theta[i-1, k]))
+                # alpha = (self.f_marg_PDF[k](xi[k])          * self.f_prop_PDF(theta[i-1, k], xi[k]))/ \
+                #         (self.f_marg_PDF[k](theta[i-1, k])  * self.f_prop_PDF(xi[k], theta[i-1, k]))
 
-
+                alpha = self.f_marg_PDF[k](xi[k])         / \
+                        self.f_marg_PDF[k](theta[i-1, k]) 
 
                 r     = np.minimum(alpha, 1)
 

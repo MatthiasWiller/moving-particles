@@ -77,23 +77,14 @@ for i in range(0, d):
     sample_marg_PDF_list.append(sample_marg_PDF)
     f_marg_PDF_list.append(f_marg_PDF)
 
+
 # ---------------------------------------------------------------------------
 # INPUT FOR MODIFIED METROPOLIS HASTINGS
 # ---------------------------------------------------------------------------
 
-# distributions
-mu      = 0.0
-sigma   = 1.0
-
-# proposal distribution (gaussian)
-#f_prop_PDF      = lambda x, param: 0.5
-#f_prop_PDF      = lambda x, param: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
-f_prop_PDF      = lambda x, param: ( 2.*np.pi*sigma**2. )**-.5 * np.exp( -.5 * (x-param)**2. / sigma**2. )
-
-# sample from proposal distribution (gaussian)
-#sample_prop_PDF = lambda param: np.random.uniform(param-1, param+1, 1)
-#sample_prop_PDF = lambda param: scps.norm.rvs(mu, sigma, 1)
-sample_prop_PDF = lambda param: np.random.normal(param, sigma, 1)
+# proposal distribution
+# proposal_dist = 'uniform'
+proposal_dist = 'gaussian'
 
 
 # ---------------------------------------------------------------------------
@@ -117,9 +108,9 @@ pa = 0.1
 # ---------------------------------------------------------------------------
 
 # initializing sampling method
-#sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, sample_prop_PDF, f_prop_PDF)
+sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, proposal_dist)
 #sampling_method = cs.CondSampling(sample_marg_PDF_list, rho_k)
-sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, pa)
+# sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, pa)
 
 # apply subset-simulation
 n_sim = 10
