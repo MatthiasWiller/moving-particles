@@ -96,10 +96,11 @@ def mp_one_particle(N, LSF, sampler, sample_marg_PDF_list):
 
         g[i] = LSF(theta[i, :])
 
-    m = 0
+    m_list = []
 
     # move every particle in the failure domain and count the steps (= m)
     for i in range(0, N):
+        m = 0
         while g[i] > 0 and m < m_max:
             # sample theta[i] from F(.|g_[i] > g_[i-1]))
             theta_temp, g_temp = sampler.get_next_sample(theta[i], g[i], LSF)
@@ -114,7 +115,10 @@ def mp_one_particle(N, LSF, sampler, sample_marg_PDF_list):
             m = m + 1
             print('m:', m, '| g =', g_temp)
 
-    pf_hat = (1 - 1/N)**m
-    acc_rate = acc/m
+        m_list.append(m)
 
-    return pf_hat, theta, g, acc_rate
+    m_sum = np.sum(np.asarray(m_list))
+    pf_hat = (1 - 1/N)**m_sum
+    acc_rate = acc/m_sum
+
+    return pf_hat, theta, g, acc_rate, m_list

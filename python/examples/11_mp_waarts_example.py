@@ -40,10 +40,11 @@ b = 30           # burn-in
 n_simulations = 5
 
 # limit-state function
-LSF = lambda u: min(3 + 0.1*(u[0] - u[1])**2 - 2**(-0.5) * np.absolute(u[0] + u[1]), 7* 2**(-0.5) - np.absolute(u[0] - u[1]))
+LSF = lambda u: np.minimum(3 + 0.1*(u[0] - u[1])**2 - 2**(-0.5) * np.absolute(u[0] + u[1]), 7* 2**(-0.5) - np.absolute(u[0] - u[1]))
 
 # analytical CDF
 # no analytical CDF available
+
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
 # ---------------------------------------------------------------------------
@@ -92,6 +93,6 @@ pf_analytical = 2.275 * 10**-3
 print("\nRESULTS:")
 print("> Probability of Failure (Moving Particels Est.)\t=", round(pf_mean, 8))
 print("> Probability of Failure (Analytical) \t\t\t=", round(pf_analytical, 8))
-print("> Pf mean =", pf_mean)
-print("> Pf sigma =", pf_sigma)
-print("> C.O.V. =", pf_sigma/pf_mean)
+print("> Pf mean \t=", pf_mean)
+print("> Pf sigma \t=", pf_sigma)
+print("> C.O.V. \t=", pf_sigma/pf_mean)

@@ -46,10 +46,12 @@ class CondSampler:
         theta_temp = theta0
         g_temp     = g0
         
+        # calculate sigma_cond
         sigma_cond = np.sqrt(1 - self.rho_k**2)
 
         b = self.burnin
         while b > 0:
+            # calculate mu_cond
             mu_cond = self.rho_k * theta_temp
 
             # initialization
@@ -59,7 +61,7 @@ class CondSampler:
             for k in range(0, d):
                 theta_star[k] = np.random.normal(mu_cond[k], sigma_cond, 1)
 
-            g_star     = LSF(theta_star)
+            g_star = LSF(theta_star)
 
             # check if new sample is better than old sample
             if g0 > g_star:
