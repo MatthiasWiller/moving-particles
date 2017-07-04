@@ -49,9 +49,10 @@ class GuyaderSampler:
         b = self.burnin
         while b > 0:
             # sample new x
-            w = np.zeros(d)
-            for k in range(0, d):
-                w = np.random.randn(1)
+            # w = np.zeros(d)
+            # for k in range(0, d):
+            #     w(k) = np.random.randn(1)
+            w = np.random.randn(d)
 
             theta_star = (theta_temp + self.sigma_sampling*w) / np.sqrt(1 + self.sigma_sampling**2)
             g_star     = LSF(theta_star)

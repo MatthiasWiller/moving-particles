@@ -50,9 +50,10 @@ class MHSampler:
         b = self.burnin
         while b > 0:
             # initialization
-            w = np.zeros(d, float)
-            for k in range(0, d):
-                w = np.random.randn(1)
+            # w = np.zeros(d, float)
+            # for k in range(0, d):
+            #     w = np.random.randn(1)
+            w = np.random.randn(d)
 
             theta_star = theta_temp + self.sigma_sampling * w
 

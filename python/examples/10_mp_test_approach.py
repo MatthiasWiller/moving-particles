@@ -71,9 +71,9 @@ for i in range(0, d):
 # MOVING PARTICLES
 # ---------------------------------------------------------------------------
 
-#sampler = mpgs.GuyaderSampler(b, 0.3)
+sampler = mpgs.GuyaderSampler(b, 0.3)
 #sampler = mpcs.CondSampler(b, 0.8)
-sampler = mpmhs.MHSampler(b, 0.3, f_marg_PDF_list)
+# sampler = mpmhs.MHSampler(b, 0.3, f_marg_PDF_list)
 #sampler = mpmmhs.MMHSampler(b, 0.3, f_marg_PDF_list)
 
 pf_list = []
