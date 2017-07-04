@@ -27,6 +27,8 @@ import algorithms.cond_sampling as cs
 import algorithms.modified_metropolis as mmh
 import algorithms.adaptive_cond_sampling as acs
 
+import algorithms.mcs as mcs
+
 import utilities.plots as uplt
 import utilities.stats as ustat
 import utilities.util as uutil
@@ -57,6 +59,7 @@ LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
 # analytical CDF
 analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 
+pf_analytical    = analytical_CDF(0)
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
@@ -86,14 +89,12 @@ for i in range(0, d):
 # proposal_dist = 'uniform'
 proposal_dist = 'gaussian'
 
-
 # ---------------------------------------------------------------------------
 # INPUT FOR CONDITIONAL SAMPLING
 # ---------------------------------------------------------------------------
 
 # note: don't set it to 0.2; it is too low;
 rho_k = 0.8         # ~0.7 gives kinda good results
-
 
 # ---------------------------------------------------------------------------
 # INPUT FOR ADAPTIVE CONDITIONAL SAMPLING
@@ -102,43 +103,35 @@ rho_k = 0.8         # ~0.7 gives kinda good results
 #
 pa = 0.1
 
-
 # ---------------------------------------------------------------------------
 # SUBSET SIMULATION
 # ---------------------------------------------------------------------------
 
 # initializing sampling method
-sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, proposal_dist)
+#sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, proposal_dist)
 #sampling_method = cs.CondSampling(sample_marg_PDF_list, rho_k)
-# sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, pa)
+sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, pa)
 
 # apply subset-simulation
-n_sim = 10
+n_sim = 2
 
 # initialization of lists
-p_F_SS_list  = []
-theta_list   = []
-g_list       = []
+p_F_SS_list = []
+theta_list  = []
+g_list      = []
 
 print('\n> START Sampling')
 startTime = timer.time()
 
-n_loops = n_sim
-while n_loops > 0:
-    for i in range(0, n_loops):
-        # perform SubSim
-        p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
+for i in range(0, n_sim):
+    # perform SubSim
+    p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
 
-        # save values in lists
-        p_F_SS_list.append(p_F_SS)
-        theta_list.append(theta)
-        g_list.append(g)
-        print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
-
-    # check if we have enough samples yet
-    n_eff_sim = uutil.get_n_eff_sim(g_list)
-    #n_loops = n_sim - n_eff_sim
-    n_loops = 0
+    # save values in lists
+    p_F_SS_list.append(p_F_SS)
+    theta_list.append(theta)
+    g_list.append(g)
+    print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
 
 
 print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
@@ -146,8 +139,15 @@ print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 # computing cov
 print('\n> START Computing C.O.V')
 startTime = timer.time()
-delta     = ustat.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+cov_analytical     = ustat.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
 print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2), "s")
+
+
+# ---------------------------------------------------------------------------
+# MONTE CARLO SIMULATION
+# ---------------------------------------------------------------------------
+
+g_mcs = np.load('mcs_example_1_d10_N10000.npy')
 
 # ---------------------------------------------------------------------------
 # RESULTS
@@ -157,16 +157,14 @@ p_F_SS_array     = np.asarray(p_F_SS_list).reshape(-1)
 sigma_pf_ss      = np.std(p_F_SS_array)
 mu_pf_ss         = np.mean(p_F_SS_array)
 
-pf_analytical    = analytical_CDF(0)
-
-delta_analytical = delta
-delta_estimation = sigma_pf_ss/mu_pf_ss
+cov_estimation = sigma_pf_ss/mu_pf_ss
 
 print("\nRESULTS:")
 print("> Probability of Failure (SubSim Est.)\t=", round(mu_pf_ss, 8))
+# print("> Probability of Failure (MCS Est.)\t=", round(pf_mcs, 8))
 print("> Probability of Failure (Analytical) \t=", round(pf_analytical, 8))
-print("> Coefficient of Variation (Estimation)\t=", round(delta_estimation, 8))
-print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
+print("> Coefficient of Variation (Estimation)\t=", round(cov_estimation, 8))
+print("> Coefficient of Variation (Analytical)\t=", round(cov_analytical, 8))
 
 
 # ---------------------------------------------------------------------------
@@ -174,9 +172,9 @@ print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
 # ---------------------------------------------------------------------------
 
 # plot samples
-#uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF)
-#uplt.plot_cov_over_pf(g_list, p0, n_samples_per_level)
+uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF, g_mcs)
 #uplt.plot_sus_trails(g_list, p0, n_samples_per_level, analytical_CDF)
-uplt.plot_cov_b_over_pf(g_list, p0, n_samples_per_level)
+#uplt.plot_cov_over_pf(g_list, p0, n_samples_per_level)
+uplt.plot_cov_pf_over_b(g_list, p0, n_samples_per_level)
 
 plt.show()

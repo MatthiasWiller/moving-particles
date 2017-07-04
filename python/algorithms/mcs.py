@@ -42,7 +42,7 @@ def mcs(N, sample_marg_PDF_list, LSF):
 
         # sample each dimension of itself
         for k in range(0, d):
-            theta_star[k] = sample_marg_PDF_list[i]()
+            theta_star[k] = sample_marg_PDF_list[k]()
 
         # evaluate limit state function
         g_star = LSF(theta_star)

@@ -73,8 +73,8 @@ for i in range(0, d):
 
 #sampler = mpgs.GuyaderSampler(b, 0.3)
 #sampler = mpcs.CondSampler(b, 0.8)
-#sampler = mpmhs.MHSampler(b, 0.3, f_marg_PDF_list)
-sampler = mpmmhs.MMHSampler(b, 0.3, f_marg_PDF_list)
+sampler = mpmhs.MHSampler(b, 0.3, f_marg_PDF_list)
+#sampler = mpmmhs.MMHSampler(b, 0.3, f_marg_PDF_list)
 
 pf_list = []
 for sim in range(0, n_simulations):
@@ -96,7 +96,7 @@ lam = -np.log(pf_analytical)
 poisson = lambda k: lam**k * np.exp(-lam) / np.math.factorial(k)
 x = np.linspace(0, 20, 21)
 y = np.zeros(21, float)
-for i in range (0, 21):
+for i in range(0, 21):
     y[i] = poisson(x[i])
 
 plt.plot(y)

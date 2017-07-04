@@ -63,7 +63,7 @@ def plot_hist(x, target_PDF=0, dimension=1):
 # -----------------------------------------------------------------------------------------
 # plot values of index
 def plot_mixing(x):
-    
+
     n_samples = len(x)
 
     plt.figure()
@@ -259,7 +259,7 @@ def plot_scatter_with_hist(x, target_PDF=0):
     bins = np.arange(lowerlim, upperlim + binwidth, binwidth)
     axHistx.hist(x[0,:], bins=bins, normed=1, color='navy')
     axHisty.hist(x[1,:], bins=bins, orientation='horizontal', normed=1, color='navy')
-    
+
     # plot best-fit line, if target_PDF is given
     if(target_PDF != 0):
         f_x0 = compute_marginal_PDF(target_PDF, bins, 0)
@@ -267,7 +267,7 @@ def plot_scatter_with_hist(x, target_PDF=0):
 
         f_x1 = compute_marginal_PDF(target_PDF, bins, 1)
         axHisty.plot(f_x1, bins, '--', color='red')
-    
+
     # limit histograms to limits of scatter-plot
     axHistx.set_xlim(axScatter.get_xlim())
     axHisty.set_ylim(axScatter.get_ylim())
