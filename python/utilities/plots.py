@@ -398,7 +398,7 @@ def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0, g_mcs=0):
         pf_exact_point  = analytical_CDF(0)        
 
     if len(g_mcs) != 0:
-        b_mcs_line= np.sort(g_mcs)
+        b_mcs_line  = np.sort(g_mcs)
         pf_mcs_line = np.arange(1, len(b_mcs_line)+1)/float(len(b_mcs_line))
 
     # set y-axis to log-scale
@@ -439,7 +439,6 @@ def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0, g_mcs=0):
     plt.legend(loc='lower right')
 
     # set titles
-    plt.title(r'Failure probability estimate')
     plt.xlabel(r'Limit state function values $b$')
     plt.ylabel(r'$P(g(x) \leq b)$')
     plt.tight_layout()
@@ -572,93 +571,7 @@ def plot_sus_trails(g_list, p0, N, analytical_CDF):
 
 
 # ---------------------------------------------------------------------------
-# plot cov_b over pf
-def plot_cov_b_over_pf(g_list, p0, N):
-    # create figure
-    fig = plt.figure()
-
-    # some constants
-    Nc    = int(N*p0)
-    n_sim = len(g_list)
-
-    # initialization
-    n_levels = np.zeros(n_sim, int)
-
-    # count number of levels
-    for i in range(0, n_sim):
-        n_levels[i] = len(g_list[i])
-
-    # find most often encountered n_levels
-    count_n_levels   = np.bincount(n_levels)
-    most_often_level = np.nanargmax(count_n_levels)
-    n_levels         = most_often_level
-
-    # delete all other levels
-    for i in reversed(range(0, n_sim)):
-        if len(g_list[i]) != most_often_level:
-            g_list.pop(i)
-    
-    n_sim_effective = len(g_list)
-
-    print('The number of effective samples was successfully reduced from', n_sim, 'to', n_sim_effective, '!')
-
-    # set up Pf_line
-    Pf_line       = np.zeros((n_levels, Nc), float)
-    Pf_line[0, :] = np.linspace(p0, 1, Nc)
-    for i in range(1, n_levels):
-        Pf_line[i, :] = Pf_line[i-1, :]*p0
-    
-    # initialize matrices and list
-    b_line_mean_matrix  = np.zeros((n_levels, Nc), float)
-    b_line_sigma_matrix = np.zeros((n_levels, Nc), float)
-
-    b_line_list_all_sims = []
-
-    # loop over all (effective) simulations to get the b_line
-    for sim in range(0, n_sim_effective):
-        b_line_list = []
-        g           = g_list[sim]
-
-        b_line      = np.zeros((n_levels, Nc), float)
-
-        # loop over all levels and get b_line
-        for level in range(0, n_levels):
-            g_sorted          = np.sort(g[level])
-            b_line[level, :]  = np.percentile(g_sorted, Pf_line[0, :]*100)
-        
-        b_line_array_temp = b_line.reshape(-1)
-        b_line_array_temp = np.sort(b_line_array_temp)
-        b_line_list_all_sims.append(b_line_array_temp)
-    
-    # reshape and sort the matrices
-    Pf_line = np.asarray(Pf_line).reshape(-1)
-    Pf_line = np.sort(Pf_line)
-
-    b_line_matrix = np.asarray(b_line_list_all_sims)
-
-    b_line_mean_array  = np.mean(b_line_matrix, axis=0)
-    b_line_sigma_array = np.std(b_line_matrix, axis=0)
-
-    cov_line_array = np.abs( b_line_sigma_array / b_line_mean_array )
-
-    # set x-axis to log-scale
-    plt.xscale('log')
-
-    # plotting
-    plt.plot(Pf_line, cov_line_array, '--', color='navy', label=r'$\delta$ of b')
-    
-
-    # add legend
-    matplotlib.rcParams['legend.fontsize'] = 12
-    plt.legend(loc='lower right')
-
-    # set titles
-    plt.title(r'Failure probability estimate')
-    plt.xlabel(r'$P(g(x) \leq b)$')
-    plt.ylabel(r'$\delta$')
-    plt.tight_layout()
-    #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
-
+# plot cov of pf over b
 def plot_cov_pf_over_b(g_list, p0, N):
     # create figure
     fig = plt.figure()
@@ -732,5 +645,67 @@ def plot_cov_pf_over_b(g_list, p0, N):
     plt.title(r'Failure probability estimate')
     plt.xlabel(r'$b$')
     plt.ylabel(r'$\delta$')
+    plt.tight_layout()
+    #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+def plot_m_with_poisson_dist(m_list, pf):
+    # set up the distribution of m
+    m_array = np.asarray(m_list)
+    m_dist = np.bincount(m_array)
+    N = len(m_array.reshape(-1))
+    m_dist = m_dist/N
+
+    
+
+    # parameter for poisson distribution
+    lam     = -np.log(pf)
+    poisson = lambda k: lam**k * np.exp(-lam) / np.math.factorial(k)
+
+    x = np.linspace(0, len(m_dist)-1, len(m_dist))
+    y = np.zeros(len(m_dist), float)
+    for i in range(0, len(m_dist)):
+        y[i] = poisson(x[i])
+    
+    # create figure
+    fig = plt.figure()
+
+    # plot results
+    plt.plot(y)
+    plt.plot(m_dist)
+
+def plot_mp_pf(N, g_list, analytical_CDF):
+    # sort g_list
+    g_list.sort(reverse=True)
+
+    # initialization
+    pf_line = np.zeros(len(g_list)-N)
+    b_line = np.zeros(len(g_list)-N)
+
+    for m in range(0, len(g_list)-N):
+        pf_line[m] = (1-1/N)**(m+1)
+        b_line[m] = g_list[m]
+    
+    print('pf =', pf_line[-1])
+
+    # exact line and exact point (with analytical_CDF) 
+    max_lim         = np.max(np.asarray(g_list))
+    b_exact_line    = np.linspace(0, max_lim, 140)
+    pf_exact_line   = analytical_CDF(b_exact_line)
+
+    # create figure
+    fig = plt.figure()
+
+    # set y-axis to log-scale
+    plt.yscale('log')
+
+    # * plot exact line
+    plt.plot(b_exact_line, pf_exact_line, '-', color='red', label=r'Exact')
+
+    # * plot estimated line
+    plt.plot(b_line, pf_line, '--', color='navy', label=r'MP Estimation')
+
+     # set titles
+    plt.xlabel(r'Limit state function values $b$')
+    plt.ylabel(r'$P(g(x) \leq b)$')
     plt.tight_layout()
     #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')

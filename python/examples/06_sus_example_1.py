@@ -36,7 +36,7 @@ import utilities.util as uutil
 print("RUN 06_sus_example_1.py")
 
 # set seed for randomization
-np.random.seed(3)
+np.random.seed(0)
 
 # ---------------------------------------------------------------------------
 # STANDARD INPUT FOR SUBSET SIMULATION
@@ -113,7 +113,7 @@ pa = 0.1
 sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, pa)
 
 # apply subset-simulation
-n_sim = 2
+n_sim = 20
 
 # initialization of lists
 p_F_SS_list = []

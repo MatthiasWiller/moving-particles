@@ -23,6 +23,8 @@ import algorithms.mp_cond_sampler as mpcs
 import algorithms.mp_mh_sampler as mpmhs
 import algorithms.mp_mmh_sampler as mpmmhs
 
+import utilities.plots as uplt
+
 print("RUN 11_mp_waarts_example.py")
 
 # set seed for randomization
@@ -76,7 +78,7 @@ sampler = mpmmhs.MMHSampler(b, 0.3, f_marg_PDF_list)
 
 pf_list = []
 for sim in range(0, n_simulations):
-    pf_hat, theta_temp, g_temp, acc_rate = mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
+    pf_hat, theta_temp, g_list, acc_rate, m_list = mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
     # save simulation in list
     pf_list.append(pf_hat)
 
@@ -96,3 +98,13 @@ print("> Probability of Failure (Analytical) \t\t\t=", round(pf_analytical, 8))
 print("> Pf mean \t=", pf_mean)
 print("> Pf sigma \t=", pf_sigma)
 print("> C.O.V. \t=", pf_sigma/pf_mean)
+
+
+# ---------------------------------------------------------------------------
+# PLOTS
+# ---------------------------------------------------------------------------
+
+uplt.plot_m_with_poisson_dist(m_list, pf_analytical)
+uplt.plot_mp_pf(N, g_list)
+
+plt.show()

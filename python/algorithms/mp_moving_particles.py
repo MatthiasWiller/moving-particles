@@ -89,14 +89,17 @@ def mp_one_particle(N, LSF, sampler, sample_marg_PDF_list):
     g     = np.zeros(N, float)
     acc   = 0
 
+    g_list = []
+    m_list = []
+
     # MCS sampling
     for i in range(0, N):
         for k in range(0, d):
             theta[i, k] = sample_marg_PDF_list[k]()
 
         g[i] = LSF(theta[i, :])
-
-    m_list = []
+        g_list.append(g[i])
+    
 
     # move every particle in the failure domain and count the steps (= m)
     for i in range(0, N):
@@ -112,6 +115,9 @@ def mp_one_particle(N, LSF, sampler, sample_marg_PDF_list):
             theta[i] = theta_temp
             g[i]     = g_temp
 
+            # save g-value in list
+            g_list.append(g_temp)
+
             m = m + 1
             print('m:', m, '| g =', g_temp)
 
@@ -121,4 +127,4 @@ def mp_one_particle(N, LSF, sampler, sample_marg_PDF_list):
     pf_hat = (1 - 1/N)**m_sum
     acc_rate = acc/m_sum
 
-    return pf_hat, theta, g, acc_rate, m_list
+    return pf_hat, theta, g_list, acc_rate, m_list
