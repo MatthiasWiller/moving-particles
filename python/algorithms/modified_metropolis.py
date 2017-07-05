@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-07
 # ---------------------------------------------------------------------------
 # Input:
 # * theta0          : seed of the Markov-chain
@@ -34,9 +34,10 @@ import time as timer
 import numpy as np
 
 class ModifiedMetropolisHastings:
-    def __init__(self, sample_marg_PDF, f_marg_PDF, proposal_dist):
+    def __init__(self, sample_marg_PDF, f_marg_PDF, proposal_dist, burnin=0):
         self.f_marg_PDF      = f_marg_PDF
         self.sample_marg_PDF = sample_marg_PDF
+        self.T               = burnin
 
         if proposal_dist == 'uniform':
             self.sample_prop_PDF = lambda mu: np.random.uniform(mu - 1.0, mu + 1.0, 1)
@@ -50,22 +51,22 @@ class ModifiedMetropolisHastings:
 
     def sample_mcs_level(self, n_samples_per_level, LSF):
         # get dimension
-        d       = len(self.sample_marg_PDF)
+        d      = len(self.sample_marg_PDF)
 
         # initialize theta0 and g0
-        theta0  = np.zeros((n_samples_per_level, d), float)
-        g0      = np.zeros(n_samples_per_level, float)
+        theta  = np.zeros((n_samples_per_level, d), float)
+        g      = np.zeros(n_samples_per_level, float)
 
 
         for i in range(0, n_samples_per_level):
             # sample theta0
             for k in range(0, d):
-                theta0[i, k] = self.sample_marg_PDF[k]()
+                theta[i, k] = self.sample_marg_PDF[k]()
 
             # evaluate theta0
-            g0[i] = LSF(theta0[i, :])
+            g[i] = LSF(theta[i, :])
 
-        return theta0, g0
+        return theta, g
 
 
     def sample_subsim_level(self, theta_seed, Ns, Nc, LSF, b):
@@ -95,33 +96,20 @@ class ModifiedMetropolisHastings:
         d = np.size(theta0)
 
         # initialize theta and g(x)
-        theta       = np.zeros((N, d), float)
+        theta       = np.zeros((self.T + N, d), float)
         theta[0, :] = theta0
-        g           = np.zeros((N), float)
+        g           = np.zeros((self.T + N), float)
         g[0]        = LSF(theta0)
 
         xi          = np.zeros((d), float)
 
-        for i in range(1, N):
+        for i in range(1, self.T + N):
             # generate a candidate state xi:
             for k in range(0, d):
                 # sample xi from proposal_PDF
                 xi[k] = self.sample_prop_PDF(theta[i-1, k])
 
-                # compute acceptance ratio
-
-                # alpha = (p(y) * q(y,x)) /   =   (p(y) * g(y)) /
-                #         (p(x) * q(x,y))         (p(x) * g(x))
-                # tmp1 = self.f_marg_PDF[k](xi[k])
-                # tmp2 = self.f_marg_PDF[k](theta[i-1, k])
-                # tmp3 = self.f_prop_PDF(theta[i-1, k], xi[k])
-                # tmp4 = self.f_prop_PDF(xi[k], theta[i-1, k])
-
-                # print('Control Values: alpha = (', tmp1, '*', tmp3, ') / (', tmp2, '*', tmp4, ')')
-
-                # alpha = (self.f_marg_PDF[k](xi[k])          * self.f_prop_PDF(theta[i-1, k], xi[k]))/ \
-                #         (self.f_marg_PDF[k](theta[i-1, k])  * self.f_prop_PDF(xi[k], theta[i-1, k]))
-
+                # compute accaptence ratio
                 alpha = self.f_marg_PDF[k](xi[k])         / \
                         self.f_marg_PDF[k](theta[i-1, k]) 
 
@@ -145,5 +133,9 @@ class ModifiedMetropolisHastings:
                 # not in failure domain -> reject
                 theta[i, :] = theta[i-1, :]
                 g[i] = g[i-1]
+        
+        # apply burn-in
+        theta = theta[self.T:,:]
+        g = g[self.T:]
 
         return theta, g

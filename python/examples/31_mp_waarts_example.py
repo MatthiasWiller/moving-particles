@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-06
+# Version 2017-07
 # ---------------------------------------------------------------------------
 """
 
@@ -16,19 +16,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as scps
 
-import algorithms.mp_moving_particles as mp
+import algorithms.moving_particles as mp
 
-import algorithms.mp_guyader_sampler as mpgs
-import algorithms.mp_cond_sampler as mpcs
-import algorithms.mp_mh_sampler as mpmhs
-import algorithms.mp_mmh_sampler as mpmmhs
+import algorithms.modified_metropolis as mmh
+import algorithms.cond_sampling as cs
 
 import utilities.plots as uplt
 
 print("RUN 11_mp_waarts_example.py")
 
 # set seed for randomization
-# np.random.seed(0)
+np.random.seed(0)
 
 # ---------------------------------------------------------------------------
 # STANDARD INPUT FOR MOVING PARTICLES
@@ -71,10 +69,8 @@ for i in range(0, d):
 # MOVING PARTICLES
 # ---------------------------------------------------------------------------
 
-#sampler = mpgs.GuyaderSampler(b, 0.3)
-#sampler = mpcs.CondSampler(b, 0.8)
-#sampler = mpmhs.MHSampler(b, 0.3, f_marg_PDF_list)
-sampler = mpmmhs.MMHSampler(b, 0.3, f_marg_PDF_list)
+#sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, b)
+sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', b)
 
 pf_list = []
 for sim in range(0, n_simulations):
@@ -105,6 +101,6 @@ print("> C.O.V. \t=", pf_sigma/pf_mean)
 # ---------------------------------------------------------------------------
 
 uplt.plot_m_with_poisson_dist(m_list, pf_analytical)
-uplt.plot_mp_pf(N, g_list)
+uplt.plot_mp_pf(N, g_list, analytical_CDF)
 
 plt.show()

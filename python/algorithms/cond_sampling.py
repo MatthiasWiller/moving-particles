@@ -32,9 +32,10 @@
 import numpy as np
 
 class CondSampling:
-    def __init__(self, sample_marg_PDF, rho_k):
+    def __init__(self, sample_marg_PDF, rho_k, burnin=0):
         self.sample_marg_PDF = sample_marg_PDF
         self.rho_k           = rho_k
+        self.T               = burnin
 
     def sample_mcs_level(self, n_samples_per_level, LSF):
         # get dimension
@@ -91,15 +92,16 @@ class CondSampling:
         d           = np.size(theta0)
 
         # initialize theta and g(x)
-        theta       = np.zeros((Ns, d), float)
+        theta       = np.zeros((self.T+Ns, d), float)
         theta[0, :] = theta0
-        g           = np.zeros((Ns), float)
+        g           = np.zeros((self.T+Ns), float)
         g[0]        = LSF(theta0)
 
         # compute sigma from correlation parameter rho_k
         sigma_cond  = np.sqrt(1 - self.rho_k**2)
 
-        for i in range(1, Ns):
+
+        for i in range(1, self.T+Ns):
             theta_star = np.zeros(d, float)
             # generate a candidate state xi:
             for k in range(0, d):
@@ -117,6 +119,10 @@ class CondSampling:
                 # not in failure domain -> reject
                 theta[i, :] = theta[i-1, :]
                 g[i] = g[i-1]
+        
+        # apply burn-in
+        theta = theta[self.T:, :]
+        g     = g[self.T:]
 
         # output
         return theta, g

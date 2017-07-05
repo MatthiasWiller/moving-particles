@@ -16,12 +16,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as scps
 
-import algorithms.mp_moving_particles as mp
+import algorithms.moving_particles as mp
 
-import algorithms.mp_guyader_sampler as mpgs
-import algorithms.mp_cond_sampler as mpcs
-import algorithms.mp_mh_sampler as mpmhs
-import algorithms.mp_mmh_sampler as mpmmhs
+import algorithms.modified_metropolis as mmh
+import algorithms.cond_sampling as cs
 
 import utilities.plots as uplt
 
@@ -36,7 +34,7 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 1000          # number of samples
+N = 100          # number of samples
 d = 10           # number of dimensions
 b = 30           # burn-in
 
@@ -75,10 +73,8 @@ for i in range(0, d):
 # MOVING PARTICLES
 # ---------------------------------------------------------------------------
 
-sampler = mpgs.GuyaderSampler(b, 0.3)
-#sampler = mpcs.CondSampler(b, 0.8)
-# sampler = mpmhs.MHSampler(b, 0.3, f_marg_PDF_list)
-#sampler = mpmmhs.MMHSampler(b, 0.3, f_marg_PDF_list)
+#sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, b)
+sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', b)
 
 pf_list = []
 for sim in range(0, n_simulations):
