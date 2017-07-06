@@ -21,7 +21,6 @@
 import time as timer
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 import algorithms.modified_metropolis as mmh
 import algorithms.cond_sampling as cs
@@ -29,11 +28,9 @@ import algorithms.adaptive_cond_sampling as acs
 
 import algorithms.sus as sus
 
-import utilities.plots as uplt
 import utilities.stats as ustat
-import utilities.util as uutil
 
-print("RUN 24_sus_waarts_example.py")
+print("RUN 23_sus_waarts_example.py")
 
 # set seed for randomization
 np.random.seed(0)
@@ -45,15 +42,21 @@ np.random.seed(0)
 # parameters
 n_samples_per_level = 500          # number of samples per conditional level
 p0                  = 0.1          # Probability of each subset, chosen adaptively
+sampling_method     = 'acs'         # 'mmh' = Modified Metropolis Hastings
+                                    # 'cs'  = Conditional Sampling
+                                    # 'acs' = adaptive Conditional Sampling
+n_simulations       = 2             # Number of Simulations
 
-n_simulations = 5
+
+# file-name
+filename = 'python/data/sus_waarts_Nspl' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
+
+# reference solution from paper
+mu_pf_mcs       = 2.275 * 10**-3
 
 # limit-state function
 LSF = lambda u: np.minimum(3 + 0.1*(u[0] - u[1])**2 - 2**(-0.5) * np.absolute(u[0] + u[1]), 7* 2**(-0.5) - np.absolute(u[0] - u[1]))
 
-
-# analytical CDF
-# no analytical CDF available
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
@@ -77,39 +80,19 @@ f_marg_PDF_list.append(f_marg_PDF)
 
 
 # ---------------------------------------------------------------------------
-# INPUT FOR MODIFIED METROPOLIS HASTINGS
-# ---------------------------------------------------------------------------
-
-# proposal distribution
-#proposal_dist = 'uniform'
-proposal_dist = 'gaussian'
-
-
-# ---------------------------------------------------------------------------
-# INPUT FOR CONDITIONAL SAMPLING
-# ---------------------------------------------------------------------------
-
-# note: don't set it to 0.2; it is too low;
-rho_k = 0.8         # ~0.7 gives kinda good results
-
-# ---------------------------------------------------------------------------
-# INPUT FOR ADAPTIVE CONDITIONAL SAMPLING
-# ---------------------------------------------------------------------------
-
-#
-pa = 0.1
-
-# ---------------------------------------------------------------------------
 # SUBSET SIMULATION
 # ---------------------------------------------------------------------------
 
-# initialize sampling method
-#sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, proposal_dist)
-sampling_method = cs.CondSampling(sample_marg_PDF_list, rho_k)
-#sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, pa)
+# initializing sampling method
+if sampling_method == 'mmh':
+     sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian')
+elif sampling_method == 'cs':
+    sampler = cs.CondSampling(sample_marg_PDF_list, 0.8)
+elif sampling_method == 'acs':
+    sampler = acs.AdaptiveCondSampling(sample_marg_PDF_list, 0.1)
 
 
-# apply subset-simulation
+## apply subset-simulation
 
 # initialization of lists
 p_F_SS_list  = []
@@ -120,10 +103,9 @@ g_list       = []
 print('\n> START Sampling')
 startTime = timer.time()
 
-
 for i in range(0, n_simulations):
     # perform SubSim
-    p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
+    p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampler)
 
     # save values in lists
     p_F_SS_list.append(p_F_SS)
@@ -137,34 +119,32 @@ print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 # computing cov
 print('\n> START Computing C.O.V')
 startTime = timer.time()
-delta     = ustat.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+
+cov_analytical = ustat.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+
 print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2), "s")
 
 # ---------------------------------------------------------------------------
 # RESULTS
 # ---------------------------------------------------------------------------
 
-p_F_SS_array    = np.asarray(p_F_SS_list).reshape(-1)
-sigma_pf_ss     = np.std(p_F_SS_array)
-mu_pf_ss        = np.mean(p_F_SS_array)
+p_F_SS_array   = np.asarray(p_F_SS_list).reshape(-1)
+sigma_pf_ss    = np.std(p_F_SS_array)
+mu_pf_ss       = np.mean(p_F_SS_array)
 
-mu_pf_mcs       = 2.275 * 10**-3
-
-delta_analytical = delta
-delta_estimation = sigma_pf_ss/mu_pf_ss
+cov_estimation = sigma_pf_ss/mu_pf_ss
 
 print("\nSTART Results:")
 print("> Probability of Failure (SubSim Est.)\t=", round(mu_pf_ss, 8))
 print("> Probability of Failure (MCS) \t\t=", round(mu_pf_mcs, 8))
-print("> Coefficient of Variation (Estimation)\t=", round(delta_estimation, 8))
-print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
+print("> Coefficient of Variation (Estimation)\t=", round(cov_estimation, 8))
+print("> Coefficient of Variation (Analytical)\t=", round(cov_analytical, 8))
 
 
 # ---------------------------------------------------------------------------
-# PLOTS
+# SAVE RESULTS
 # ---------------------------------------------------------------------------
 
-# plot samples
-#uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF=0)
-
-plt.show()
+np.save(filename + '_g_list.npy', g_list)
+np.save(filename + '_theta_list.npy', theta_list)
+print("\n> File was successfully saved as:", filename)

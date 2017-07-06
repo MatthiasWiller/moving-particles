@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-07
 # ---------------------------------------------------------------------------
 # References:
 # 1."MCMC algorithms for Subset Simulation"
@@ -21,17 +21,16 @@
 import time as timer
 
 import numpy as np
-import matplotlib.pyplot as plt
 import scipy.stats as scps
 
-import algorithms.sus as sus
+
 import algorithms.cond_sampling as cs
 import algorithms.modified_metropolis as mmh
 import algorithms.adaptive_cond_sampling as acs
 
-import utilities.plots as uplt
+import algorithms.sus as sus
+
 import utilities.stats as ustat
-import utilities.util as uutil
 
 print("RUN 22_sus_liebscher.py")
 
@@ -43,10 +42,18 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-n_samples_per_level = 500          # number of samples per conditional level
+n_samples_per_level = 1000          # number of samples per conditional level
 p0                  = 0.1           # Probability of each subset, chosen adaptively
+sampling_method     = 'acs'         # 'mmh' = Modified Metropolis Hastings
+                                    # 'cs'  = Conditional Sampling
+                                    # 'acs' = adaptive Conditional Sampling
+n_simulations       = 1             # Number of Simulations
 
-n_simulations = 1
+# file-name
+filename = 'python/data/sus_liebscher_Nspl' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
+
+# reference solution from paper
+mu_pf_mcs       = 0.00405
 
 # parameters for beta-distribution
 p = 6.0
@@ -70,8 +77,6 @@ z   = lambda x: 8* np.exp(-(x[0]**2 + x[1]**2)) + 2* np.exp(-((x[0]-5)**2 + (x[1
 #LSF = lambda x: 7.5 - z(x)
 LSF = lambda u: 7.5 - z(transform_U2X(u))
 
-# analytical CDF
-# no analytical CDF available
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
@@ -81,17 +86,10 @@ LSF = lambda u: 7.5 - z(transform_U2X(u))
 sample_marg_PDF_list = []
 f_marg_PDF_list      = []
 
-
-
 # sample from marginal pdf (beta-distribution)
-#sample_marg_PDF = lambda: scps.beta.rvs(p, q, 1)
-#sample_marg_PDF = lambda: np.random.beta(p, q, 1)
-#sample_marg_PDF = lambda: transform_X2U(scps.beta.rvs(p, q, size=1))
 sample_marg_PDF = lambda: transform_X2U(beta_distr.rvs(1))
 
 # marginal pdf / target pdf (beta-distribution)
-#f_marg_PDF      = lambda x: scps.beta.pdf(x, p, q)
-#f_marg_PDF      = lambda u: scps.beta.pdf(transform_U2X(u), p, q)
 f_marg_PDF      = lambda u: beta_distr.pdf(transform_U2X(u))
 
 # append distributions to list
@@ -106,9 +104,12 @@ f_marg_PDF_list.append(f_marg_PDF)
 # ---------------------------------------------------------------------------
 
 # initializing sampling method
-#sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian')
-#sampling_method = cs.CondSampling(sample_marg_PDF_list, 0.8)
-sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, 0.1)
+if sampling_method == 'mmh':
+     sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian')
+elif sampling_method == 'cs':
+    sampler = cs.CondSampling(sample_marg_PDF_list, 0.8)
+elif sampling_method == 'acs':
+    sampler = acs.AdaptiveCondSampling(sample_marg_PDF_list, 0.1)
 
 
 ## apply subset-simulation
@@ -128,7 +129,7 @@ for i in range(0, n_simulations):
     # perform SubSim
     p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
 
-    # transform samples from u to x-space
+    # transform samples back from u to x-space
     for j in range(0, len(theta)):
         theta[j] = transform_U2X(theta[j])
 
@@ -144,7 +145,9 @@ print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 # computing cov
 print('\n> START Computing C.O.V')
 startTime = timer.time()
-delta     = ustat.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+
+cov_analytical = ustat.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+
 print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2), "s")
 
 # ---------------------------------------------------------------------------
@@ -155,27 +158,19 @@ p_F_SS_array    = np.asarray(p_F_SS_list).reshape(-1)
 sigma_pf_ss     = np.std(p_F_SS_array)
 mu_pf_ss        = np.mean(p_F_SS_array)
 
-mu_pf_mcs       = 0.00405
-
-delta_analytical = delta
-delta_estimation = sigma_pf_ss/mu_pf_ss
+cov_estimation = sigma_pf_ss/mu_pf_ss
 
 print("\nSTART Results:")
 print("> Probability of Failure (SubSim Est.)\t=", round(mu_pf_ss, 8))
 print("> Probability of Failure (MCS) \t\t=", round(mu_pf_mcs, 8))
-print("> Coefficient of Variation (Estimation)\t=", round(delta_estimation, 8))
-print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
+print("> Coefficient of Variation (Estimation)\t=", round(cov_estimation, 8))
+print("> Coefficient of Variation (Analytical)\t=", round(cov_analytical, 8))
 
 
 # ---------------------------------------------------------------------------
-# PLOTS
+# SAVE RESULTS
 # ---------------------------------------------------------------------------
 
-# plot samples
-uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF=0)
-
-g_max_global = np.amax(np.asarray(g).reshape(-1))
-for i in range(0, len(theta)):
-    uplt.plot_surface_with_samples(theta[i], g[i], z, g_max_global)
-
-plt.show()
+np.save(filename + '_g_list.npy', g_list)
+np.save(filename + '_theta_list.npy', theta_list)
+print("\n> File was successfully saved as:", filename)

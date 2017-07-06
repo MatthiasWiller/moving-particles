@@ -66,7 +66,7 @@ sample_marg_PDF_list.append(sample_marg_PDF)
 print('\n> START Monte Carlo Simulation')
 startTime = timer.time()
 
-pf_mcs, theta_list_mcs, g_list_mcs = mcs.mcs(N, sample_marg_PDF_list, LSF)
+pf_mcs, theta_list, g_list = mcs.mcs(N, sample_marg_PDF_list, LSF)
 
 cov_mcs = np.sqrt((1 - pf_mcs) / (N * pf_mcs))
 
@@ -77,6 +77,7 @@ print("\n> Time needed for Monte Carlo Simulation =", round(timer.time() - start
 # ---------------------------------------------------------------------------
 # SAVE RESULTS
 # ---------------------------------------------------------------------------
-filename = filename + '.npy'
-np.save(filename, g_list_mcs)
+
+np.save(filename + '_g_list.npy', g_list)
+np.save(filename + '_theta_list.npy', theta_list)
 print("\n> File was successfully saved as:", filename)

@@ -117,3 +117,14 @@ legend_list.append('MP')
 uplt.plot_pf_over_b(b_line_list, pf_line_list, legend_list)
 
 plt.show()
+
+# ---------------------------------------------------------------------------
+# PLOTS (from orinial file - doesn't work here!!)
+# ---------------------------------------------------------------------------
+
+# plot samples
+# g_max_global = np.amax(np.asarray(g).reshape(-1))
+# for i in range(0, len(theta)):
+#     uplt.plot_surface_with_samples(theta[i], g[i], z, g_max_global)
+
+# plt.show()

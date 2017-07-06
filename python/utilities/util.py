@@ -34,7 +34,51 @@ def get_n_eff_sim(g_list):
 
 # ---------------------------------------------------------------------------
 def get_pf_line_and_b_line_from_SUS(g_list, p0, N):
-    return True
+    # some constants
+    Nc    = int(N*p0)    # number of chains
+    n_sim = len(g_list)  # number of simulations
+
+    # initialization
+    n_levels = np.zeros(n_sim, int)
+
+    # count number of levels
+    for i in range(0, n_sim):
+        n_levels[i] = len(g_list[i])
+
+    # find max n_levels
+    n_levels = np.amax(n_levels)
+
+    # set up Pf_line
+    pf_line       = np.zeros((n_levels, Nc), float)
+    pf_line[0, :] = np.linspace(p0, 1, Nc)
+    for i in range(1, n_levels):
+        pf_line[i, :] = pf_line[i-1, :] * p0
+    
+    # initialization
+    b_line_list = []
+
+    # loop over all simulations to get the b_line
+    for sim in range(0, n_sim):
+        g           = g_list[sim]
+
+        n_levels    = len(g)
+
+        b_line      = np.zeros((n_levels, Nc), float)
+
+        # loop over all levels and get b_line
+        for level in range(0, n_levels):
+            g_sorted          = np.sort(g[level])
+            b_line[level, :]  = np.percentile(g_sorted, pf_line[0, :]*100)
+
+        b_line_array_temp = b_line.reshape(-1)
+        b_line_array_temp = np.sort(b_line_array_temp)
+        b_line_list.append(b_line_array_temp)
+
+    # reshape and sort the matrices
+    pf_line = np.asarray(pf_line).reshape(-1)
+    pf_line = np.sort(pf_line)
+
+    return b_line_list, pf_line
 
 # ---------------------------------------------------------------------------
 def get_pf_line_and_b_line_from_MP(g_list_list, N):

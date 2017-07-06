@@ -97,6 +97,7 @@ elif sampling_method == 'cs':
 elif sampling_method == 'acs':
     sampler = acs.AdaptiveCondSampling(sample_marg_PDF_list, 0.1)
 
+
 ## apply subset-simulation
 
 # initialization of lists
@@ -123,7 +124,9 @@ print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 # computing cov
 print('\n> START Computing C.O.V')
 startTime = timer.time()
-cov_analytical     = ustat.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+
+cov_analytical = ustat.cov_analytical(theta, g, p0, n_samples_per_level, p_F_SS)
+
 print("> Time needed for Computing C.O.V =", round(timer.time() - startTime, 2), "s")
 
 
