@@ -79,8 +79,8 @@ for sim in range(0, n_simulations):
     pf_list.append(pf_hat)
 
 pf_sim_array = np.asarray(pf_list)
-pf_mean = np.mean(pf_sim_array)
-pf_sigma = np.std(pf_sim_array)
+pf_mean      = np.mean(pf_sim_array)
+pf_sigma     = np.std(pf_sim_array)
 
 # ---------------------------------------------------------------------------
 # RESULTS

@@ -19,7 +19,7 @@ import numpy as np
 import algorithms.mcs as mcs
 
 
-print("RUN 12_mcs_simuations.py")
+print("RUN 11_mcs_example_1.py")
 
 # set seed for randomization
 np.random.seed(0)
@@ -32,9 +32,9 @@ np.random.seed(0)
 N = int(1e4)       # number of Simulations
 d = 10
 
-filename = 'python/data/mcs_example_0_d' + repr(d) +'_N' + repr(N) + '.npy'
+filename = 'python/data/mcs_example_1_d' + repr(d) +'_N' + repr(N)
 
-# limit-state function problem 1
+# limit-state function
 #beta = 5.1993       # for pf = 10^-7
 #beta = 4.7534       # for pf = 10^-6
 #beta = 4.2649       # for pf = 10^-5
@@ -65,7 +65,6 @@ for i in range(0, d):
 print('\n> START Monte Carlo Simulation')
 startTime = timer.time()
 
-
 pf_mcs, theta_list_mcs, g_list_mcs = mcs.mcs(N, sample_marg_PDF_list, LSF)
 
 cov_mcs = np.sqrt((1 - pf_mcs) / (N * pf_mcs))
@@ -78,5 +77,6 @@ print("\n> Time needed for Monte Carlo Simulation =", round(timer.time() - start
 # SAVE RESULTS
 # ---------------------------------------------------------------------------
 
+filename = filename + '.npy'
 np.save(filename, g_list_mcs)
 print("\n> File was successfully saved as:", filename)

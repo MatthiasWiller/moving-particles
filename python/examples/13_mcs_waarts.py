@@ -19,7 +19,7 @@ import numpy as np
 import algorithms.mcs as mcs
 
 
-print("RUN 12_mcs_simuations.py")
+print("RUN 13_mcs_waarts.py")
 
 # set seed for randomization
 np.random.seed(0)
@@ -30,18 +30,11 @@ np.random.seed(0)
 
 # parameters
 N = int(1e4)       # number of Simulations
-d = 10
 
-filename = 'python/data/mcs_example_0_d' + repr(d) +'_N' + repr(N) + '.npy'
+filename = 'python/data/mcs_waarts_N' + repr(N) + '.npy'
 
-# limit-state function problem 1
-#beta = 5.1993       # for pf = 10^-7
-#beta = 4.7534       # for pf = 10^-6
-#beta = 4.2649       # for pf = 10^-5
-#beta = 3.7190       # for pf = 10^-4
-beta = 3.0902       # for pf = 10^-3
-#beta = 2.3263       # for pf = 10^-2
-LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
+# limit-state function 
+LSF = lambda u: np.minimum(3 + 0.1*(u[0] - u[1])**2 - 2**(-0.5) * np.absolute(u[0] + u[1]), 7* 2**(-0.5) - np.absolute(u[0] - u[1]))
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION
@@ -54,8 +47,8 @@ sample_marg_PDF_list = []
 sample_marg_PDF = lambda: np.random.randn(1)
 
 # append distributions to list
-for i in range(0, d):
-    sample_marg_PDF_list.append(sample_marg_PDF)
+sample_marg_PDF_list.append(sample_marg_PDF)
+sample_marg_PDF_list.append(sample_marg_PDF)
 
 
 # ---------------------------------------------------------------------------
@@ -65,7 +58,6 @@ for i in range(0, d):
 print('\n> START Monte Carlo Simulation')
 startTime = timer.time()
 
-
 pf_mcs, theta_list_mcs, g_list_mcs = mcs.mcs(N, sample_marg_PDF_list, LSF)
 
 cov_mcs = np.sqrt((1 - pf_mcs) / (N * pf_mcs))
@@ -73,6 +65,11 @@ cov_mcs = np.sqrt((1 - pf_mcs) / (N * pf_mcs))
 print('> Estimated Pf \t=', pf_mcs)
 print('> Estimated C.O.V. = ', cov_mcs)
 print("\n> Time needed for Monte Carlo Simulation =", round(timer.time() - startTime, 2), "s")
+
+# ---------------------------------------------------------------------------
+# POST PROCESSING
+# ---------------------------------------------------------------------------
+
 
 # ---------------------------------------------------------------------------
 # SAVE RESULTS

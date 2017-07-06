@@ -33,7 +33,7 @@ import utilities.plots as uplt
 import utilities.stats as ustat
 import utilities.util as uutil
 
-print("RUN 07_sus_example_2.py")
+print("RUN 22_sus_liebscher.py")
 
 # set seed for randomization
 np.random.seed(0)
@@ -45,6 +45,8 @@ np.random.seed(0)
 # parameters
 n_samples_per_level = 500          # number of samples per conditional level
 p0                  = 0.1           # Probability of each subset, chosen adaptively
+
+n_simulations = 1
 
 # parameters for beta-distribution
 p = 6.0
@@ -100,40 +102,16 @@ f_marg_PDF_list.append(f_marg_PDF)
 
 
 # ---------------------------------------------------------------------------
-# INPUT FOR MODIFIED METROPOLIS HASTINGS
-# ---------------------------------------------------------------------------
-
-# proposal distribution
-#proposal_dist = 'uniform'
-proposal_dist = 'gaussian'
-
-
-# ---------------------------------------------------------------------------
-# INPUT FOR CONDITIONAL SAMPLING
-# ---------------------------------------------------------------------------
-
-# note: don't set it to 0.2; it is too low;
-rho_k = 0.8         # ~0.7 gives kinda good results
-
-# ---------------------------------------------------------------------------
-# INPUT FOR ADAPTIVE CONDITIONAL SAMPLING
-# ---------------------------------------------------------------------------
-
-#
-pa = 0.1
-
-# ---------------------------------------------------------------------------
 # SUBSET SIMULATION
 # ---------------------------------------------------------------------------
 
 # initializing sampling method
-#sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, proposal_dist)
-#sampling_method = cs.CondSampling(sample_marg_PDF_list, rho_k)
-sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, pa)
+#sampling_method = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian')
+#sampling_method = cs.CondSampling(sample_marg_PDF_list, 0.8)
+sampling_method = acs.AdaptiveCondSampling(sample_marg_PDF_list, 0.1)
 
 
-# apply subset-simulation
-n_sim = 1
+## apply subset-simulation
 
 # initialization of lists
 p_F_SS_list  = []
@@ -144,25 +122,22 @@ g_list       = []
 print('\n> START Sampling')
 startTime = timer.time()
 
-n_loops = n_sim
-while n_loops > 0:
-    for i in range(0, n_loops):
-        # perform SubSim
-        p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
 
-        # transform samples from u to x-space
-        for j in range(0, len(theta)):
-            theta[j] = transform_U2X(theta[j])
 
-        # save values in lists
-        p_F_SS_list.append(p_F_SS)
-        theta_list.append(theta)
-        g_list.append(g)
-        print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
+for i in range(0, n_simulations):
+    # perform SubSim
+    p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
 
-    # check if we have enough samples yet
-    n_eff_sim = uutil.get_n_eff_sim(g_list)
-    n_loops = n_sim - n_eff_sim
+    # transform samples from u to x-space
+    for j in range(0, len(theta)):
+        theta[j] = transform_U2X(theta[j])
+
+    # save values in lists
+    p_F_SS_list.append(p_F_SS)
+    theta_list.append(theta)
+    g_list.append(g)
+    print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
+
 
 print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 
@@ -198,7 +173,7 @@ print("> Coefficient of Variation (Analytical)\t=", round(delta_analytical, 8))
 
 # plot samples
 uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF=0)
-#plt.show()
+
 g_max_global = np.amax(np.asarray(g).reshape(-1))
 for i in range(0, len(theta)):
     uplt.plot_surface_with_samples(theta[i], g[i], z, g_max_global)

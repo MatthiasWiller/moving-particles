@@ -53,7 +53,8 @@ def plot_hist(x, target_PDF=0, dimension=1):
 
     plt.ylim(0,1)
     plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
-    plt.title(r'Histogram of $\theta$')
+
+    # set labels
     plt.xlabel(r'$\theta_1$')
     plt.ylabel(r'Frequency $p$')
     plt.tight_layout()
@@ -69,7 +70,7 @@ def plot_mixing(x):
     plt.figure()
     plt.plot(x, color='navy')
 
-    plt.title(r'Iterations of the MCMC')
+    # set labels
     plt.xlabel(r'Number of samples, $n$')
     plt.ylabel(r'$\theta_1$')
     plt.xlim(0, n_samples)
@@ -99,7 +100,8 @@ def plot_autocorr(x, lag):
     plt.figure()
     plt.plot(rho, '.')
 
-    plt.title(r'Sample autocorrelation')
+
+    # set labels
     plt.xlabel(r'Lag, $k$')
     plt.ylabel(r'$\hat{R}(k)')
     plt.xlim(0, lag)
@@ -122,7 +124,8 @@ def plot_scatter_with_contour(theta, target_PDF):
     plt.scatter(theta[0,:], theta[1,:], s=1, color='blue', marker='o', linestyle='None')
 
     #ax.plot_surface(theta[0,:], theta[1,:], target_PDF(theta) )
-    plt.title(r'Contour plot')
+
+    # set labels
     plt.xlabel(r'$x_1$')
     plt.ylabel(r'$x_2$')
     plt.xticks([-2, 0, 2, 4, 6, 8])
@@ -438,7 +441,7 @@ def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0, g_mcs=0):
     matplotlib.rcParams['legend.fontsize'] = 12
     plt.legend(loc='lower right')
 
-    # set titles
+    # set labels
     plt.xlabel(r'Limit state function values $b$')
     plt.ylabel(r'$P(g(x) \leq b)$')
     plt.tight_layout()
@@ -473,12 +476,12 @@ def plot_cov_over_pf(pf_line, cov_mmh, cov_cs, cov_acs):
     matplotlib.rcParams['legend.fontsize'] = 12
     plt.legend(loc='upper right')
 
-    # set titles
-    plt.title(r'Coefficient of Variation')
+    # set labels
     plt.xlabel(r'Target Probability of Failure $P_f$')
     plt.ylabel(r'Coefficient of Variation $\delta$')
     plt.tight_layout()
     #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
 
 # ---------------------------------------------------------------------------
 # plot sus trails
@@ -509,7 +512,7 @@ def plot_sus_trails(g_list, p0, N, analytical_CDF):
     # initialization
     b_line_list_all_sims = []
 
-    # loop over all (effective) simulations to get the b_line
+    # loop over all simulations to get the b_line
     for sim in range(0, n_sim):
         b_line_list = []
         g           = g_list[sim]
@@ -562,8 +565,7 @@ def plot_sus_trails(g_list, p0, N, analytical_CDF):
         plt.plot(0, pf_exact_point, marker='x', color='yellow',\
                     markersize='10', linestyle='none', label=r'Pf Exact')
 
-    # set titles
-    plt.title(r'Failure probability estimate')
+    # set labels
     plt.xlabel(r'Limit state function values $b$')
     plt.ylabel(r'$P(g(x) \leq b)$')
     plt.tight_layout()
@@ -641,8 +643,7 @@ def plot_cov_pf_over_b(g_list, p0, N):
     matplotlib.rcParams['legend.fontsize'] = 12
     plt.legend(loc='lower right')
 
-    # set titles
-    plt.title(r'Failure probability estimate')
+    # set labels
     plt.xlabel(r'$b$')
     plt.ylabel(r'$\delta$')
     plt.tight_layout()
@@ -704,8 +705,40 @@ def plot_mp_pf(N, g_list, analytical_CDF):
     # * plot estimated line
     plt.plot(b_line, pf_line, '--', color='navy', label=r'MP Estimation')
 
-     # set titles
+     # set lables
     plt.xlabel(r'Limit state function values $b$')
     plt.ylabel(r'$P(g(x) \leq b)$')
     plt.tight_layout()
     #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+
+def plot_pf_over_b(b_line_list, pf_line_list, legend_list):
+    plt.figure()
+
+    # initilize colors
+    colors = ['blue', 'fuchsia', 'green', 'red', 'navy', 'skyblue', 'orange', 'yellow']
+
+    # plot all lines
+    for i in range(0, len(b_line_list)):
+        plt.plot(b_line_list[i], pf_line_list[i], '--', color=colors[np.mod(i, len(colors))], label=legend_list[i])
+
+    # set y-axis to log-scale
+    plt.yscale('log')
+
+    # add legend
+    matplotlib.rcParams['legend.fontsize'] = 12
+    plt.legend(loc='lower right')
+
+    # set labels
+    plt.xlabel(r'Limit state function values $b$')
+    plt.ylabel(r'$P(g(x) \leq b)$')
+    plt.tight_layout()
+    #plt.savefig('plot_pf_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+    
+
+def plot_cov_over_pf(pf_line_list, cov_line_list, legend_list):
+    return True
+
+def plot_cov_ober_b(b_line_list, cov_line_list, legend_list):
+    return True

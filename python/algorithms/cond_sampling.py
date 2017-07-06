@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-07
 # ---------------------------------------------------------------------------
 # Input:
 # * theta0          : seed of the Markov-chain

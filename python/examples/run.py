@@ -13,8 +13,7 @@ import algorithms.cond_sampling as cs
 import algorithms.modified_metropolis as mmh
 import algorithms.adaptive_cond_sampling as acs
 
-import plots.sus_plot as splt
-import plots.user_plot as uplt
+import utilities.plots as uplt
 
 np.random.seed(0)
 

@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Moving Particles Test Approach
+# Moving Particles Waarts example
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-06
+# Version 2017-07
 # ---------------------------------------------------------------------------
 """
 
@@ -23,8 +23,7 @@ import algorithms.cond_sampling as cs
 
 import utilities.plots as uplt
 
-
-print("RUN 30_mp_test_approach.py")
+print("RUN 11_mp_waarts_example.py")
 
 # set seed for randomization
 np.random.seed(0)
@@ -35,19 +34,16 @@ np.random.seed(0)
 
 # parameters
 N = 100          # number of samples
-d = 10           # number of dimensions
+d = 2            # number of dimensions
 b = 30           # burn-in
 
-n_simulations = 1
+n_simulations = 5
 
 # limit-state function
-beta = 3.0902       # for pf = 10^-3
-LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
+LSF = lambda u: np.minimum(3 + 0.1*(u[0] - u[1])**2 - 2**(-0.5) * np.absolute(u[0] + u[1]), 7* 2**(-0.5) - np.absolute(u[0] - u[1]))
 
 # analytical CDF
-analytical_CDF = lambda x: scps.norm.cdf(x, beta)
-
-pf_analytical    = analytical_CDF(0)
+# no analytical CDF available
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
@@ -86,19 +82,19 @@ pf_sim_array = np.asarray(pf_list)
 pf_mean      = np.mean(pf_sim_array)
 pf_sigma     = np.std(pf_sim_array)
 
-pf_analytical    = analytical_CDF(0)
-
 # ---------------------------------------------------------------------------
 # RESULTS
 # ---------------------------------------------------------------------------
 
+pf_analytical = 2.275 * 10**-3
+
 print("\nRESULTS:")
-print("> Probability of Failure (Moving Particels Est.) =", round(pf_mean, 8))
-print("> Probability of Failure (Analytical) \t\t=", round(pf_analytical, 8))
-print("> Acceptance rate \t\t\t\t=", round(acc_rate, 8))
-print("> Pf mean =", pf_mean)
-print("> Pf sigma =", pf_sigma)
-print("> C.O.V. =", pf_sigma/pf_mean)
+print("> Probability of Failure (Moving Particels Est.)\t=", round(pf_mean, 8))
+print("> Probability of Failure (Analytical) \t\t\t=", round(pf_analytical, 8))
+print("> Pf mean \t=", pf_mean)
+print("> Pf sigma \t=", pf_sigma)
+print("> C.O.V. \t=", pf_sigma/pf_mean)
+
 
 # ---------------------------------------------------------------------------
 # PLOTS
@@ -106,4 +102,5 @@ print("> C.O.V. =", pf_sigma/pf_mean)
 
 uplt.plot_m_with_poisson_dist(m_list, pf_analytical)
 uplt.plot_mp_pf(N, g_list, analytical_CDF)
+
 plt.show()

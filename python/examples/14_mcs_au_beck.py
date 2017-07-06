@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# File for performing MCS
+# File for performing MCS on 
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -19,7 +19,7 @@ import numpy as np
 import algorithms.mcs as mcs
 
 
-print("RUN 12_mcs_simuations.py")
+print("RUN 14_mcs_au_beck.py")
 
 # set seed for randomization
 np.random.seed(0)
@@ -32,16 +32,9 @@ np.random.seed(0)
 N = int(1e4)       # number of Simulations
 d = 10
 
-filename = 'python/data/mcs_example_0_d' + repr(d) +'_N' + repr(N) + '.npy'
+filename = 'python/data/mcs_au_beck_d' + repr(d) +'_N' + repr(N) + '.npy'
 
-# limit-state function problem 1
-#beta = 5.1993       # for pf = 10^-7
-#beta = 4.7534       # for pf = 10^-6
-#beta = 4.2649       # for pf = 10^-5
-#beta = 3.7190       # for pf = 10^-4
-beta = 3.0902       # for pf = 10^-3
-#beta = 2.3263       # for pf = 10^-2
-LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
+# limit-state function for waarts example
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION
@@ -64,7 +57,6 @@ for i in range(0, d):
 
 print('\n> START Monte Carlo Simulation')
 startTime = timer.time()
-
 
 pf_mcs, theta_list_mcs, g_list_mcs = mcs.mcs(N, sample_marg_PDF_list, LSF)
 
