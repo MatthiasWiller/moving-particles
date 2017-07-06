@@ -31,7 +31,7 @@ for iDim = 1:numel(Dims)
             CoefficientOfVariation(iRho,iBurnIn) = cov_pf.(['Beta',betastr]).('MoveOneParticleWalter').(['BurnIn',num2str(nBurnIn)]).(['Dim',num2str(dim)]);
             
         end
-      save('/home/era3/Documents/Kilian/Error_vsRho_vsBUrnIn')  
+      save('Error_vsRho_vsBUrnIn')  
     end %for
     
 end%for
