@@ -37,12 +37,14 @@ np.random.seed(0)
 N = 100                     # number of samples
 d = 10                      # number of dimensions
 b = 30                      # burn-in
-sampling_method  = 'mmh'    # 'mmh' = Modified Metropolis Hastings
+sampling_method  = 'cs'    # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
-n_simulations = 2           # number of simulations
+n_simulations = 10           # number of simulations
 
 # file-name
-filename = 'python/data/mp_example_1_d' + repr(d) +'_N' + repr(N) + '_Nsim' + repr(n_simulations) + '_b' + repr(b) + '_' + sampling_method
+filename = 'python/data/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
+           '_Nsim' + repr(n_simulations) + '_b' + repr(b) + '_' + sampling_method + \
+           '_wSeedSel'
 
 # limit-state function
 #beta = 5.1993       # for pf = 10^-7
@@ -94,7 +96,7 @@ theta_list = []
 g_list     = []
 
 for sim in range(0, n_simulations):
-    pf_hat, theta_temp, g_temp, acc_rate, m_list = mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
+    pf_hat, theta_temp, g_temp, acc_rate, m_list = mp.mp(N, LSF, sampler, sample_marg_PDF_list)
     # save simulation in list
     pf_list.append(pf_hat)
     g_list.append(g_temp)
@@ -105,9 +107,9 @@ pf_sim_array = np.asarray(pf_list)
 pf_mean      = np.mean(pf_sim_array)
 pf_sigma     = np.std(pf_sim_array)
 
-uplt.plot_m_with_poisson_dist(m_list, pf_analytical)
-uplt.plot_mp_pf(N, g_list[0], analytical_CDF)
-plt.show()
+# uplt.plot_m_with_poisson_dist(m_list, pf_analytical)
+# uplt.plot_mp_pf(N, g_list[0], analytical_CDF)
+# plt.show()
 
 # ---------------------------------------------------------------------------
 # RESULTS

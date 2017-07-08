@@ -359,7 +359,7 @@ def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0, g_mcs=0):
 
     b_line_list_all_levels = []
 
-    # loop over all (effective) simulations to get the b_line
+    # loop over all simulations to get the b_line
     for sim in range(0, n_sim):
         b_line_list = []
         g           = g_list[sim]
@@ -736,9 +736,26 @@ def plot_pf_over_b(b_line_list, pf_line_list, legend_list):
     #plt.savefig('plot_pf_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
     
+def plot_cov_over_b(b_line_list, cov_line_list, legend_list):
+    plt.figure()
 
-def plot_cov_over_pf(pf_line_list, cov_line_list, legend_list):
-    return True
+    # initilize colors
+    colors = ['blue', 'fuchsia', 'green', 'red', 'navy', 'skyblue', 'orange', 'yellow']
 
-def plot_cov_ober_b(b_line_list, cov_line_list, legend_list):
+    # plot all lines
+    for i in range(0, len(cov_line_list)):
+        plt.plot(b_line_list[i], cov_line_list[i], '--', color=colors[np.mod(i, len(colors))], label=legend_list[i])
+
+    # add legend
+    matplotlib.rcParams['legend.fontsize'] = 12
+    plt.legend(loc='upper right')
+
+    # set labels
+    plt.xlabel(r'Limit state function values $b$')
+    plt.ylabel(r'$C.O.V.$')
+    plt.tight_layout()
+    #plt.savefig('plot_pf_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+def plot_cov_ober_pf(b_line_list, cov_line_list, legend_list):
+
     return True

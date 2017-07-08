@@ -8,29 +8,27 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-07
 # ---------------------------------------------------------------------------
 """
 
 import numpy as np
 
 # ---------------------------------------------------------------------------
-def get_n_eff_sim(g_list):
-    # initialization
-    n_sim    = len(g_list)
-    n_levels = np.zeros(n_sim, int)
+def get_pf_line_and_b_line_from_MCS(g_list):
+    # sort g_list to obtain b_line_temp
+    b_line_temp  = np.sort(g_list)
+    pf_line_temp = np.arange(1, len(b_line_temp)+1)/float(len(b_line_temp))
 
-    # count number of levels for every simulation
-    for i in range(0, n_sim):
-        n_levels[i] = len(g_list[i])
+    # interpolate pf-values to corresponding b-values
+    n_values = 100
+    upper_b  = b_line_temp[-1]
 
-    # find most often encountered n_levels
-    count_n_levels   = np.bincount(n_levels)
-    most_often_level = np.nanargmax(count_n_levels)
-    #n_levels         = most_often_level
-    n_eff_sim = count_n_levels[most_often_level]
+    b_line   = np.linspace(1e-3, upper_b, n_values)
+    pf_line  = np.interp(b_line, b_line_temp, pf_line_temp)
 
-    return n_eff_sim
+    return b_line, pf_line
+
 
 # ---------------------------------------------------------------------------
 def get_pf_line_and_b_line_from_SUS(g_list, p0, N):
@@ -38,47 +36,54 @@ def get_pf_line_and_b_line_from_SUS(g_list, p0, N):
     Nc    = int(N*p0)    # number of chains
     n_sim = len(g_list)  # number of simulations
 
-    # initialization
-    n_levels = np.zeros(n_sim, int)
-
-    # count number of levels
-    for i in range(0, n_sim):
-        n_levels[i] = len(g_list[i])
-
     # find max n_levels
-    n_levels = np.amax(n_levels)
+    n_levels = max(len(g_tmp) for g_tmp in g_list)
 
-    # set up Pf_line
-    pf_line       = np.zeros((n_levels, Nc), float)
-    pf_line[0, :] = np.linspace(p0, 1, Nc)
+    # set up pf_line
+    pf_line_temp       = np.zeros((n_levels, Nc), float)
+    pf_line_temp[0, :] = np.linspace(p0, 1, Nc)
     for i in range(1, n_levels):
-        pf_line[i, :] = pf_line[i-1, :] * p0
-    
+        pf_line_temp[i, :] = pf_line_temp[i-1, :] * p0
+ 
     # initialization
     b_line_list = []
 
     # loop over all simulations to get the b_line
     for sim in range(0, n_sim):
-        g           = g_list[sim]
+        g          = g_list[sim]
 
-        n_levels    = len(g)
+        n_levels   = len(g)
 
-        b_line      = np.zeros((n_levels, Nc), float)
+        b_line_temp = np.zeros((n_levels, Nc), float)
 
         # loop over all levels and get b_line
-        for level in range(0, n_levels):
-            g_sorted          = np.sort(g[level])
-            b_line[level, :]  = np.percentile(g_sorted, pf_line[0, :]*100)
+        for lvl in range(0, n_levels):
+            g_sorted            = np.sort(g[lvl])
+            b_line_temp[lvl, :] = np.percentile(g_sorted, pf_line_temp[0, :]*100)
 
-        b_line_array_temp = b_line.reshape(-1)
+        b_line_array_temp = b_line_temp.reshape(-1)
         b_line_array_temp = np.sort(b_line_array_temp)
         b_line_list.append(b_line_array_temp)
 
     # reshape and sort the matrices
-    pf_line = np.asarray(pf_line).reshape(-1)
-    pf_line = np.sort(pf_line)
+    pf_line_temp = np.asarray(pf_line_temp).reshape(-1)
+    pf_line_temp = np.sort(pf_line_temp)
 
-    return b_line_list, pf_line
+    pf_line_list = []
+
+    # interpolate pf_line-values to get a pf_line_list,
+    # that is dependent only on one b_line
+    n_values = 100
+    upper_b  = min(max(np.amax(g_lvl) for g_lvl in g_sim) for g_sim in g_list)
+    b_line   = np.linspace(1e-3, upper_b, n_values)
+
+    for i in range(0, n_sim):
+        len_b    = len(b_line_list[i])
+        pf_line  = np.interp(b_line, b_line_list[i], pf_line_temp[-len_b:])
+        pf_line_list.append(pf_line)
+
+    return b_line, pf_line_list
+
 
 # ---------------------------------------------------------------------------
 def get_pf_line_and_b_line_from_MP(g_list_list, N):
@@ -86,8 +91,8 @@ def get_pf_line_and_b_line_from_MP(g_list_list, N):
     n_sim = len(g_list_list)
 
     # initialization
-    b_line_list = []
-    pf_line_list = []
+    b_line_list_prelim  = []
+    pf_line_list_prelim = []
 
     for i in range(0, n_sim):
         # sort g_list
@@ -95,28 +100,46 @@ def get_pf_line_and_b_line_from_MP(g_list_list, N):
         g_list.sort(reverse=True)
 
         # initialization
-        pf_line = np.zeros(len(g_list)-N)
-        b_line = np.zeros(len(g_list)-N)
+        pf_line_temp = np.zeros(len(g_list)-N)
+        b_line_temp  = np.zeros(len(g_list)-N)
 
         for m in range(0, len(g_list)-N):
-            pf_line[m] = (1 -1/N)**(m+1)
-            b_line[m] = g_list[m]
+            pf_line_temp[m] = (1 -1/N)**(m+1)
+            b_line_temp[m]  = g_list[m]
         
-        pf_line_list.append(pf_line)
-        b_line_list.append(b_line)
+        pf_line_temp.sort()
+        b_line_temp.sort()
 
-    return b_line_list, pf_line_list
+        pf_line_list_prelim.append(pf_line_temp)
+        b_line_list_prelim.append(b_line_temp)
+    
+    # initialization
+    pf_line_list = []
+
+    # interpolate pf_line-values to get a pf_line_list,
+    # that is dependent only on one b_line
+    n_values = 100
+    upper_b  = min(max(g_sim) for g_sim in g_list_list)
+    b_line   = np.linspace(1e-3, upper_b, n_values)
+
+    for i in range(0, n_sim):
+        pf_line  = np.interp(b_line, b_line_list_prelim[i], pf_line_list_prelim[i])
+        pf_line_list.append(pf_line)
+
+    return b_line, pf_line_list
+
 
 # ---------------------------------------------------------------------------
-def get_pf_line_and_b_line_from_MCS(g_list):
-    # sort g_list to obtain b_line
-    b_line_mcs  = np.sort(g_list)
-    pf_line_mcs = np.arange(1, len(b_line_mcs)+1)/float(len(b_line_mcs))
+def get_mean_and_cov_from_pf_lines(pf_line_list):
+    # get number of simulations
+    n_sim = len(pf_line_list)
 
-    # delete all negative values
-    n_negative_values = sum(1 for g in g_list if g < 0)
+    # turn lists in a matrix to get mean and std
+    pf_line_matrix = np.asarray(pf_line_list).reshape(n_sim, -1)
 
-    b_line_mcs  = b_line_mcs[n_negative_values:]
-    pf_line_mcs = pf_line_mcs[n_negative_values:]
+    # get mean and std 
+    pf_line_mean = np.mean(pf_line_matrix, axis=0)
+    pf_line_std  = np.std(pf_line_matrix, axis=0)
+    pf_line_cov  = pf_line_std / pf_line_mean
 
-    return b_line_mcs, pf_line_mcs
+    return pf_line_mean, pf_line_cov

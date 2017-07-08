@@ -46,7 +46,7 @@ p0                  = 0.1           # Probability of each subset, chosen adaptiv
 sampling_method     = 'acs'         # 'mmh' = Modified Metropolis Hastings
                                     # 'cs'  = Conditional Sampling
                                     # 'acs' = adaptive Conditional Sampling
-n_simulations       = 2             # Number of Simulations
+n_simulations       = 10             # Number of Simulations
 
 # file-name
 filename = 'python/data/sus_example_1_d' + repr(d) +'_Nspl' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method

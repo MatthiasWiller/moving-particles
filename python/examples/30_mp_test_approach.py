@@ -78,7 +78,7 @@ sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 
 
 pf_list = []
 for sim in range(0, n_simulations):
-    pf_hat, theta_temp, g_list, acc_rate, m_list = mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
+    pf_hat, theta_temp, g_list, acc_rate = mp.mp(N, LSF, sampler, sample_marg_PDF_list)
     # save simulation in list
     pf_list.append(pf_hat)
 
@@ -104,6 +104,5 @@ print("> C.O.V. =", pf_sigma/pf_mean)
 # PLOTS
 # ---------------------------------------------------------------------------
 
-uplt.plot_m_with_poisson_dist(m_list, pf_analytical)
 uplt.plot_mp_pf(N, g_list, analytical_CDF)
 plt.show()

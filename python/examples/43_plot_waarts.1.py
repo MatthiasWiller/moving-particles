@@ -63,14 +63,11 @@ direction = 'python/data/'
 
 g_list_mcs     = np.load(direction + 'mcs_example_1_d10_N10000.npy')
 
-g_list_sus     = np.load(direction + 'sus_example_1_d10_Nspl1000_Nsim10_acs_g_list.npy')
-# theta_list_sus = np.load(direction + 'sus_example_1_d10_Nspl1000_Nsim10_acs_theta_list.npy')
+g_list_sus     = np.load(direction + 'sus_example_1_d10_Nspl1000_Nsim2_acs_g_list.npy')
+theta_list_sus = np.load(direction + 'sus_example_1_d10_Nspl1000_Nsim2_acs_theta_list.npy')
 
-g_list_mp      = np.load(direction + 'mp_example_1_d10_N100_Nsim10_b30_cs_g_list.npy')
-# theta_list_mp  = np.load(direction + 'mp_example_1_d10_N100_Nsim10_b30_cs_theta_list.npy')
-
-g_list_mp_wSeedSel = np.load(direction + 'mp_example_1_d10_N100_Nsim10_b30_cs_wSeedSel_g_list.npy')
-
+g_list_mp      = np.load(direction + 'mp_example_1_d10_N100_Nsim2_b30_mmh_g_list.npy')
+theta_list_mp  = np.load(direction + 'mp_example_1_d10_N100_Nsim2_b30_mmh_theta_list.npy')
 
 # ---------------------------------------------------------------------------
 # POST-PROCESSING
@@ -79,52 +76,55 @@ g_list_mp_wSeedSel = np.load(direction + 'mp_example_1_d10_N100_Nsim10_b30_cs_wS
 b_line_analytical       = np.linspace(0,7,100)
 pf_line_analytical      = analytical_CDF(b_line_analytical)
 
-b_line_mcs, pf_line_mcs           = uutil.get_pf_line_and_b_line_from_MCS(g_list_mcs)
+b_line_mcs, pf_line_mcs         = uutil.get_pf_line_and_b_line_from_MCS(g_list_mcs)
 
-b_line_sus, pf_line_list_sus      = uutil.get_pf_line_and_b_line_from_SUS(g_list_sus, p0, n_samples_per_level)
-pf_line_mean_sus, pf_line_cov_sus = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_sus)
+b_line_list_sus, pf_line_sus    = uutil.get_pf_line_and_b_line_from_SUS(g_list_sus, p0, n_samples_per_level)
 
-b_line_mp, pf_line_list_mp        = uutil.get_pf_line_and_b_line_from_MP(g_list_mp, n_initial_samples)
-pf_line_mean_mp, pf_line_cov_mp   = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp)
+b_line_list_mp, pf_line_list_mp = uutil.get_pf_line_and_b_line_from_MP(g_list_mp, n_initial_samples)
 
-b_line_mp2, pf_line_list_mp2        = uutil.get_pf_line_and_b_line_from_MP(g_list_mp_wSeedSel, n_initial_samples)
-pf_line_mean_mp2, pf_line_cov_mp2   = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp2)
 
 # initialization
-b_line_list   = []
-pf_line_list  = []
-cov_line_list = []
-legend_list   = []
+b_line_list  = []
+pf_line_list = []
+legend_list  = []
 
 b_line_list.append(b_line_analytical)
 b_line_list.append(b_line_mcs)
-b_line_list.append(b_line_sus)
-b_line_list.append(b_line_mp)
-b_line_list.append(b_line_mp2)
-
+b_line_list.append(b_line_list_sus[0])
+b_line_list.append(b_line_list_mp[0])
 
 pf_line_list.append(pf_line_analytical)
 pf_line_list.append(pf_line_mcs)
-pf_line_list.append(pf_line_mean_sus)
-pf_line_list.append(pf_line_mean_mp)
-pf_line_list.append(pf_line_mean_mp2)
-
-cov_line_list.append(pf_line_cov_sus)
-cov_line_list.append(pf_line_cov_mp)
-cov_line_list.append(pf_line_cov_mp2)
+pf_line_list.append(pf_line_sus)
+pf_line_list.append(pf_line_list_mp[0])
 
 legend_list.append('analytical')
 legend_list.append('MCS')
 legend_list.append('SUS')
-legend_list.append('MP noSeedSel')
-legend_list.append('MP wSeedSel')
+legend_list.append('MP')
 
 
 # ---------------------------------------------------------------------------
 # PLOTS
 # ---------------------------------------------------------------------------
 
+# plot samples
+# uplt.plot_sus_list(g_list, p0, n_samples_per_level, p_F_SS_array, analytical_CDF, g_mcs)
+# #uplt.plot_sus_trails(g_list, p0, n_samples_per_level, analytical_CDF)
+# #uplt.plot_cov_over_pf(g_list, p0, n_samples_per_level)
+# uplt.plot_cov_pf_over_b(g_list, p0, n_samples_per_level)
+
 uplt.plot_pf_over_b(b_line_list, pf_line_list, legend_list)
-uplt.plot_cov_over_b(b_line_list[2:5], cov_line_list, legend_list[2:5])
 
 plt.show()
+
+# ---------------------------------------------------------------------------
+# PLOTS (from orinial file - doesn't work here!!)
+# ---------------------------------------------------------------------------
+
+# plot samples
+# g_max_global = np.amax(np.asarray(g).reshape(-1))
+# for i in range(0, len(theta)):
+#     uplt.plot_surface_with_samples(theta[i], g[i], z, g_max_global)
+
+# plt.show()

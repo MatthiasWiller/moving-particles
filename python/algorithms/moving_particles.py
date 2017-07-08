@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-07
 # ---------------------------------------------------------------------------
 # Input:
 # * theta0          : seed of the Markov-chain
@@ -33,46 +33,61 @@
 import time as timer
 import numpy as np
 
-# def mp(N, LSF, sampler, sample_marg_PDF_list):
-#     m_max = 1e7
+import random
 
-#     # get dimension
-#     d = len(sample_marg_PDF_list)
+def mp(N, LSF, sampler, sample_marg_PDF_list):
+    m_max = 1e7
 
-#     # initialization
-#     theta = np.zeros((N, d), float)
-#     g     = np.zeros(N, float)
-#     acc   = 0
+    # get dimension
+    d = len(sample_marg_PDF_list)
 
-#     # MCS sampling
-#     for i in range(0, N):
-#         for k in range(0, d):
-#             theta[i, k] = sample_marg_PDF_list[k]()
+    # initialization
+    theta = np.zeros((N, d), float)
+    g     = np.zeros(N, float)
+    acc   = 0
+    
+    seed_id_list = [i for i in range(0, N)]
+    g_list       = []
 
-#         g[i] = LSF(theta[i, :])
+    # MCS sampling
+    for i in range(0, N):
+        for k in range(0, d):
+            theta[i, k] = sample_marg_PDF_list[k]()
 
-#     m = 0
+        g[i] = LSF(theta[i, :])
+        g_list.append(g[i])
 
-#     while np.max(g) > 0 and m < m_max:
-#         # get index of smallest g
-#         id_min = np.argmax(g)
+    m = 0
 
-#         # sampling
-#         theta_temp, g_temp = sampler.sample_markov_chain(theta[id_min], 1, LSF, g[id_min])
+    while np.max(g) > 0 and m < m_max:
+        # get index of smallest g
+        id_min = np.argmax(g)
+        print('id_min =', id_min)
 
-#         # count acceptance rate
-#         if g[id_min] != g_temp:
-#             acc = acc + 1
+        # get theta_seed randomly from all theta (despite of theta[id_min])
+        seed_id_list_tmp = seed_id_list.copy()
+        seed_id_list_tmp.pop(id_min)
+        seed_id          = random.choice(seed_id_list_tmp)
+        theta_seed       = theta[seed_id]
 
-#         theta[id_min] = theta_temp
-#         g[id_min]     = g_temp
+        # sampling
+        theta_temp, g_temp = sampler.sample_markov_chain(theta_seed, 1, LSF, g[id_min])
 
-#         m = m + 1
-#         print('m:', m, '| g =', g_temp)
+        # count acceptance rate
+        if g[id_min] != g_temp:
+            acc = acc + 1
 
-#     pf_hat = (1 - 1/N)**m
+        theta[id_min] = theta_temp
+        g[id_min]     = g_temp
+        g_list.append(g_temp)
 
-#     return pf_hat, theta, g, acc
+        m = m + 1
+        print('m:', m, '| g =', g_temp)
+
+    pf_hat = (1 - 1/N)**m
+    acc_rate = acc / m
+
+    return pf_hat, theta, g_list, acc_rate, m
 
 
 
