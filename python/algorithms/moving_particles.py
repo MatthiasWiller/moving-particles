@@ -45,7 +45,7 @@ def mp(N, LSF, sampler, sample_marg_PDF_list):
     theta = np.zeros((N, d), float)
     g     = np.zeros(N, float)
     acc   = 0
-    
+
     seed_id_list = [i for i in range(0, N)]
     g_list       = []
 
