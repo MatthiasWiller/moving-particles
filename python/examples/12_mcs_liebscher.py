@@ -30,7 +30,7 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = int(1e6)       # number of Simulations
+N = int(1e7)       # number of Simulations
 # pf ~ 0.00405, with cov < 0.015 -> N > 1e6
 
 filename = 'python/data/mcs_liebscher_N' + repr(N)

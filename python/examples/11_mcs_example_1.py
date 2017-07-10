@@ -29,18 +29,18 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = int(1e4)       # number of Simulations
+N = int(1e6)       # number of Simulations
 d = 10
 
 filename = 'python/data/mcs_example_1_d' + repr(d) +'_N' + repr(N)
 
 # limit-state function
 #beta = 5.1993       # for pf = 10^-7
-#beta = 4.7534       # for pf = 10^-6
-#beta = 4.2649       # for pf = 10^-5
-#beta = 3.7190       # for pf = 10^-4
-beta = 3.0902       # for pf = 10^-3
-#beta = 2.3263       # for pf = 10^-2
+#beta = 4.7534       # for pf = 10^-6 (N=5*1e9)
+#beta = 4.2649       # for pf = 10^-5 (N=5*1e8)
+#beta = 3.7190       # for pf = 10^-4 (N=5*1e7)
+beta = 3.0902       # for pf = 10^-3 (N=5*1e6)
+#beta = 2.3263       # for pf = 10^-2 (N=5*1e5)
 LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
 
 # ---------------------------------------------------------------------------

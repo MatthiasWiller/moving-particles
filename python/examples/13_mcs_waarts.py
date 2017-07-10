@@ -29,9 +29,9 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = int(1e4)       # number of Simulations
+N = int(1e6)       # number of Simulations
 
-filename = 'python/data/mcs_waarts_N' + repr(N) + '.npy'
+filename = 'python/data/mcs_waarts_N' + repr(N)
 
 # limit-state function 
 LSF = lambda u: np.minimum(3 + 0.1*(u[0] - u[1])**2 - 2**(-0.5) * np.absolute(u[0] + u[1]), 7* 2**(-0.5) - np.absolute(u[0] - u[1]))

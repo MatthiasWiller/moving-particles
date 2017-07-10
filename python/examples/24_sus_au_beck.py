@@ -28,12 +28,29 @@ import algorithms.adaptive_cond_sampling as acs
 
 import algorithms.sus as sus
 
+import SDOF as sdof
+
 import utilities.stats as ustat
 
-print("RUN 23_sus_waarts.py")
+print("RUN 24_sus_au_beck.py")
 
 # set seed for randomization
 np.random.seed(0)
+
+# ---------------------------------------------------------------------------
+# DEFINITION OF THE WHITE NOISE ESCITATION
+# ---------------------------------------------------------------------------
+
+S  = 1                          # White noise spectral intensity 
+T  = 30                         # Duration of the excitation, s
+dt = 0.02                       # Time increment, s
+t  = np.arange(0,T+2*dt,dt)     # time instants (one more due to interpolation)
+n  = len(t)-1                   # n points ~ number of random variables
+# The uncertain state vector theta consists of the sequence of i.i.d.
+# standard Gaussian random variables which generate the white noise input
+# at the discrete time instants
+W = lambda theta: np.sqrt(2*np.pi*S/dt)*theta   # random excitation
+
 
 # ---------------------------------------------------------------------------
 # STANDARD INPUT FOR SUBSET SIMULATION
@@ -49,14 +66,12 @@ n_simulations       = 2             # Number of Simulations
 
 
 # file-name
-filename = 'python/data/sus_waarts_Nspl' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
+filename = 'python/data/sus_au_beck_Nspl' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
 
-# reference solution from paper
-mu_pf_mcs       = 2.275 * 10**-3
 
 # limit-state function
-LSF = lambda u: np.minimum(3 + 0.1*(u[0] - u[1])**2 - 2**(-0.5) * np.absolute(u[0] + u[1]), 7* 2**(-0.5) - np.absolute(u[0] - u[1]))
-
+max_thresh = 2.4    # See Fig.(1) Ref.(1)
+lsf = lambda theta: sdof.LSF(theta, t, W, max_thresh)
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
@@ -73,11 +88,9 @@ sample_marg_PDF = lambda: np.random.randn(1)
 f_marg_PDF      = lambda x: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
 
 # append distributions to list
-sample_marg_PDF_list.append(sample_marg_PDF)
-sample_marg_PDF_list.append(sample_marg_PDF)
-f_marg_PDF_list.append(f_marg_PDF)
-f_marg_PDF_list.append(f_marg_PDF)
-
+for i in range(0, n+1):
+    sample_marg_PDF_list.append(sample_marg_PDF)
+    f_marg_PDF_list.append(f_marg_PDF)
 
 # ---------------------------------------------------------------------------
 # SUBSET SIMULATION
@@ -105,7 +118,7 @@ startTime = timer.time()
 
 for i in range(0, n_simulations):
     # perform SubSim
-    p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampler)
+    p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, lsf, sampler)
 
     # save values in lists
     p_F_SS_list.append(p_F_SS)

@@ -37,6 +37,9 @@ def mcs(N, sample_marg_PDF_list, LSF):
 
     n_fail = 0
     for i in range(0, N):
+        if (i % int(N/100) == 0):
+            string = '[' + repr(int(i/N*100)) + '%] Iteration ' + repr(i)
+            print(string)
         # initialization
         theta_star = np.zeros(d)
 
@@ -46,14 +49,12 @@ def mcs(N, sample_marg_PDF_list, LSF):
 
         # evaluate limit state function
         g_star = LSF(theta_star)
-        if g_star < 0:
-            n_fail = n_fail + 1
 
         # save theta and g in lists
         theta_list.append(theta_star)
         g_list.append(g_star)
 
     # calculate failure probability
-    pf_mcs = n_fail / N
+    pf_mcs = sum(g<0 for g in g_list) / N
 
     return pf_mcs, theta_list, g_list
