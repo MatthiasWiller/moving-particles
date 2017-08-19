@@ -16,7 +16,7 @@
 # * sample_prop_PDF : proposal PDF sampling
 # * initial_theta   : initial sample to run the Markov chain
 # * n_samples       : total number of simulated samples
-# * burnInFraction  : fraction of burn-in samples
+# * burnInPeriod    : burn-in of samples
 # * lagPeriod       : to perform thinning of the Markov chain sequence
 # ---------------------------------------------------------------------------
 # Output:
@@ -35,19 +35,18 @@ import matplotlib.pyplot as plt
 import time as timer
 
 
-def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burnInFraction, lagPeriod):
+def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burnInPeriod, lagPeriod):
     print(">==========================================================================")
     print("> Properties of Sampling:")
     print("> Algorithm \t\t= Metropolis-Hastings")
     print("> Number of samples \t=", n_samples)
     print("> Lag-Period \t\t=", lagPeriod)
-    print("> Burning-In-Fraction \t=", burnInFraction)
+    print("> Burning-In-Period \t=", burnInPeriod)
 
     print("\n\n> Starting sampling")
     startTime = timer.time()
 
     d                   = np.size(initial_theta)
-    burnInPeriod        = int(n_samples * burnInFraction)
     N                   = (n_samples + burnInPeriod)*lagPeriod
 
     # initialize theta
@@ -96,7 +95,6 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
         theta = theta_red
 
     # apply burn-in-period
-    burnInPeriod    = int (n_samples * burnInFraction)
     theta           = theta[:, burnInPeriod:]
     
     print("> Time needed for sampling =",round(timer.time() - startTime,2),"s")

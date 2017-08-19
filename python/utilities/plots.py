@@ -44,22 +44,24 @@ def plot_hist(x, target_PDF=0, dimension=1):
     # add a 'best fit' line
     if((target_PDF != 0) and (dimension == 1)):
         # for 1D case
-        y = target_PDF(bins)
-        plt.plot(bins, y, '--', color='red')
+        x_bins = np.arange(-10,20,0.05)
+        y = target_PDF(x_bins)
+        plt.plot(x_bins, y, '-', color='red')
 
     if((target_PDF != 0) and (dimension == 2)):
         # for 2D case
         y = compute_marginal_PDF(target_PDF, bins, 0)
-        plt.plot(bins, y, '--', color='red')
+        plt.plot(bins, y, '-', color='red')
 
-    plt.ylim(0,1)
-    plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    # plt.ylim(0,1)
+    # plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+
 
     # set labels
-    plt.xlabel(r'$\theta_1$')
+    plt.xlabel(r'$x$')
     plt.ylabel(r'Frequency $p$')
     plt.tight_layout()
-    #plt.savefig('plot_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    # plt.savefig('plot_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # -----------------------------------------------------------------------------------------
@@ -73,7 +75,7 @@ def plot_mixing(x):
 
     # set labels
     plt.xlabel(r'Number of samples, $n$')
-    plt.ylabel(r'$\theta_1$')
+    plt.ylabel(r'$x$')
     plt.xlim(0, n_samples)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
 
@@ -83,7 +85,7 @@ def plot_mixing(x):
 
 # -----------------------------------------------------------------------------------------
 # plot of the estimated autocorrelation of samples
-def plot_autocorr(x, lag):
+def plot_autocorr(x, lag, id=0):
 
     # compute sample autocorrelation
     n_samples   = len(x)
@@ -109,7 +111,7 @@ def plot_autocorr(x, lag):
     plt.xlim(0, lag)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
     plt.tight_layout()
-    #plt.savefig('plot_autocorr.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot_autocorr_'+str(id)+'.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # -----------------------------------------------------------------------------------------
@@ -216,20 +218,27 @@ def plot_surface_custom(target_PDF):
     plt.figure()
     ax = plt.gca(projection='3d')
 
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.pink)
+    # ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.pink)
+    ax.plot_surface(X, Y, Z, rstride=3, cstride=3, cmap=cm.pink_r, antialiased=False, alpha=1.0)
+    # # ax.plot_surface(X, Y, Z, rstride=3, cstride=3, cmap=cm.pink_r, antialiased=True)
 
-    ttl = ax.set_title('Target distribution')
-    ttl.set_position([.5, 0.95])
+    ax.plot_wireframe(X, Y, Z, rstride=3, cstride=3, linewidth=0.5, color='black', alpha=1.0)
+
+    # ttl = ax.set_title('Target distribution')
+    # ttl.set_position([.5, 0.95])
     ax.view_init(elev=45, azim=40)
     ax.set_xlim3d(-2, 8)
     ax.set_ylim3d(-2, 8)
-    ax.set_zlim3d(0, 0.25)
-    ax.xaxis._axinfo['label']['space_factor'] = 20
-    ax.yaxis._axinfo['label']['space_factor'] = 20
-    ax.zaxis._axinfo['label']['space_factor'] = 20
+    ax.set_zlim3d(0, .6)
+    ax.set_xlabel(r'x_1')
+    ax.set_ylabel(r'x_2')
+    ax.set_zlabel(r'f(x)')
+    ax.xaxis._axinfo['label']['space_factor'] = 40
+    ax.yaxis._axinfo['label']['space_factor'] = 40
+    ax.zaxis._axinfo['label']['space_factor'] = 40
 
     plt.tight_layout()
-    #plt.savefig('plot3d.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot3d.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # -----------------------------------------------------------------------------------------
@@ -237,6 +246,11 @@ def plot_surface_custom(target_PDF):
 def plot_scatter_with_hist(x, target_PDF=0):
 
     nullfmt = NullFormatter()         # no labels
+
+    xx       = np.linspace(-2, 8, 100)
+    X, Y    = np.meshgrid(xx, xx)
+    Z       = target_PDF([X, Y])
+
 
     # definitions for the axes
     left, width         = 0.1, 0.65
@@ -259,6 +273,9 @@ def plot_scatter_with_hist(x, target_PDF=0):
     # no labels
     axHistx.xaxis.set_major_formatter(nullfmt)
     axHisty.yaxis.set_major_formatter(nullfmt)
+
+    # the contour
+    axScatter.contour(X, Y, Z, 5, cmap=cm.jet)
 
     # the scatter plot
     axScatter.scatter(x[0, :], x[1, :], marker='o', facecolors='None', \
@@ -293,7 +310,7 @@ def plot_scatter_with_hist(x, target_PDF=0):
     axHisty.set_ylim(axScatter.get_ylim())
 
     # tight layout not possible here !
-    #plt.savefig('plot_scatter_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot_scatter_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # -----------------------------------------------------------------------------------------

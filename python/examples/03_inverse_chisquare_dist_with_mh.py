@@ -20,7 +20,7 @@ import numpy as np
 import scipy.stats as scps
 import matplotlib.pyplot as plt
 
-import plots.user_plot as uplt
+import utilities.plots as uplt
 import algorithms.metropolis_hastings as mh
 
 # INPUT 

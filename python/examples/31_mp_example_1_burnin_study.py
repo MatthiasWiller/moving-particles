@@ -36,12 +36,12 @@ np.random.seed(0)
 # parameters
 N = 100                     # number of samples
 d = 10                      # number of dimensions
-b_max = 30                  # burn-in
+b_max = 12                  # burn-in
 sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
-n_simulations = 10          # number of simulations
+n_simulations = 50          # number of simulations
 
-burn_in_list = [i for i in range(1, b_max)]
+burn_in_list = [i for i in range(9, b_max)]
 
 for burnin in burn_in_list:
 

@@ -60,7 +60,7 @@ analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 # ---------------------------------------------------------------------------
 direction = 'python/data/'
 
-g_list_mcs     = np.load(direction + 'mcs_example_1_d10_N10000.npy')
+g_list_mcs     = np.load(direction + 'mcs_example_1_d10_N1000000_g_list.npy')
 
 g_list_sus     = np.load(direction + 'sus_example_1_d10_Nspl1000_Nsim10_acs_g_list.npy')
 # theta_list_sus = np.load(direction + 'sus_example_1_d10_Nspl1000_Nsim10_acs_theta_list.npy')

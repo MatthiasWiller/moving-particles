@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as scps
 
-import plots.user_plot as uplt
+import utilities.plots as uplt
 import algorithms.metropolis as ma
 
 # INPUT 

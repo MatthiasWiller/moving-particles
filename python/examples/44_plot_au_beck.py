@@ -45,7 +45,11 @@ n_initial_samples   = 100       # MP: Number of initial samples
 # ---------------------------------------------------------------------------
 direction = 'python/data/'
 
-g_list_mcs = np.load(direction + 'mcs_au_beck_N200_g_list.npy')
+mcs_data = np.loadtxt(direction + 'mcs_au_beck_N10000000.txt', delimiter=',')
+# g_list_mcs = mcs_data[:,1]
+b_line_mcs = mcs_data[:,0]
+pf_line_mcs = mcs_data[:,1]
+# g_list_mcs = np.load(direction + 'mcs_au_beck_N200_g_list.npy')
 
 # g_list_sus = np.load(direction + 'sus_example_1_d10_Nspl1000_Nsim2_acs_g_list.npy')
 
@@ -55,7 +59,7 @@ g_list_mcs = np.load(direction + 'mcs_au_beck_N200_g_list.npy')
 # POST-PROCESSING
 # ---------------------------------------------------------------------------
 
-b_line_mcs, pf_line_mcs         = uutil.get_pf_line_and_b_line_from_MCS(g_list_mcs)
+#b_line_mcs, pf_line_mcs         = uutil.get_pf_line_and_b_line_from_MCS(g_list_mcs)
 
 # b_line_list_sus, pf_line_sus    = uutil.get_pf_line_and_b_line_from_SUS(g_list_sus, p0, n_samples_per_level)
 

@@ -124,7 +124,7 @@ class AdaptiveCondSampling:
                 sigma_k     = np.minimum(np.ones(d), lambda_t[t]*sigma_tilde)
                 rho_k       = np.sqrt(np.ones(d) - sigma_k**2)
 
-        # safe last lambda_t for next level
+        # save last lambda_t for next level
         self.lambda_0 = lambda_t[t]
 
         # convert theta_list and g_list to np.array()
