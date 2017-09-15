@@ -36,10 +36,10 @@ np.random.seed(0)
 # parameters
 N = 100                     # number of samples
 d = 10                      # number of dimensions
-b = 30                      # burn-in
+b = 5                      # burn-in
 sampling_method  = 'cs'    # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
-n_simulations = 10           # number of simulations
+n_simulations = 1           # number of simulations
 
 # file-name
 filename = 'python/data/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
@@ -48,10 +48,10 @@ filename = 'python/data/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
 
 # limit-state function
 #beta = 5.1993       # for pf = 10^-7
-#beta = 4.7534       # for pf = 10^-6
+beta = 4.7534       # for pf = 10^-6
 #beta = 4.2649       # for pf = 10^-5
 #beta = 3.7190       # for pf = 10^-4
-beta = 3.0902       # for pf = 10^-3
+#beta = 3.0902       # for pf = 10^-3
 #beta = 2.3263       # for pf = 10^-2
 LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
 
@@ -127,6 +127,6 @@ print("> C.O.V. \t=", pf_sigma/pf_mean)
 # SAVE RESULTS
 # ---------------------------------------------------------------------------
 
-np.save(filename + '_g_list.npy', g_list)
-np.save(filename + '_theta_list.npy', theta_list)
-print('\n> File was successfully saved as:', filename)
+# np.save(filename + '_g_list.npy', g_list)
+# np.save(filename + '_theta_list.npy', theta_list)
+# print('\n> File was successfully saved as:', filename)

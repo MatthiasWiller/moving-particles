@@ -35,29 +35,29 @@ np.random.seed(0)
 
 # parameters
 N = 100                     # number of samples
-d = 10                      # number of dimensions
-b_max = 11                  # burn-in
+d_max = 20                      # number of dimensions
+burnin = 20                  # burn-in
 sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
 n_simulations = 50          # number of simulations
 
-burn_in_list = [i for i in range(1, b_max)]
+dimension_in_list = [i for i in range(1, d_max+1)]
 
-for burnin in burn_in_list:
+for dim in dimension_in_list:
 
     # file-name
-    filename = 'python/data/burnin_study/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
+    filename = 'python/data/dimension_study/mp_example_1_d' + repr(dim) +'_N' + repr(N) + \
             '_Nsim' + repr(n_simulations) + '_b' + repr(burnin) + '_' + sampling_method + \
-            '_withoutSeedSel'
+            '_wSeedSel'
 
     # limit-state function
     #beta = 5.1993       # for pf = 10^-7
-    #beta = 4.7534       # for pf = 10^-6
+    beta = 4.7534       # for pf = 10^-6
     #beta = 4.2649       # for pf = 10^-5
     #beta = 3.7190       # for pf = 10^-4
-    beta = 3.0902       # for pf = 10^-3
+    #beta = 3.0902       # for pf = 10^-3
     #beta = 2.3263       # for pf = 10^-2
-    LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
+    LSF  = lambda u: u.sum(axis=0)/np.sqrt(dim) + beta
 
     # analytical CDF
     analytical_CDF = lambda x: scps.norm.cdf(x, beta)
@@ -79,7 +79,7 @@ for burnin in burn_in_list:
     f_marg_PDF      = lambda x: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
 
     # append distributions to list
-    for i in range(0, d):
+    for i in range(0, dim):
         sample_marg_PDF_list.append(sample_marg_PDF)
         f_marg_PDF_list.append(f_marg_PDF)
 
@@ -100,7 +100,7 @@ for burnin in burn_in_list:
     g_list     = []
 
     for sim in range(0, n_simulations):
-        pf_hat, theta_temp, g_temp, acc_rate, m_list = mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
+        pf_hat, theta_temp, g_temp, acc_rate, m_list = mp.mp(N, LSF, sampler, sample_marg_PDF_list)
         # save simulation in list
         pf_list.append(pf_hat)
         g_list.append(g_temp)

@@ -32,7 +32,7 @@ np.random.seed(0)
 # parameters
 N = 100                     # number of samples
 b = 30                      # burn-in
-sampling_method  = 'mmh'    # 'mmh' = Modified Metropolis Hastings
+sampling_method  = 'cs'    # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
 n_simulations = 2           # number of simulations
 

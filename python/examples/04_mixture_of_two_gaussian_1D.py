@@ -13,6 +13,7 @@
 """
 
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
 
@@ -34,7 +35,7 @@ w           = [0.3, 0.7]
 target_PDF  = lambda x: w[0]*scps.norm.pdf(x, mu[0], sigma[0]) + w[1]*scps.norm.pdf(x, mu[1], sigma[1])
 
 # proposal pdf 
-sigma_prop      = 6
+sigma_prop      = 10
 sample_prop_PDF = lambda param: np.random.normal(param, sigma_prop, 1)
 f_prop_PDF      = lambda x, param: scps.norm.pdf(x, param, sigma_prop)
 
@@ -43,7 +44,7 @@ f_prop_PDF      = lambda x, param: scps.norm.pdf(x, param, sigma_prop)
 initial_theta  = 0
 n_samples      = 1000                                       # number of samples
 burnInPeriod   = 0                                        # defines burning-in-period of samples
-lagPeriod      = 3                                          # only log every n-th value
+lagPeriod      = 10                                          # only log every n-th value
 
 # apply MCMC
 theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burnInPeriod, lagPeriod)
@@ -51,6 +52,9 @@ theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop
 # OUTPUT
 # ----------------------------------------------------------
 # plot histogram
+matplotlib.rcParams['font.size'] = 26
+
+
 x           = theta[0,:]
 len_x       = len(x)
 n           = np.sqrt(len_x)
@@ -76,7 +80,8 @@ plt.xticks([-10, 0, 10, 20])
 plt.xlabel(r'$x$')
 plt.ylabel(r'Frequency $p$')
 plt.tight_layout()
-# plt.savefig('plot_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+plt.savefig('plot_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 
@@ -107,7 +112,7 @@ axMixing = plt.axes(rect_mixing)
 axHist = plt.axes(rect_hist)
 
 # no labels
-axHist.xaxis.set_major_formatter(nullfmt)
+# axHist.xaxis.set_major_formatter(nullfmt)
 axHist.yaxis.set_major_formatter(nullfmt)
 
 # the mixing plot
@@ -133,18 +138,24 @@ axHist.plot(target_PDF(bins), bins, '-', color='red')
 
 # limit histograms to limits of mixing-plot
 axHist.set_ylim(axMixing.get_ylim())
+axHist.set_xlim([0, 0.2])
+
+axMixing.set_xticks([0, 200, 400, 600, 800])
+axHist.set_xticks([0, 0.1])
 
 # set labels
 axMixing.set_ylabel(r'$x$')
 axMixing.set_xlabel(r'Samples $n$')
 
+axHist.set_xlabel(r'$f_X(x)$')
+
 # plt.tight_layout()
-#plt.savefig('plot_mixing_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
+plt.savefig('plot_mixing_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # plot samples
 # uplt.plot_hist(theta[0, :], target_PDF)
 # uplt.plot_mixing(theta[0, :])
-uplt.plot_autocorr(theta[0, :], 400)
+uplt.plot_autocorr(theta[0, :], 20)
 
 plt.show()

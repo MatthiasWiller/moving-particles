@@ -26,6 +26,8 @@ from mpl_toolkits.mplot3d import Axes3D
 # create figure object with LaTeX font
 matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['font.size'] = 22
+matplotlib.rcParams['font.size'] = 30 # for R(x)_corr
+matplotlib.rcParams['font.size'] = 36 # for minipage with 3 plots 
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 
 
@@ -67,7 +69,7 @@ def plot_hist(x, target_PDF=0, dimension=1):
 # -----------------------------------------------------------------------------------------
 # plot values of index
 def plot_mixing(x):
-
+    matplotlib.rcParams['font.size'] = 26
     n_samples = len(x)
 
     plt.figure()
@@ -75,17 +77,19 @@ def plot_mixing(x):
 
     # set labels
     plt.xlabel(r'Number of samples, $n$')
-    plt.ylabel(r'$x$')
+    plt.ylabel(r'$x_1$')
     plt.xlim(0, n_samples)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
 
     plt.tight_layout()
-    #plt.savefig('plot_mixing.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot_mixing.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # -----------------------------------------------------------------------------------------
 # plot of the estimated autocorrelation of samples
 def plot_autocorr(x, lag, id=0):
+
+    matplotlib.rcParams['font.size'] = 26
 
     # compute sample autocorrelation
     n_samples   = len(x)
@@ -102,13 +106,15 @@ def plot_autocorr(x, lag, id=0):
 
     # plot results
     plt.figure()
-    plt.plot(rho, '.')
+    plt.plot(rho[:22], '.')
 
 
     # set labels
     plt.xlabel(r'Lag, $k$')
     plt.ylabel(r'$\hat{R}(k)')
     plt.xlim(0, lag)
+    plt.ylim(0, 1)
+    plt.yticks([0, 0.5, 1])
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
     plt.tight_layout()
     plt.savefig('plot_autocorr_'+str(id)+'.pdf', format='pdf', dpi=50, bbox_inches='tight')
@@ -308,6 +314,26 @@ def plot_scatter_with_hist(x, target_PDF=0):
     # limit histograms to limits of scatter-plot
     axHistx.set_xlim(axScatter.get_xlim())
     axHisty.set_ylim(axScatter.get_ylim())
+
+    # set labels
+    axHistx.set_ylabel(r'$f_{X_1}(x)$')
+    axHisty.set_xlabel(r'$f_{X_2}(x)$')
+
+    axScatter.set_xlabel(r'$x_1$')
+    axScatter.set_ylabel(r'$x_2$')
+
+    # set ticks and limits
+    axHistx.set_yticks([0, 0.5])
+    axHistx.set_ylim([0, 0.7])
+
+    axHisty.set_xticks([0,0.5])
+    axHisty.set_xlim([0,0.7])
+
+    axScatter.set_xticks([0,2,4,6])
+    axScatter.set_yticks([0,2,4,6])
+
+
+
 
     # tight layout not possible here !
     plt.savefig('plot_scatter_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
