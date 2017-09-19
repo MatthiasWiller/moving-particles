@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Moving Particles Example 1
+# Moving Particles Waarts example
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -13,18 +13,14 @@
 """
 
 import numpy as np
-import scipy.stats as scps
-
-import matplotlib.pyplot as plt
-
-import algorithms.moving_particles as mp
 
 import algorithms.modified_metropolis as mmh
 import algorithms.cond_sampling as cs
 
-import utilities.plots as uplt
+import algorithms.moving_particles as mp
 
-print("RUN 31_mp_example_1.py")
+
+print("RUN 35_mp_breitung.py")
 
 # set seed for randomization
 np.random.seed(0)
@@ -35,31 +31,24 @@ np.random.seed(0)
 
 # parameters
 N = 100                     # number of samples
-d = 10                      # number of dimensions
-b = 5                       # burn-in
-sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
+b = 20                      # burn-in
+sampling_method  = 'cs'    # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
-seed_selection_strategy = 0 # 
-n_simulations = 1           # number of simulations
+seed_selection_strategy = 1 # seed selection strategy
+n_simulations = 5           # number of simulations
 
 # file-name
-filename = 'python/data/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
-           '_Nsim' + repr(n_simulations) + '_b' + repr(b) + '_' + sampling_method + \
-           '_sss' + repr(seed_selection_strategy)
+filename = 'python/data/mp_breitung_N' + repr(N) + '_Nsim' + repr(n_simulations) + \
+            '_b' + repr(b) + '_' + sampling_method + '_sss' + repr(seed_selection_strategy)
+
+# reference value
+pf_analytical = 3.17 * 10**-5
+
 
 # limit-state function
-#beta = 5.1993       # for pf = 10^-7
-beta = 4.7534       # for pf = 10^-6
-#beta = 4.2649       # for pf = 10^-5
-#beta = 3.7190       # for pf = 10^-4
-#beta = 3.0902       # for pf = 10^-3
-#beta = 2.3263       # for pf = 10^-2
-LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
+# LSF = lambda x: np.minimum(5-x[0], 4+x[1])
+LSF = lambda x: np.minimum(5-x[0], 1/(1+np.exp(-2*(x[1]+4)))-0.5)
 
-# analytical CDF
-analytical_CDF = lambda x: scps.norm.cdf(x, beta)
-
-pf_analytical    = analytical_CDF(0)
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
@@ -76,9 +65,10 @@ sample_marg_PDF = lambda: np.random.randn(1)
 f_marg_PDF      = lambda x: np.exp(-0.5 * x**2)/np.sqrt(2*np.pi)
 
 # append distributions to list
-for i in range(0, d):
-    sample_marg_PDF_list.append(sample_marg_PDF)
-    f_marg_PDF_list.append(f_marg_PDF)
+sample_marg_PDF_list.append(sample_marg_PDF)
+sample_marg_PDF_list.append(sample_marg_PDF)
+f_marg_PDF_list.append(f_marg_PDF)
+f_marg_PDF_list.append(f_marg_PDF)
 
 
 # ---------------------------------------------------------------------------
@@ -95,47 +85,40 @@ elif sampling_method == 'cs':
 pf_list    = []
 theta_list = []
 g_list     = []
+m_list     = []
 
 for sim in range(0, n_simulations):
     pf_hat, theta_temp, g_temp, acc_rate, m_array = \
         mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
-
-    # pf_hat, theta_temp, g_temp, acc_rate, m_list = \
-    #     mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
-
-    # pf_hat, theta_temp, g_temp, acc_rate, m = \
-    #     mp.mp(N, LSF, sampler, sample_marg_PDF_list)
-    
     # save simulation in list
     pf_list.append(pf_hat)
     g_list.append(g_temp)
     theta_list.append(theta_temp)
-
+    m_list.append(m_array)
 
 pf_sim_array = np.asarray(pf_list)
 pf_mean      = np.mean(pf_sim_array)
 pf_sigma     = np.std(pf_sim_array)
 
-# uplt.plot_m_with_poisson_dist(m_list, pf_analytical)
-# uplt.plot_mp_pf(N, g_list[0], analytical_CDF)
-# plt.show()
-
 # ---------------------------------------------------------------------------
 # RESULTS
 # ---------------------------------------------------------------------------
 
+
 print("\nRESULTS:")
-print("> Probability of Failure (Moving Particels Est.)\t=", round(pf_mean, 10))
-print("> Probability of Failure (Analytical) \t\t\t=", round(pf_analytical, 10))
+print("> Probability of Failure (Moving Particels Est.)\t=", round(pf_mean, 8))
+print("> Probability of Failure (Analytical) \t\t\t=", round(pf_analytical, 8))
 print("> Pf mean \t=", pf_mean)
 print("> Pf sigma \t=", pf_sigma)
 print("> C.O.V. \t=", pf_sigma/pf_mean)
-print("m = ", np.sum(m_array))
+
 
 # ---------------------------------------------------------------------------
 # SAVE RESULTS
 # ---------------------------------------------------------------------------
 
-# np.save(filename + '_g_list.npy', g_list)
-# np.save(filename + '_theta_list.npy', theta_list)
+np.save(filename + '_g_list.npy', g_list)
+np.save(filename + '_theta_list.npy', theta_list)
+np.save(filename + '_m_list.npy', m_list)
+
 # print('\n> File was successfully saved as:', filename)

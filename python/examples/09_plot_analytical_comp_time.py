@@ -15,7 +15,7 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-matplotlib.rcParams.update({'font.size': 23})
+matplotlib.rcParams.update({'font.size': 20})
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 matplotlib.rcParams['text.usetex'] = True
    
@@ -27,7 +27,7 @@ monte_carlo = lambda pf, delta2: (1-pf)/(pf*delta2)
 
 # Subset Simulation
 p0 = 0.1
-subset = lambda pf, delta2, gamma: ((-np.log10(pf/p0)*(1-p0)/np.sqrt(p0))**2 - np.log10(pf/p0)*(1-p0))*((1+gamma)/(delta2))
+subset = lambda pf, delta2, gamma: ((np.log10(pf)/np.log10(p0)*(1-p0)/np.sqrt(p0))**2 + np.log10(pf)/np.log10(p0)*(1-p0)/p0)*((1+gamma)/(delta2))
 
 # Moving particles
 moving_particles = lambda pf, delta2, burnin: ((burnin + 1)*(-np.log(pf))+1)*(-np.log(pf))/(np.log(delta2 + 1))
@@ -76,28 +76,30 @@ for i in range(0, nelements):
 # plotting
 fig  = plt.figure()
 
-plt.plot(pf_line, cost_mc, label=r'Monte Carlo')
+plt.plot(pf_line, cost_mc, label=r'MCS')
 
 # plt.plot(pf_line, cost_sus_min, '--', label=r'SuS (min)', color='navy')
 # plt.plot(pf_line, cost_sus_max, '--', label=r'SuS (max)', color='navy')
 
-plt.fill_between(pf_line, cost_sus_min, cost_sus_max, label=r'SuS', alpha=0.3, color='navy')
+plt.fill_between(pf_line, cost_sus_min, cost_sus_max, label=r'SuS, $\bar{\gamma} \in [0, 10]$', alpha=0.3, color='navy')
 
 # plt.plot(pf_line, cost_mp_min, '--', label=r'MP (min)', color='red')
 # plt.plot(pf_line, cost_mp_max, '--', label=r'MP (max)', color='red')
 
-plt.fill_between(pf_line, cost_mp_min, cost_mp_max, label=r'MP', alpha=0.3, color='red')
+plt.fill_between(pf_line, cost_mp_min, cost_mp_max, label=r'MP, $N_b \in [1, 20]$', alpha=0.3, color='red')
 
 # legend
-plt.legend()
+plt.legend(loc='upper left')
 
 # xaxis
 plt.xscale('log')
 plt.gca().invert_xaxis()
+
 plt.xlabel(r'Probability of failure, $p_f$')
 
 # yaxis
 plt.yscale('log')
+plt.ylim(5e3, 5e13)
 plt.ylabel(r'Computational cost, $t$')
 
 plt.tight_layout()
@@ -132,28 +134,30 @@ for i in range(0, nelements):
 # plotting
 fig  = plt.figure()
 
-plt.plot(delta2_line, cost_mc, label=r'Monte Carlo')
+plt.plot(delta2_line, cost_mc, label=r'MCS')
 
 # plt.plot(delta2_line, cost_sus_min, '--', label=r'SuS (min)', color='navy')
 # plt.plot(delta2_line, cost_sus_max, '--', label=r'SuS (max)', color='navy')
 
-plt.fill_between(delta2_line, cost_sus_min, cost_sus_max, label=r'SuS', alpha=0.3, color='navy')
+plt.fill_between(delta2_line, cost_sus_min, cost_sus_max, label=r'SuS, $\bar{\gamma} \in [0, 10]$', alpha=0.3, color='navy')
 
 # plt.plot(delta2_line, cost_mp_min, '--', label=r'MP (min)', color='red')
 # plt.plot(delta2_line, cost_mp_max, '--', label=r'MP (max)', color='red')
 
-plt.fill_between(delta2_line, cost_mp_min, cost_mp_max, label=r'MP', alpha=0.3, color='red')
+plt.fill_between(delta2_line, cost_mp_min, cost_mp_max, label=r'MP, $N_b \in [1, 20]$', alpha=0.3, color='red')
 
 # legend
-plt.legend()
+plt.legend(loc='upper left')
+
 
 # xaxis
-#plt.xscale('log')
-#plt.gca().invert_xaxis()
+plt.xscale('log')
+plt.gca().invert_xaxis()
 plt.xlabel(r'Coefficient of variation, $\delta^2$')
 
 # yaxis
 plt.yscale('log')
+plt.ylim(5e3, 5e13)
 plt.ylabel(r'Computational cost, $t$')
 
 plt.tight_layout()

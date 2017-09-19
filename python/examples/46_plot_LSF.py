@@ -27,8 +27,9 @@ from matplotlib import ticker
 
 # INPUT 
 
-example = 1
-savepdf = False
+example = 3
+# savepdf = False
+savepdf = True
 
 
 gaussian = lambda x, y: (1/(2*np.pi) * np.exp(-(x**2/2 + y**2/2)))
@@ -51,9 +52,9 @@ if example == 1:
     x       = np.linspace(-6, 6, 300)
     X, Y    = np.meshgrid(x, x)
     Z1       = LSF(np.array([X, Y]), beta1)
-    Z2       = LSF(np.array([X, Y]), beta2)
-    Z3       = LSF(np.array([X, Y]), beta3)
-    Z4       = LSF(np.array([X, Y]), beta4)
+    # Z2       = LSF(np.array([X, Y]), beta2)
+    # Z3       = LSF(np.array([X, Y]), beta3)
+    # Z4       = LSF(np.array([X, Y]), beta4)
 
     min_x = min(X.flatten())
     min_y = min(Y.flatten())
@@ -64,8 +65,8 @@ if example == 1:
     fig = plt.figure()
 
     ax = fig.gca(projection='3d')
-    ax.plot_surface(X, Y, Z1, rstride=6, cstride=6, cmap=cm.pink_r, antialiased=False, alpha=1.0)
-    ax.plot_wireframe(X, Y, Z1, rstride=6, cstride=6, linewidth=0.5, color='black', alpha=1.0)
+    ax.plot_surface(X, Y, Z1, rstride=20, cstride=20, cmap=cm.pink_r, antialiased=False, alpha=1.0)
+    ax.plot_wireframe(X, Y, Z1, rstride=20, cstride=20, linewidth=0.5, color='black', alpha=1.0)
     ax.view_init(elev=42, azim=-40)
 
     # axes and title config
@@ -92,8 +93,8 @@ if example == 1:
     fig = plt.figure()
     plt.axes().set_aspect('equal')
 
-    Z0 = gaussian(X,Y)
-    CS0 = plt.contour(X, Y, Z0, [1e-5, 1e-3, 2e-2, 1e-1], linewidths=.2, colors='k')
+    # Z0 = gaussian(X,Y)
+    # CS0 = plt.contour(X, Y, Z0, [1e-5, 1e-3, 2e-2, 1e-1], linewidths=.2, colors='k')
 
     # CS1 = plt.contour(X, Y, Z1, [0], colors='k')
     # plt.clabel(CS1, fontsize=9, inline=1, fmt=r'$p_f = 10^{-2}$', manual=[(0, 0)])
@@ -106,13 +107,13 @@ if example == 1:
 
 
     CS1 = plt.contour(X, Y, Z1, [0], colors='k')
-    plt.clabel(CS1, fontsize=15, inline=3, inline_spacing=5, fmt=r'$\beta = 2.33$')
+    #plt.clabel(CS1, fontsize=15, inline=3, inline_spacing=5, fmt=r'$\beta = 2.33$')
 
-    CS2 = plt.contour(X, Y, Z2, [0], colors='k')
-    plt.clabel(CS2, fontsize=9, inline=1, inline_spacing=5, fmt=r'$\beta = 3.72$', manual=[(0, 0)])
+    # CS2 = plt.contour(X, Y, Z2, [0], colors='k')
+    # plt.clabel(CS2, fontsize=9, inline=1, inline_spacing=5, fmt=r'$\beta = 3.72$', manual=[(0, 0)])
 
-    CS4 = plt.contour(X, Y, Z4, [0], colors='k')
-    plt.clabel(CS4, fontsize=9, inline=1, inline_spacing=5, fmt=r'$\beta = 4.75$', manual=[(0, 0)])
+    # CS4 = plt.contour(X, Y, Z4, [0], colors='k')
+    # plt.clabel(CS4, fontsize=9, inline=1, inline_spacing=5, fmt=r'$\beta = 4.75$', manual=[(0, 0)])
 
     # set labels
     plt.xlabel(r'$u_1$')
@@ -123,7 +124,6 @@ if example == 1:
 
     plt.xticks([-5, 0, 5])
     plt.yticks([-5, 0, 5])
-
     
     plt.tight_layout()
     if savepdf:
@@ -219,8 +219,8 @@ elif example == 3:
     fig = plt.figure()
 
     ax = fig.gca(projection='3d')
-    ax.plot_surface(X, Y, Z, rstride=6, cstride=6, cmap=cm.pink_r, antialiased=False, alpha=1.0)
-    ax.plot_wireframe(X, Y, Z, rstride=6, cstride=6, linewidth=0.5, color='black', alpha=1.0)
+    ax.plot_surface(X, Y, Z, rstride=20, cstride=20, cmap=cm.pink_r, antialiased=False, alpha=1.0)
+    ax.plot_wireframe(X, Y, Z, rstride=20, cstride=20, linewidth=0.5, color='black', alpha=1.0)
     ax.view_init(elev=42, azim=-135)
 
     # axes and title config
@@ -243,11 +243,12 @@ elif example == 3:
 
     # PLOT 2D-plot
     fig = plt.figure()
+    plt.axes().set_aspect('equal')
 
-    plt.contour(X, Y, Z, [0], cmap=cm.jet, linewidth=.5, colors='k')
+    plt.contour(X, Y, Z, [0], linewidth=.2, colors='k')
 
-    Z0 = gaussian(X,Y)
-    CS0 = plt.contour(X, Y, Z0, [1e-5, 1e-3, 2e-2, 1e-1], linewidths=.2, colors='k')
+    # Z0 = gaussian(X,Y)
+    # CS0 = plt.contour(X, Y, Z0, [1e-5, 1e-3, 2e-2, 1e-1], linewidths=.2, colors='k')
 
     # set labels
     plt.xlabel(r'$u_1$')
@@ -258,8 +259,6 @@ elif example == 3:
 
     plt.xticks([-5, 0, 5])
     plt.yticks([-5, 0, 5])
-
-    plt.axes().set_aspect('equal')
 
     plt.tight_layout()
     if savepdf:
@@ -274,9 +273,76 @@ elif example == 3:
 # EXAMPLE 4 (au and beck)
 # -------------------------------------------------------------------------------------------
 
-# example 5
-elif example == 5:
-    LSF = lambda x: x
 
 
+
+# -------------------------------------------------------------------------------------------
+# EXAMPLE 5 (breitung)
+# -------------------------------------------------------------------------------------------elif example == 5:
+if example == 5:
+    LSF = lambda x: np.minimum(5-x[0], 4+x[1])
+    # LSF = lambda x: np.minimum(5-x[0], 1/(1+np.exp(-2*(x[1]+4)))-0.5)
+
+    # get grid, minimum, maximum
+    x       = np.linspace(-7, 7, 300)
+    X, Y    = np.meshgrid(x, x)
+    Z       = LSF([X, Y])
+
+    min_x = min(X.flatten())
+    min_y = min(Y.flatten())
+    min_z = min(Z.flatten())
+    max_x = max(X.flatten())
+    max_y = max(Y.flatten())
+    max_z = max(Z.flatten())
+
+    # PLOT 3D-plot
+    fig = plt.figure()
+
+    ax = fig.gca(projection='3d')
+    ax.plot_surface(X, Y, Z, rstride=20, cstride=20, cmap=cm.pink_r, antialiased=False, alpha=1.0)
+    ax.plot_wireframe(X, Y, Z, rstride=20, cstride=20, linewidth=0.5, color='black', alpha=1.0)
+    ax.view_init(elev=60, azim=-120)
+
+    # axes and title config
+    ax.set_xlabel('$u_1$', labelpad=15)
+    ax.xaxis.set_rotate_label(False) # disable automatic rotation
+    ax.set_ylabel('$u_2$', rotation = 0, labelpad=15)
+    ax.yaxis.set_rotate_label(False)
+    ax.set_zlabel('$g(u_1, u_2)$',rotation=93, labelpad=7)
+    ax.zaxis.set_rotate_label(False)
+    ax.set_xlim3d(min_x, max_x)
+    ax.set_ylim3d(min_y, max_y)
+    ax.set_zlim3d(-3, 13)
+    ax.set_zticks([0, 5, 10])
+
+    plt.tight_layout()
+    if savepdf:
+        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
+        # plt.savefig('density.pdf', format='pdf', dpi=50)
+
+
+    # PLOT 2D-plot
+    fig = plt.figure()
+    plt.axes().set_aspect('equal')
+
+    plt.contour(X, Y, Z, [0], linewidth=.2, colors='k')
+
+    # Z0 = gaussian(X,Y)
+    # CS0 = plt.contour(X, Y, Z0, [1e-5, 1e-3, 2e-2, 1e-1], linewidths=.2, colors='k')
+
+    # set labels
+    plt.xlabel(r'$u_1$')
+    plt.ylabel(r'$u_2$')
+
+    plt.xlim(-7, 7)
+    plt.ylim(-7, 7)
+
+    plt.xticks([-5, 0, 5])
+    plt.yticks([-5, 0, 5])
+
+    plt.tight_layout()
+    if savepdf:
+        plt.savefig('example'+ repr(example) +'_lsf_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+    plt.show()
 
