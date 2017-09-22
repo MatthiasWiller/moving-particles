@@ -31,13 +31,15 @@ np.random.seed(0)
 
 # parameters
 N = 100                     # number of samples
-b = 30                      # burn-in
+Nb = 20                      # burn-in
 sampling_method  = 'cs'    # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
 n_simulations = 2           # number of simulations
+seed_selection_strategy = 2 # seed selection strategy
 
 # file-name
-filename = 'python/data/mp_liebscher_N' + repr(N) + '_Nsim' + repr(n_simulations) + '_b' + repr(b) + '_' + sampling_method
+filename = 'python/data/mp_liebscher_N' + repr(N) + '_Nsim' + repr(n_simulations) + \
+            '_b' + repr(Nb) + '_' + sampling_method + '_sss' + repr(seed_selection_strategy)
 
 # reference solution
 mu_pf_mcs = 0.00405
@@ -90,9 +92,9 @@ f_marg_PDF_list.append(f_marg_PDF)
 
 # initializing sampling method
 if sampling_method == 'mmh':
-    sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', b)
+    sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', Nb)
 elif sampling_method == 'cs':
-    sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, b)
+    sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, Nb)
 
 ## apply moving particles - simulation
 
@@ -102,7 +104,8 @@ theta_list = []
 g_list     = []
 
 for sim in range(0, n_simulations):
-    pf_hat, theta_temp, g_temp, acc_rate, m_list = mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
+    pf_hat, theta_temp, g_temp, acc_rate, m_list = \
+        mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
     
     # transform samples back from u to x-space
     for j in range(0, len(theta_temp)):
@@ -125,7 +128,7 @@ pf_sigma     = np.std(pf_sim_array)
 
 print("\nRESULTS:")
 print("> Probability of Failure (Moving Particels Est.)\t=", round(pf_mean, 8))
-print("> Probability of Failure (Analytical) \t\t\t=", round(pf_analytical, 8))
+print("> Probability of Failure (Analytical) \t\t\t=", round(mu_pf_mcs, 8))
 print("> Pf mean \t=", pf_mean)
 print("> Pf sigma \t=", pf_sigma)
 print("> C.O.V. \t=", pf_sigma/pf_mean)

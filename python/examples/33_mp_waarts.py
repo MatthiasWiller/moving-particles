@@ -31,13 +31,16 @@ np.random.seed(0)
 
 # parameters
 N = 100                     # number of samples
-b = 30                      # burn-in
-sampling_method  = 'mmh'    # 'mmh' = Modified Metropolis Hastings
+b = 20                      # burn-in
+sampling_method  = 'cs'    # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
 n_simulations = 2           # number of simulations
+seed_selection_strategy = 2 # seed selection strategy
 
 # file-name
-filename = 'python/data/mp_waarts_N' + repr(N) + '_Nsim' + repr(n_simulations) + '_b' + repr(b) + '_' + sampling_method
+filename = 'python/data/mp_waarts_N' + repr(N) + '_Nsim' + repr(n_simulations) + \
+            '_b' + repr(b) + '_' + sampling_method + '_sss' + repr(seed_selection_strategy)
+
 
 # reference value
 pf_analytical = 2.275 * 10**-3
@@ -84,7 +87,9 @@ theta_list = []
 g_list     = []
 
 for sim in range(0, n_simulations):
-    pf_hat, theta_temp, g_temp, acc_rate, m_list = mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
+    pf_hat, theta_temp, g_temp, acc_rate, m_list \
+        = mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
+
     # save simulation in list
     pf_list.append(pf_hat)
     g_list.append(g_temp)

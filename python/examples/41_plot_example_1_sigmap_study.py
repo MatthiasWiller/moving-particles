@@ -48,14 +48,14 @@ p0                  = 0.1       # SUS: Probability of each subset, chosen adapti
 n_initial_samples   = 100       # MP: Number of initial samples
 b                   = 20        # MP: burnin
 
-sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.6, 0.7, 0.8, 0.9, 1.0]
+sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 n_sigma = len(sigma_p_list)
 # limit-state function
 #beta = 5.1993       # for pf = 10^-7
-beta = 4.7534       # for pf = 10^-6
+# beta = 4.7534       # for pf = 10^-6
 #beta = 4.2649       # for pf = 10^-5
 #beta = 3.7190       # for pf = 10^-4
-#beta = 3.0902       # for pf = 10^-3
+beta = 3.0902       # for pf = 10^-3
 #beta = 2.3263       # for pf = 10^-2
 LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
 
@@ -71,7 +71,7 @@ g_list_list = []
 iii = 0
 for sigma_p in sigma_p_list:
     iii = iii + 1
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b20_cs_sss2_' \
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b5_cs_sss2_sigmap' \
         + repr(iii) + '_g_list.npy')
     g_list_list.append(g_list_mp_tmp)
 
@@ -100,8 +100,8 @@ for i in range(0, n_sigma):
     pf_mean_array[i] = pf_line_mean_mp[0]
 
 # analytical expression
-pf_analytical  = np.ones(d_max, float) * analytical_CDF(0)
-cov_analytical = np.ones(d_max, float) * np.sqrt(pf_analytical**(-1/n_initial_samples)-1)
+pf_analytical  = np.ones(n_sigma, float) * analytical_CDF(0)
+cov_analytical = np.ones(n_sigma, float) * np.sqrt(pf_analytical**(-1/n_initial_samples)-1)
 
 
 # ---------------------------------------------------------------------------

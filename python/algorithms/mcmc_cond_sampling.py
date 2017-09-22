@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 import time as timer
 
 
-def cond_sampling(initial_theta, rho_k, n_samples, burnInPeriod, lagPeriod):
+def cond_sampling(initial_theta, n_samples, rho_k, burnInPeriod, lagPeriod):
     print(">==========================================================================")
     print("> Properties of Sampling:")
     print("> Algorithm \t\t= Conditional Sampling")

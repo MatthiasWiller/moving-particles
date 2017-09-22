@@ -208,8 +208,6 @@ def plot_surface_with_samples(theta, g, f, g_max_global):
     ax.set_xlim3d(min_x, max_x)
     ax.set_ylim3d(min_y, max_y)
     ax.set_zlim3d(min_z, max_z)
-    ttl = ax.set_title('Benchmark Study')
-    ttl.set_position([.5, 0.95])
 
     plt.tight_layout()
 
@@ -331,9 +329,6 @@ def plot_scatter_with_hist(x, target_PDF=0):
 
     axScatter.set_xticks([0,2,4,6])
     axScatter.set_yticks([0,2,4,6])
-
-
-
 
     # tight layout not possible here !
     plt.savefig('plot_scatter_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')

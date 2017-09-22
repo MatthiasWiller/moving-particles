@@ -31,12 +31,22 @@ example = 2
 # savepdf = False
 savepdf = True
 
+# load data
+direction = 'python/data/'
+
+linestyle = ['yH-','ro-','bs-']
 
 # -------------------------------------------------------------------------------------------
 # EXAMPLE 1
 # -------------------------------------------------------------------------------------------
 if example == 1:
-    #beta = 5.1993       # for pf = 10^-7
+    # load samples
+    theta_list_list  = np.load(direction + 'mp_example_1_d2_N100_Nsim1_b5_cs_sss2_theta_list.npy')
+    theta_list = theta_list_list[0]
+    sample_id_list = [2,5,8]
+
+
+    # beta = 5.1993       # for pf = 10^-7
     # beta = 4.7534       # for pf = 10^-6 (N=5*1e9)
     # beta = 4.2649       # for pf = 10^-5 (N=5*1e8)
     # beta = 3.7190       # for pf = 10^-4 (N=5*1e7)
@@ -50,9 +60,6 @@ if example == 1:
     x       = np.linspace(-6, 6, 300)
     X, Y    = np.meshgrid(x, x)
     Z       = LSF(np.array([X, Y]), beta)
-    # Z2       = LSF(np.array([X, Y]), beta2)
-    # Z3       = LSF(np.array([X, Y]), beta3)
-    # Z4       = LSF(np.array([X, Y]), beta4)
 
     min_x = min(X.flatten())
     min_y = min(Y.flatten())
@@ -63,8 +70,8 @@ if example == 1:
     fig = plt.figure()
 
     ax = fig.gca(projection='3d')
-    ax.plot_surface(X, Y, Z1, rstride=20, cstride=20, cmap=cm.pink_r, antialiased=False, alpha=1.0)
-    ax.plot_wireframe(X, Y, Z1, rstride=20, cstride=20, linewidth=0.5, color='black', alpha=1.0)
+    ax.plot_surface(X, Y, Z, rstride=20, cstride=20, cmap=cm.pink_r, antialiased=False, alpha=1.0)
+    ax.plot_wireframe(X, Y, Z, rstride=20, cstride=20, linewidth=0.5, color='black', alpha=1.0)
     ax.view_init(elev=42, azim=-40)
 
     # axes and title config
@@ -83,16 +90,21 @@ if example == 1:
 
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
+        # plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
         # plt.savefig('density.pdf', format='pdf', dpi=50)
+        print('no pdf saved!')
 
 
     # PLOT 2D-plot
     fig = plt.figure()
     plt.axes().set_aspect('equal')
 
-    CS = plt.contour(X, Y, Z, [0], colors='k')
-    #plt.clabel(CS1, fontsize=15, inline=3, inline_spacing=5, fmt=r'$\beta = 2.33$')
+    plt.contour(X, Y, Z, [0], colors='k')
+
+    for i in range(0, len(sample_id_list)):
+        sample = sample_id_list[i]
+        theta = np.array(theta_list[sample])
+        plt.plot(theta[:, 0], theta[:, 1], linestyle[i])
 
     # set labels
     plt.xlabel(r'$u_1$')
@@ -106,7 +118,7 @@ if example == 1:
     
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
+        plt.savefig('example'+ repr(example) +'_lsf_w_samples_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
     plt.show()
 
@@ -114,6 +126,12 @@ if example == 1:
 # EXAMPLE 2 (liebscher)
 # -------------------------------------------------------------------------------------------
 elif example == 2: 
+    # load samples
+    theta_list_list  = np.load(direction + 'mp_liebscher_N100_Nsim2_b20_cs_sss2_theta_list.npy')
+    theta_list = theta_list_list[0]
+    sample_id_list = [4,5,1]
+
+
     LSF   = lambda x: 8* np.exp(-(x[0]**2 + x[1]**2)) + 2* np.exp(-((x[0]-5)**2 + (x[1]-4)**2)) + 1 + x[0]*x[1]/10
 
     # get grid, minimum, maximum
@@ -150,9 +168,9 @@ elif example == 2:
 
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
+        # plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
         # plt.savefig('density.pdf', format='pdf', dpi=50)
-
+        print('no pdf saved!')
 
     # PLOT 2D-plot
     fig = plt.figure()
@@ -160,6 +178,12 @@ elif example == 2:
 
     # plt.contour(X, Y, Z, [7.5], cmap=cm.jet)
     plt.contour(X, Y, Z, [7.5], colors='k')
+
+    for i in range(0, len(sample_id_list)):
+        sample = sample_id_list[i]
+        theta = np.array(theta_list[sample])
+        plt.plot(theta[:, 0], theta[:, 1], linestyle[i])
+
 
     # set labels
     plt.xlabel(r'$x_1$')
@@ -173,7 +197,7 @@ elif example == 2:
 
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
+        plt.savefig('example'+ repr(example) +'_lsf_w_samples_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
     plt.show()
 
@@ -183,6 +207,12 @@ elif example == 2:
 # EXAMPLE 3 (waarts)
 # -------------------------------------------------------------------------------------------
 elif example == 3:
+    # load samples
+    theta_list_list  = np.load(direction + 'mp_waarts_N100_Nsim2_b20_cs_sss2_theta_list.npy')
+    theta_list = theta_list_list[0]
+    sample_id_list = [7,6,3]
+
+
     LSF = lambda u: np.minimum(3 + 0.1*(u[0] - u[1])**2 - 2**(-0.5) * np.absolute(u[0] + u[1]), 7* 2**(-0.5) - np.absolute(u[0] - u[1]))
     
     # get grid, minimum, maximum
@@ -219,9 +249,9 @@ elif example == 3:
 
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
+        # plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
         # plt.savefig('density.pdf', format='pdf', dpi=50)
-
+        print('no pdf saved!')
 
     # PLOT 2D-plot
     fig = plt.figure()
@@ -229,8 +259,10 @@ elif example == 3:
 
     plt.contour(X, Y, Z, [0], linewidth=.2, colors='k')
 
-    # Z0 = gaussian(X,Y)
-    # CS0 = plt.contour(X, Y, Z0, [1e-5, 1e-3, 2e-2, 1e-1], linewidths=.2, colors='k')
+    for i in range(0, len(sample_id_list)):
+        sample = sample_id_list[i]
+        theta = np.array(theta_list[sample])
+        plt.plot(theta[:, 0], theta[:, 1], linestyle[i])
 
     # set labels
     plt.xlabel(r'$u_1$')
@@ -244,7 +276,7 @@ elif example == 3:
 
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
+        plt.savefig('example'+ repr(example) +'_lsf_w_samples_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
     plt.show()
 

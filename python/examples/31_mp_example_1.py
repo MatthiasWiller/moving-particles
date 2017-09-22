@@ -35,24 +35,24 @@ np.random.seed(0)
 
 # parameters
 N = 100                     # number of samples
-d = 10                      # number of dimensions
-b = 5                       # burn-in
+d = 2                      # number of dimensions
+burnin = 5                       # burn-in
 sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
-seed_selection_strategy = 0 # 
+seed_selection_strategy = 2 # 
 n_simulations = 1           # number of simulations
 
 # file-name
 filename = 'python/data/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
-           '_Nsim' + repr(n_simulations) + '_b' + repr(b) + '_' + sampling_method + \
+           '_Nsim' + repr(n_simulations) + '_b' + repr(burnin) + '_' + sampling_method + \
            '_sss' + repr(seed_selection_strategy)
 
 # limit-state function
 #beta = 5.1993       # for pf = 10^-7
-beta = 4.7534       # for pf = 10^-6
+# beta = 4.7534       # for pf = 10^-6
 #beta = 4.2649       # for pf = 10^-5
 #beta = 3.7190       # for pf = 10^-4
-#beta = 3.0902       # for pf = 10^-3
+beta = 3.0902       # for pf = 10^-3
 #beta = 2.3263       # for pf = 10^-2
 LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
 
@@ -87,9 +87,9 @@ for i in range(0, d):
 
 # initializing sampling method
 if sampling_method == 'mmh':
-    sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', b)
+    sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', burnin)
 elif sampling_method == 'cs':
-    sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, b)
+    sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, burnin)
 
 # initialization
 pf_list    = []
@@ -136,6 +136,6 @@ print("m = ", np.sum(m_array))
 # SAVE RESULTS
 # ---------------------------------------------------------------------------
 
-# np.save(filename + '_g_list.npy', g_list)
-# np.save(filename + '_theta_list.npy', theta_list)
-# print('\n> File was successfully saved as:', filename)
+np.save(filename + '_g_list.npy', g_list)
+np.save(filename + '_theta_list.npy', theta_list)
+print('\n> File was successfully saved as:', filename)

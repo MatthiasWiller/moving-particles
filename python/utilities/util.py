@@ -143,3 +143,14 @@ def get_mean_and_cov_from_pf_lines(pf_line_list):
     pf_line_cov  = pf_line_std / pf_line_mean
 
     return pf_line_mean, pf_line_cov
+
+# ---------------------------------------------------------------------------
+def get_ncall_lines_and_pf_line_from_MP(g_list_list, N):
+    print('function is empty!')
+
+
+# ---------------------------------------------------------------------------
+def get_ncall_lines_and_cov_line_from_MP(pf_line_list):
+    print('function is empty!')
+
+

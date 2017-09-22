@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 import utilities.plots as uplt
 import utilities.util as uutil
 
-matplotlib.rcParams.update({'font.size': 23})
+matplotlib.rcParams.update({'font.size': 18})
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 matplotlib.rcParams['text.usetex'] = True
 
@@ -77,6 +77,26 @@ for i in range(0, b_max):
     g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss0_g_list.npy')
     g_list_list_sss0.append(g_list_mp_tmp)
 
+for i in range(0, b_max):
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss1_g_list.npy')
+    g_list_list_sss1.append(g_list_mp_tmp)
+
+for i in range(0, b_max):
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss2_g_list.npy')
+    g_list_list_sss2.append(g_list_mp_tmp)
+
+for i in range(0, b_max):
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss3_g_list.npy')
+    g_list_list_sss3.append(g_list_mp_tmp)
+
+for i in range(0, b_max):
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss4_g_list.npy')
+    g_list_list_sss4.append(g_list_mp_tmp)
+
+for i in range(0, b_max):
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss5_g_list.npy')
+    g_list_list_sss5.append(g_list_mp_tmp)
+
 
 # ---------------------------------------------------------------------------
 # POST-PROCESSING
@@ -92,6 +112,18 @@ pf_mean_array_sss0 = np.zeros(b_max, float)
 
 cov_at_pf_array_sss1 = np.zeros(b_max, float)
 pf_mean_array_sss1 = np.zeros(b_max, float)
+
+cov_at_pf_array_sss2 = np.zeros(b_max, float)
+pf_mean_array_sss2 = np.zeros(b_max, float)
+
+cov_at_pf_array_sss3 = np.zeros(b_max, float)
+pf_mean_array_sss3 = np.zeros(b_max, float)
+
+cov_at_pf_array_sss4 = np.zeros(b_max, float)
+pf_mean_array_sss4 = np.zeros(b_max, float)
+
+cov_at_pf_array_sss5 = np.zeros(b_max, float)
+pf_mean_array_sss5 = np.zeros(b_max, float)
 
 # seed selection stragegy 0
 for i in range(0, b_max):
@@ -176,7 +208,7 @@ cov_analytical = np.ones(b_max, float) * np.sqrt(pf_analytical**(-1/n_initial_sa
 plt.figure()
 burn_in_list = [i for i in range(1, b_max+1)]
 plt.plot(burn_in_list, cov_analytical,'o', label=r'Analytical')
-plt.plot(burn_in_list, cov_at_pf_array_sss0,'x', label=r'Seed Sel. Strat. 0')
+# plt.plot(burn_in_list, cov_at_pf_array_sss0,'x', label=r'Seed Sel. Strat. 0')
 plt.plot(burn_in_list, cov_at_pf_array_sss1,'x', label=r'Seed Sel. Strat. 1')
 plt.plot(burn_in_list, cov_at_pf_array_sss2,'x', label=r'Seed Sel. Strat. 2')
 plt.plot(burn_in_list, cov_at_pf_array_sss3,'x', label=r'Seed Sel. Strat. 3')
@@ -194,7 +226,7 @@ plt.savefig('burnin_study_cov_over_b.pdf', format='pdf', dpi=50, bbox_inches='ti
 # plot pf over b
 plt.figure()
 plt.plot(burn_in_list, pf_analytical,'o', label=r'Analytical')
-plt.plot(burn_in_list, pf_mean_array_sss0,'x', label=r'Seed Sel. Strat. 0')
+# plt.plot(burn_in_list, pf_mean_array_sss0,'x', label=r'Seed Sel. Strat. 0')
 plt.plot(burn_in_list, pf_mean_array_sss1,'x', label=r'Seed Sel. Strat. 1')
 plt.plot(burn_in_list, pf_mean_array_sss2,'x', label=r'Seed Sel. Strat. 2')
 plt.plot(burn_in_list, pf_mean_array_sss3,'x', label=r'Seed Sel. Strat. 3')

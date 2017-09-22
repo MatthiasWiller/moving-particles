@@ -34,7 +34,7 @@ import time as timer
 import numpy as np
 
 class ModifiedMetropolisHastings:
-    def __init__(self, sample_marg_PDF, f_marg_PDF, proposal_dist, burnin=0):
+    def __init__(self, sample_marg_PDF, f_marg_PDF, proposal_dist, sigma_p=1.0, burnin=0):
         self.f_marg_PDF      = f_marg_PDF
         self.sample_marg_PDF = sample_marg_PDF
         self.T               = burnin
@@ -43,7 +43,7 @@ class ModifiedMetropolisHastings:
             self.sample_prop_PDF = lambda mu: np.random.uniform(mu - 1.0, mu + 1.0, 1)
 
         elif proposal_dist == 'gaussian' or proposal_dist == 'normal':
-            self.sample_prop_PDF = lambda mu: np.random.normal(mu, 1.0, 1)
+            self.sample_prop_PDF = lambda mu: np.random.normal(mu, sigma_p, 1)
 
         else:
             self.sample_prop_PDF = lambda mu: 0

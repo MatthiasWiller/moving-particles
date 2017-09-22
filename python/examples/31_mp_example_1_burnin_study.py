@@ -34,7 +34,7 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 100                     # number of samples
+N = 10                     # number of samples
 d = 10                      # number of dimensions
 #b_max = 11                  # burn-in
 sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
@@ -44,13 +44,15 @@ n_simulations = 50          # number of simulations
 #burn_in_list = [i for i in range(1, b_max)]
 burn_in_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 seed_selection_list = [0, 1, 2, 3, 4, 5]
+# burn_in_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# seed_selection_list = [2, 3, 4, 5]
 
 
 for seed_selection_strategy in seed_selection_list:
     for burnin in burn_in_list:
 
         # file-name
-        filename = 'python/data/burnin_study/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
+        filename = 'python/data/burnin_study_N10/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
                 '_Nsim' + repr(n_simulations) + '_b' + repr(burnin) + '_' + sampling_method + \
                 '_sss' + repr(seed_selection_strategy)
 
@@ -138,6 +140,6 @@ for seed_selection_strategy in seed_selection_list:
         # ---------------------------------------------------------------------------
 
         np.save(filename + '_g_list.npy', g_list)
-        np.save(filename + '_theta_list.npy', theta_list)
+        # np.save(filename + '_theta_list.npy', theta_list)
         np.save(filename + '_m_list.npy', m_list)
         print('\n> File was successfully saved as:', filename)

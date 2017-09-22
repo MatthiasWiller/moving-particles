@@ -33,20 +33,20 @@ np.random.seed(0)
 # parameters
 N = 100                     # number of samples
 d = 10                      # number of dimensions
-burnin = 20                  # burn-in
-sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
+Nb = 5                  # burn-in
+sampling_method  = 'mmh'     # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
-n_simulations = 50          # number of simulations
+n_simulations = 100          # number of simulations
 seed_selection_strategy = 2
 
-sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.6, 0.7, 0.8, 0.9, 1.0]
+sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 iii = 0
 for sigma_p in sigma_p_list:
 
     iii = iii+1
     # file-name
     filename = 'python/data/sigma_p_study/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
-            '_Nsim' + repr(n_simulations) + '_b' + repr(burnin) + '_' + sampling_method + \
+            '_Nsim' + repr(n_simulations) + '_b' + repr(Nb) + '_' + sampling_method + \
             '_sss' + repr(seed_selection_strategy) + '_sigmap' + repr(iii)
 
     # limit-state function
@@ -89,10 +89,10 @@ for sigma_p in sigma_p_list:
 
     # initializing sampling method
     if sampling_method == 'mmh':
-        sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', burnin)
+        sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', sigma_p, Nb)
     elif sampling_method == 'cs':
         rho_k = np.sqrt(1 - sigma_p**2)
-        sampler = cs.CondSampling(sample_marg_PDF_list, rho_k, burnin)
+        sampler = cs.CondSampling(sample_marg_PDF_list, rho_k, Nb)
 
     # initialization
     pf_list    = []
@@ -134,6 +134,6 @@ for sigma_p in sigma_p_list:
     # ---------------------------------------------------------------------------
 
     np.save(filename + '_g_list.npy', g_list)
-    np.save(filename + '_theta_list.npy', theta_list)
+    # np.save(filename + '_theta_list.npy', theta_list)
     np.save(filename + '_m_list.npy', m_list)
     print('\n> File was successfully saved as:', filename)

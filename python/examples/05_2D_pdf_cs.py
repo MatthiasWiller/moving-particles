@@ -19,8 +19,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as scps
-from scipy.special import erf
-from scipy.special import erfinv
+# from scipy.special import erf
+# from scipy.special import erfinv
+
+import scipy.integrate as integrate
+import scipy.interpolate as interpolate
 
 import utilities.plots as uplt
 import algorithms.mcmc_metropolis_hastings as mh
@@ -34,7 +37,6 @@ np.random.seed(1)
 # target pdf {f(x,y) = 1/20216.335877 * exp(-(x*x*y*y + x*x + y*y - 8*x - 8*y)/2)}
 c = 1/20216.335877
 target_PDF = lambda u: c * np.exp(-(u[0]*u[0]*u[1]*u[1] + u[0]*u[0] + u[1]*u[1] - 8*u[0] - 8*u[1])/2)
-
 
 # parameters for proposal pdf
 sig = 2
@@ -55,7 +57,7 @@ rho_k           = 0.8
 #test configuration
 n_samples    = 1000
 burnInPeriod = 100
-lagPeriod    = 1
+lagPeriod    = 2
 
 
 # transformation to/from U-space
@@ -64,8 +66,21 @@ phi_inv = lambda x: scps.norm.ppf(x)
 
 
 # !! -- define target CDF and inverse of target CDF here -- !!
-CDF     = lambda x: (1.25331*c*2.71828**(8/(x[1]**2+1)-0.5*(x[1]-8)*x[1])*erf(0.707107*(x[0]*x[1]**2+x[0]-4)/np.sqrt(x[1]**2+1)))/(np.sqrt(x[1]**2+1))
-CDF_inv = lambda x: 1.41421*erfinv((2.24331e-8*np.exp(-8/(x[1]**2+1))*((3.55671e7*c*np.exp(0.5*(x[1]-8)*x[1])*x[1]**2/np.sqrt(x[1]**2+1))+(3.55671e7*c*np.exp(0.5*(x[1]-8)*x[1]))))/x[0])/np.sqrt(x[1]**2+1)+4/(x[1]**2+1)
+f = lambda x, y: c * np.exp(-(x*x*y*y + x*x + y*y - 8*x - 8*y)/2)
+
+x_line = np.linspace(-5, 10, 500)
+f_marg = np.zeros(len(x_line))
+
+for i in range(0, len(x_line)):
+    print('integrating pdf:',i/len(x_line)*100,'%')
+    f_marg[i], err = integrate.quad(f, -10, 15, args=(x_line[i]))
+
+# normalize
+f_marg = f_marg/np.sum(f_marg)
+F_marg = np.cumsum(f_marg)
+
+CDF     = lambda x: np.array([interpolate.spline(x_line,F_marg,x[0]), interpolate.spline(x_line,F_marg,x[1])])
+CDF_inv = lambda x: np.array([interpolate.spline(F_marg,x_line,x[0]), interpolate.spline(F_marg,x_line,x[1])])
 
 transform_U2X = lambda u: CDF_inv(phi(u))
 transform_X2U = lambda x: phi_inv(CDF(x))
@@ -76,8 +91,26 @@ initial_theta_u = transform_X2U(initial_theta)
 # apply mcmc-method
 theta_u = cs.cond_sampling(initial_theta_u, n_samples, rho_k, burnInPeriod, lagPeriod)
 
+plt.figure()
+plt.scatter(theta_u[0,:], theta_u[1,:])
+
 # transform chain from U to X
 theta_x = transform_U2X(theta_u)
+
+plt.figure()
+plt.scatter(theta_x[0,:], theta_x[1,:])
+
+
+# x_new = np.linspace(-5,10,50)
+# plt.figure()
+# plt.plot(x_new, CDF(x_new))
+
+# x_new_new = np.linspace(0,1,50)
+# plt.figure()
+# plt.plot(x_new_new, CDF_inv(x_new_new))
+
+
+plt.show()
 
 # OUTPUT
 print('E[X1] =', round(theta_x[0,:].mean(), 5))

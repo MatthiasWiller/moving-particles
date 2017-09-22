@@ -7,51 +7,39 @@ import time as timer
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as scps
+import scipy.integrate as integrate
+import scipy.interpolate as interpolate
 
-import algorithms.sus as sus
-import algorithms.cond_sampling as cs
-import algorithms.modified_metropolis as mmh
-import algorithms.adaptive_cond_sampling as acs
-
-import utilities.plots as uplt
 
 np.random.seed(0)
 
-n_samples = 25000
+# f1 = lambda y, x: scps.multivariate_normal.pdf(np.array([x,y]))
+def f1(y,x):
+    return scps.multivariate_normal.pdf(np.array([x,y]),mean=np.array([0,0]))
+n_steps = 100.0
 
-# parameters for beta-distribution
-p = 6.0
-q = 6.0
-beta_distr = scps.betaprime(p, q)
+x_line       = np.linspace(-4, 4, n_steps)
+f_marg   = np.zeros(len(x_line))
 
-# limit-state function
-z   = lambda x: 8* np.exp(-(x[0]**2 + x[1]**2)) + 2* np.exp(-((x[0]-5)**2 + (x[1]-4)**2)) + 1 + x[0]*x[1]/10
-LSF = lambda x: 7.5 - z(x)
+for i in range(0, len(x_line)):
+    f_marg[i], err = integrate.quad(f1, -20, 20, args=(x_line[i]))
 
-sample_marg_PDF = lambda: beta_distr.rvs(1)
+# normalize
+f_marg = f_marg/np.sum(f_marg)
+F_marg = np.cumsum(f_marg)
+
+num_CDF = lambda x: interpolate.spline(x_line,F_marg,x)
+inv_CDF = lambda x: interpolate.spline(F_marg,x_line,x)
+
+
+# F_analytical = scps.norm.cdf(x_new)
+print('true:', scps.norm.cdf(x_new))
+print('num:', num_CDF(x_new))
 
 
 
-theta0  = np.zeros((n_samples, 2), float)
-g0      = np.zeros(n_samples, float)
+plt.figure()
+plt.plot(x_line, F_marg)
+# plt.plot(x, F_analytical)
 
-Nf = 0
-
-for i in range(0, n_samples):
-    msg = "> MCS ... [" + repr(int(i/n_samples*100)) + "%]"
-    print(msg)
-
-    # sample theta0
-    for k in range(0, 2):
-        theta0[i, k] = sample_marg_PDF()
-
-    # evaluate theta0
-    g0[i] = LSF(theta0[i, :])
-
-    # count failure samples
-    if g0[i] <= 0:
-        Nf += 1
-
-pf_mcs = Nf/n_samples
-
-print(pf_mcs)
+plt.show()
