@@ -26,8 +26,8 @@ from mpl_toolkits.mplot3d import Axes3D
 # create figure object with LaTeX font
 matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['font.size'] = 22
-matplotlib.rcParams['font.size'] = 30 # for R(x)_corr
-matplotlib.rcParams['font.size'] = 36 # for minipage with 3 plots 
+# matplotlib.rcParams['font.size'] = 30 # for R(x)_corr
+# matplotlib.rcParams['font.size'] = 36 # for minipage with 3 plots 
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 
 

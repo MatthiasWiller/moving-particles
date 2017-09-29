@@ -36,18 +36,20 @@ p0                  = 0.1       # SUS: Probability of each subset, chosen adapti
 
 n_initial_samples   = 100       # MP: Number of initial samples 
 
-n_sim = 20
+n_sim = 1
 
 # limit-state function
 LSF = lambda x: np.minimum(5-x[0], 1/(1+np.exp(-2*(x[1]+4)))-0.5)
 
+color_list = ['blue', 'green', 'yellow', 'brown', 'red']
 
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
 # ---------------------------------------------------------------------------
 direction = 'python/data/'
 
-theta_list_mp  = np.load(direction + 'sus_breitung_b_Nspl500_Nsim20_acs_theta_list.npy')
+theta_list_sus = np.load(direction + 'sus_breitung_b_Nspl500_Nsim20_acs_theta_list.npy')
+g_list_sus     = np.load(direction + 'sus_breitung_b_Nspl500_Nsim20_acs_g_list.npy')
 
 
 # ---------------------------------------------------------------------------
@@ -70,10 +72,19 @@ for sim in range(0, n_sim):
     plt.axes().set_aspect('equal')
 
     plt.contour(X, Y, Z, [0], colors='k')
-    theta = np.array(theta_list_mp[sim])
-    for lvl in range(0, theta.shape[0]):
+
+    theta = np.array(theta_list_sus[sim])
+    g     = np.array(g_list_sus[sim])
+    n_lvl = theta.shape[0]
+
+    for lvl in range(0, n_lvl):
+        if lvl < n_lvl-1: # don't plot contour for last level
+            g_lvl     = g[lvl,:]
+            b_lvl = np.percentile(g_lvl, p0*100)
+            plt.contour(X,Y,Z,[b_lvl], colors='k')
+
         theta_lvl = theta[lvl,:,:]
-        plt.scatter(theta_lvl[:, 0], theta_lvl[:, 1], s=1, color='blue', marker='o', linestyle='None')
+        plt.scatter(theta_lvl[:, 0], theta_lvl[:, 1], s=1, color=color_list[lvl], marker='o', linestyle='None')
 
     # set labels
     plt.xlabel(r'$u_1$')

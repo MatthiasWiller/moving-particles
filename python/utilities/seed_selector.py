@@ -44,7 +44,7 @@ class SeedSelector:
         # if all samples are blocked, release them
         # and block just sample of active path
         if np.sum(self.seed_matrix[active_path_id, :]) == 0:
-            self.seed_matrix = np.identity((self.number_of_samples, self.number_of_samples))
+            self.seed_matrix = np.identity(self.number_of_samples)
 
         seed_list = []
         for i in range(0, self.number_of_samples):

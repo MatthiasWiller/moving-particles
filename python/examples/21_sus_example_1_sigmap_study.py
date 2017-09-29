@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Moving Particles Example 1
+# Subset Simulation examples 1
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -17,10 +17,12 @@ import scipy.stats as scps
 
 import matplotlib.pyplot as plt
 
-import algorithms.moving_particles as mp
+# import algorithms.moving_particles as mp
+import algorithms.sus as sus
 
 import algorithms.modified_metropolis as mmh
 import algorithms.cond_sampling as cs
+import algorithms.adaptive_cond_sampling as acs
 
 
 # set seed for randomization
@@ -31,31 +33,31 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 100                     # number of samples
+N = 1000                     # number of samples per level
 d = 10                      # number of dimensions
-Nb = 5                  # burn-in
-sampling_method  = 'mmh'     # 'mmh' = Modified Metropolis Hastings
-                            # 'cs'  = Conditional Sampling
+p0 = 0.1           # Probability of each subset, chosen adaptively
+sampling_method     = 'mmh'         # 'mmh' = Modified Metropolis Hastings
+                                    # 'cs'  = Conditional Sampling
+                                    # 'acs' = adaptive Conditional Sampling
 n_simulations = 100          # number of simulations
 seed_selection_strategy = 2
 
-# sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, \
-#                 1.2, 1.4, 1.6, 1.8, 2.0, \
-#                 2.2, 2.4, 2.6, 2.8, 3.0, \
-#                 3.2, 3.4, 3.6, 3.8, 4.0, \
-#                 4.2, 4.4, 4.6, 4.8, 5.0, \
-#                 5.2, 5.4, 5.6, 5.8, 6.0]
-
-sigma_p_list = [5.2, 5.4, 5.6, 5.8, 6.0]
-
-iii = 25
+# sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+sigma_p_list = [1.2, 1.4, 1.6, 1.8, 2.0, \
+                2.2, 2.4, 2.6, 2.8, 3.0, \
+                3.2, 3.4, 3.6, 3.8, 4.0, \
+                4.2, 4.4, 4.6, 4.8, 5.0, \
+                5.2, 5.4, 5.6, 5.8, 6.0, \
+                6.2, 6.4, 6.6, 6.8, 7.0, \
+                7.2, 7.4, 7.6, 7.8, 8.0]
+iii = 10
 for sigma_p in sigma_p_list:
 
     iii = iii+1
     # file-name
-    filename = 'python/data/sigma_p_study/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
-            '_Nsim' + repr(n_simulations) + '_b' + repr(Nb) + '_' + sampling_method + \
-            '_sss' + repr(seed_selection_strategy) + '_sigmap' + repr(iii)
+    filename = 'python/data/sigma_p_study_sus/sus_example_1_d' + repr(d) +'_N' + repr(N) + \
+            '_Nsim' + repr(n_simulations) + '_' + sampling_method + \
+            '_sigmap' + repr(iii)
 
     # limit-state function
     #beta = 5.1993       # for pf = 10^-7
@@ -97,33 +99,33 @@ for sigma_p in sigma_p_list:
 
     # initializing sampling method
     if sampling_method == 'mmh':
-        sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', sigma_p, Nb)
+        sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', sigma_p, 0)
     elif sampling_method == 'cs':
         rho_k = np.sqrt(1 - sigma_p**2)
-        sampler = cs.CondSampling(sample_marg_PDF_list, rho_k, Nb)
+        sampler = cs.CondSampling(sample_marg_PDF_list, rho_k, 0)
+    elif sampling_method == 'acs':
+        sampler = acs.AdaptiveCondSampling(sample_marg_PDF_list, 0.1)
+    
+    ## apply subset-simulation
 
     # initialization
     pf_list    = []
     theta_list = []
     g_list     = []
-    m_list     = []
 
     for sim in range(0, n_simulations):
-        pf_hat, theta_temp, g_temp, acc_rate, m_array = mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
+        pf_hat, theta_temp, g_temp = \
+            sus.subsetsim(p0, N, LSF, sampler)
+
         # save simulation in list
         pf_list.append(pf_hat)
         g_list.append(g_temp)
         theta_list.append(theta_temp)
-        m_list.append(m_array)
+        print("> [", i+1, "] Subset Simulation Estimator \t=", pf_hat)
 
-
-    pf_sim_array = np.asarray(pf_list)
+    pf_sim_array = np.asarray(pf_list).reshape(-1)
     pf_mean      = np.mean(pf_sim_array)
     pf_sigma     = np.std(pf_sim_array)
-
-    # uplt.plot_m_with_poisson_dist(m_list, pf_analytical)
-    # uplt.plot_mp_pf(N, g_list[0], analytical_CDF)
-    # plt.show()
 
     # ---------------------------------------------------------------------------
     # RESULTS
@@ -143,5 +145,4 @@ for sigma_p in sigma_p_list:
 
     np.save(filename + '_g_list.npy', g_list)
     # np.save(filename + '_theta_list.npy', theta_list)
-    np.save(filename + '_m_list.npy', m_list)
     print('\n> File was successfully saved as:', filename)

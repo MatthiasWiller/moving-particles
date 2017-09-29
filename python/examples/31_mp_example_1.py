@@ -34,17 +34,17 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 100                     # number of samples
-d = 2                      # number of dimensions
-burnin = 5                       # burn-in
+N = 1000                     # number of samples
+d = 10                      # number of dimensions
+Nb = 20                       # burn-in
 sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
 seed_selection_strategy = 2 # 
-n_simulations = 1           # number of simulations
+n_simulations = 100         # number of simulations
 
 # file-name
 filename = 'python/data/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
-           '_Nsim' + repr(n_simulations) + '_b' + repr(burnin) + '_' + sampling_method + \
+           '_Nsim' + repr(n_simulations) + '_b' + repr(Nb) + '_' + sampling_method + \
            '_sss' + repr(seed_selection_strategy)
 
 # limit-state function
@@ -87,9 +87,9 @@ for i in range(0, d):
 
 # initializing sampling method
 if sampling_method == 'mmh':
-    sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', burnin)
+    sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', Nb)
 elif sampling_method == 'cs':
-    sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, burnin)
+    sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, Nb)
 
 # initialization
 pf_list    = []
@@ -137,5 +137,5 @@ print("m = ", np.sum(m_array))
 # ---------------------------------------------------------------------------
 
 np.save(filename + '_g_list.npy', g_list)
-np.save(filename + '_theta_list.npy', theta_list)
+# np.save(filename + '_theta_list.npy', theta_list)
 print('\n> File was successfully saved as:', filename)

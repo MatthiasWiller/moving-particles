@@ -145,12 +145,79 @@ def get_mean_and_cov_from_pf_lines(pf_line_list):
     return pf_line_mean, pf_line_cov
 
 # ---------------------------------------------------------------------------
-def get_ncall_lines_and_pf_line_from_MP(g_list_list, N):
-    print('function is empty!')
+def get_ncall_lines_and_pf_line_from_MP(b_line_analytical, pf_line_analytical, g_list_list, N, Nb):
+    n_sim = len(g_list_list)
 
+    # initialization
+    ncall_line_list = []
+    pf_line = pf_line_analytical
+
+    for i in range(0, n_sim):
+        g_list = g_list_list[i]
+        b_line = np.flipud(np.sort(g_list))
+        # b_line = b_line[::-1] # reverse array
+        m = len(g_list) - N
+        ncall_line = np.zeros(m)
+
+        for j in range(0,m):
+            ncall_line[j] = N + (j+1)*Nb
+        b_line = b_line[N:]
+
+        ncall_line_new = np.interp(b_line_analytical, np.flipud(b_line), np.flipud(ncall_line) )
+        ncall_line_list.append(ncall_line_new)
+
+    return pf_line, ncall_line_list
 
 # ---------------------------------------------------------------------------
 def get_ncall_lines_and_cov_line_from_MP(pf_line_list):
     print('function is empty!')
 
+# ---------------------------------------------------------------------------
+def get_mean_ncall_from_MP(g_list_list, number_of_samples, Nb):
+    nsim = len(g_list_list)
+    ncall_array = np.zeros(nsim)
+    for i in range(0, nsim):
+        nele = len(g_list_list[i])
+        ncall_array[i] = (nele - number_of_samples)*Nb + number_of_samples
 
+    return np.mean(ncall_array)
+
+
+# ---------------------------------------------------------------------------
+def get_mean_ncall_from_SUS(g_list_list, number_of_samples_per_level, p0):
+    nsim = len(g_list_list)
+    ncall_array = np.zeros(nsim)
+    for i in range(0, nsim):
+        nlvl = len(g_list_list[i])
+        ncall_array[i] = (nlvl - 1)*(1-p0)*number_of_samples_per_level + number_of_samples_per_level
+
+    return np.mean(ncall_array)
+
+
+# ---------------------------------------------------------------------------
+def get_mean_and_cov_pf_from_MP(g_list_list, number_of_samples):
+    nsim = len(g_list_list)
+    pf_array = np.zeros(nsim)
+    for i in range(0, nsim):
+        m = len(g_list_list[i]) - number_of_samples
+        pf_array[i] = (1 - 1/number_of_samples)**m
+
+    pf_mean = np.mean(pf_array)
+    pf_cov = np.std(pf_array)/pf_mean
+    return pf_mean, pf_cov
+
+
+# ---------------------------------------------------------------------------
+def get_mean_and_cov_pf_from_SUS(g_list_list, number_of_samples_per_level, p0):
+    nsim = len(g_list_list)
+    pf_array = np.zeros(nsim)
+    for i in range(0, nsim):
+        nlvl = len(g_list_list[i])
+        g_lvl = np.array(g_list_list[i][-1])
+        n_fail = np.ones(number_of_samples_per_level, float)
+        n_fail = n_fail[g_lvl<0]
+        pf_array[i] = p0**(nlvl-1)*np.sum(n_fail)/number_of_samples_per_level
+
+    pf_mean = np.mean(pf_array)
+    pf_cov = np.std(pf_array)/pf_mean
+    return pf_mean, pf_cov

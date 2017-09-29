@@ -19,6 +19,8 @@ matplotlib.rcParams.update({'font.size': 23})
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 matplotlib.rcParams['text.usetex'] = True
 
+# matplotlib.rcParams.update({'figure.autolayout': True})
+
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import ticker     
@@ -50,9 +52,6 @@ if example == 1:
     x       = np.linspace(-6, 6, 300)
     X, Y    = np.meshgrid(x, x)
     Z       = LSF(np.array([X, Y]), beta)
-    # Z2       = LSF(np.array([X, Y]), beta2)
-    # Z3       = LSF(np.array([X, Y]), beta3)
-    # Z4       = LSF(np.array([X, Y]), beta4)
 
     min_x = min(X.flatten())
     min_y = min(Y.flatten())
@@ -63,16 +62,16 @@ if example == 1:
     fig = plt.figure()
 
     ax = fig.gca(projection='3d')
-    ax.plot_surface(X, Y, Z1, rstride=20, cstride=20, cmap=cm.pink_r, antialiased=False, alpha=1.0)
-    ax.plot_wireframe(X, Y, Z1, rstride=20, cstride=20, linewidth=0.5, color='black', alpha=1.0)
+    ax.plot_surface(X, Y, Z, rstride=20, cstride=20, cmap=cm.pink_r, antialiased=False, alpha=1.0)
+    ax.plot_wireframe(X, Y, Z, rstride=20, cstride=20, linewidth=0.5, color='black', alpha=1.0)
     ax.view_init(elev=42, azim=-40)
 
     # axes and title config
-    ax.set_xlabel('$u_1$', labelpad=15)
+    axx = ax.set_xlabel('$u_1$', labelpad=15)
     ax.xaxis.set_rotate_label(False) # disable automatic rotation
-    ax.set_ylabel('$u_2$', rotation = 0, labelpad=15)
+    axy = ax.set_ylabel('$u_2$', rotation = 0, labelpad=15)
     ax.yaxis.set_rotate_label(False)
-    ax.set_zlabel('$g(u_1, u_2)$',rotation=93, labelpad=7)
+    axz = ax.set_zlabel('$g(u_1, u_2)$',rotation=93, labelpad=7)
     ax.zaxis.set_rotate_label(False)
     ax.set_xlim3d(min_x, max_x)
     ax.set_ylim3d(min_y, max_y)
@@ -83,8 +82,9 @@ if example == 1:
 
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
-        # plt.savefig('density.pdf', format='pdf', dpi=50)
+        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', \
+                    bbox_extra_artists=(axx, axy, axz), \
+                    format='pdf', dpi=50, bbox_inches='tight', pad_inches=0.3)
 
 
     # PLOT 2D-plot
@@ -137,11 +137,11 @@ elif example == 2:
     ax.view_init(elev=42, azim=-40)
 
     # axes and title config
-    ax.set_xlabel('$x_1$', labelpad=15)
+    axx = ax.set_xlabel('$x_1$', labelpad=15)
     ax.xaxis.set_rotate_label(False) # disable automatic rotation
-    ax.set_ylabel('$x_2$', rotation = 0, labelpad=15)
+    axy = ax.set_ylabel('$x_2$', rotation = 0, labelpad=15)
     ax.yaxis.set_rotate_label(False)
-    ax.set_zlabel('$z(x_1, x_2)$',rotation=93, labelpad=7)
+    axz = ax.set_zlabel('$z(x_1, x_2)$',rotation=93, labelpad=7)
     ax.zaxis.set_rotate_label(False)
     ax.set_xlim3d(min_x, max_x)
     ax.set_ylim3d(min_y, max_y)
@@ -150,8 +150,9 @@ elif example == 2:
 
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
-        # plt.savefig('density.pdf', format='pdf', dpi=50)
+        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf',\
+                    bbox_extra_artists=(axx, axy, axz), \
+                    format='pdf', dpi=50, bbox_inches='tight', pad_inches=0.3)
 
 
     # PLOT 2D-plot
@@ -206,11 +207,11 @@ elif example == 3:
     ax.view_init(elev=42, azim=-135)
 
     # axes and title config
-    ax.set_xlabel('$u_1$', labelpad=15)
+    axx = ax.set_xlabel('$u_1$', labelpad=15)
     ax.xaxis.set_rotate_label(False) # disable automatic rotation
-    ax.set_ylabel('$u_2$', rotation = 0, labelpad=15)
+    axy = ax.set_ylabel('$u_2$', rotation = 0, labelpad=15)
     ax.yaxis.set_rotate_label(False)
-    ax.set_zlabel('$g(u_1, u_2)$',rotation=93, labelpad=7)
+    axz = ax.set_zlabel('$g(u_1, u_2)$',rotation=93, labelpad=7)
     ax.zaxis.set_rotate_label(False)
     ax.set_xlim3d(min_x, max_x)
     ax.set_ylim3d(min_y, max_y)
@@ -219,18 +220,15 @@ elif example == 3:
 
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
-        # plt.savefig('density.pdf', format='pdf', dpi=50)
-
+        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', \
+                    bbox_extra_artists=(axx, axy, axz), \
+                    format='pdf', dpi=50, bbox_inches='tight', pad_inches=0.3)
 
     # PLOT 2D-plot
     fig = plt.figure()
     plt.axes().set_aspect('equal')
 
     plt.contour(X, Y, Z, [0], linewidth=.2, colors='k')
-
-    # Z0 = gaussian(X,Y)
-    # CS0 = plt.contour(X, Y, Z0, [1e-5, 1e-3, 2e-2, 1e-1], linewidths=.2, colors='k')
 
     # set labels
     plt.xlabel(r'$u_1$')
@@ -286,11 +284,11 @@ if example == 5:
     ax.view_init(elev=60, azim=-120)
 
     # axes and title config
-    ax.set_xlabel('$u_1$', labelpad=15)
+    axx = ax.set_xlabel('$u_1$', labelpad=15)
     ax.xaxis.set_rotate_label(False) # disable automatic rotation
-    ax.set_ylabel('$u_2$', rotation = 0, labelpad=15)
+    axy = ax.set_ylabel('$u_2$', rotation = 0, labelpad=15)
     ax.yaxis.set_rotate_label(False)
-    ax.set_zlabel('$g(u_1, u_2)$',rotation=93, labelpad=7)
+    axz = ax.set_zlabel('$g(u_1, u_2)$',rotation=93, labelpad=7)
     ax.zaxis.set_rotate_label(False)
     ax.set_xlim3d(min_x, max_x)
     ax.set_ylim3d(min_y, max_y)
@@ -299,8 +297,9 @@ if example == 5:
 
     plt.tight_layout()
     if savepdf:
-        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', format='pdf', dpi=50, bbox_inches='tight')
-        # plt.savefig('density.pdf', format='pdf', dpi=50)
+        plt.savefig('example'+ repr(example) +'_lsf_3D.pdf', \
+            bbox_extra_artists=(axx, axy, axz), \
+            format='pdf', dpi=50, bbox_inches='tight', pad_inches=0.3)
 
 
     # PLOT 2D-plot

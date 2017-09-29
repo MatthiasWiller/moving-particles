@@ -51,7 +51,7 @@ def cond_sampling(initial_theta, n_samples, rho_k, burnInPeriod, lagPeriod):
 
     # initialize theta
     theta = np.zeros((d, N), float)
-    theta[:, 0] = initial_theta
+    theta[:, 0] = initial_theta[:, 0]
 
     sigma_cond = np.sqrt(1 - rho_k**2)
 

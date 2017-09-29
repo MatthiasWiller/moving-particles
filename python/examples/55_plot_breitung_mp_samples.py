@@ -41,6 +41,8 @@ n_sim = 1
 # limit-state function
 LSF = lambda x: np.minimum(5-x[0], 1/(1+np.exp(-2*(x[1]+4)))-0.5)
 
+level_list = [0, 5, 10, 15, 19]
+color_list = ['blue', 'green', 'yellow', 'brown', 'red']
 
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
@@ -72,33 +74,40 @@ for sim in range(0, n_sim):
     m_vec = (len(list_tmp) for list_tmp in theta_list)
     m_max = max(m_vec)
 
-    for lvl in range(0, m_max):
-        fig = plt.figure()
-        plt.axes().set_aspect('equal')
+    fig = plt.figure()
+    plt.axes().set_aspect('equal')
+    plt.contour(X, Y, Z, [0], colors='k')
 
-        plt.contour(X, Y, Z, [0], colors='k')
-
+    for i in range(0, len(level_list)):
+        lvl = level_list[i]
         theta = []
         for theta_tmp in theta_list:
             if len(theta_tmp) > lvl:
                 theta.append(theta_tmp[lvl])
 
         theta = np.array(theta)
-        plt.scatter(theta[:, 0], theta[:, 1], s=1, color='blue', marker='o', linestyle='None')
+        plt.scatter(theta[:, 0], theta[:, 1], s=1, color=color_list[i], marker='o', linestyle='None')
 
-        # set labels
-        plt.xlabel(r'$u_1$')
-        plt.ylabel(r'$u_2$')
+    # plot all failure samples
+    theta = []
+    for theta_tmp in theta_list:
+        theta.append(theta_tmp[-1])
 
-        plt.xlim(-6, 6)
-        plt.ylim(-6, 6)
+    theta = np.array(theta)
+    plt.scatter(theta[:, 0], theta[:, 1], s=1, color='red', marker='o', linestyle='None')
+    # set labels
+    plt.xlabel(r'$u_1$')
+    plt.ylabel(r'$u_2$')
 
-        plt.xticks([-5, 0, 5])
-        plt.yticks([-5, 0, 5])
+    plt.xlim(-6, 6)
+    plt.ylim(-6, 6)
+
+    plt.xticks([-5, 0, 5])
+    plt.yticks([-5, 0, 5])
     
-        plt.tight_layout()
-        if savepdf:
-            plt.savefig('example_5_sim' + repr(sim) +'_lvl' + lvl + '_lsf_w_samples_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.tight_layout()
+    if savepdf:
+        plt.savefig('example_5_sim' + repr(sim) +'_lsf_w_samples_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 plt.show()

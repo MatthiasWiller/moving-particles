@@ -39,8 +39,10 @@ np.random.seed(0)
 # STANDARD INPUT
 # ---------------------------------------------------------------------------
 
+savepdf = False
+
 # parameters
-d                   = 10        # number of dimensions
+d                   = 100        # number of dimensions
 
 n_samples_per_level = 1000      # SUS: number of samples per conditional level
 p0                  = 0.1       # SUS: Probability of each subset, chosen adaptively
@@ -63,7 +65,7 @@ analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
 # ---------------------------------------------------------------------------
-direction = 'python/data/burnin_study/'
+direction = 'python/data/burnin_study_d100/'
 
 g_list_list_sss0 = []
 g_list_list_sss1 = []
@@ -73,28 +75,28 @@ g_list_list_sss4 = []
 g_list_list_sss5 = []
 
 
-for i in range(0, b_max):
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss0_g_list.npy')
-    g_list_list_sss0.append(g_list_mp_tmp)
+# for i in range(0, b_max):
+#     g_list_mp_tmp = np.load(direction + 'mp_example_1_d'+ repr(d) +'_N100_Nsim50_b'+ repr(i+1) +'_cs_sss0_g_list.npy')
+#     g_list_list_sss0.append(g_list_mp_tmp)
 
 for i in range(0, b_max):
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss1_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d'+ repr(d) +'_N100_Nsim50_b'+ repr(i+1) +'_cs_sss1_g_list.npy')
     g_list_list_sss1.append(g_list_mp_tmp)
 
 for i in range(0, b_max):
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss2_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d'+ repr(d) +'_N100_Nsim50_b'+ repr(i+1) +'_cs_sss2_g_list.npy')
     g_list_list_sss2.append(g_list_mp_tmp)
 
 for i in range(0, b_max):
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss3_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d'+ repr(d) +'_N100_Nsim50_b'+ repr(i+1) +'_cs_sss3_g_list.npy')
     g_list_list_sss3.append(g_list_mp_tmp)
 
 for i in range(0, b_max):
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss4_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d'+ repr(d) +'_N100_Nsim50_b'+ repr(i+1) +'_cs_sss4_g_list.npy')
     g_list_list_sss4.append(g_list_mp_tmp)
 
 for i in range(0, b_max):
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N100_Nsim50_b'+ repr(i+1) +'_cs_sss5_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d'+ repr(d) +'_N100_Nsim50_b'+ repr(i+1) +'_cs_sss5_g_list.npy')
     g_list_list_sss5.append(g_list_mp_tmp)
 
 
@@ -103,10 +105,6 @@ for i in range(0, b_max):
 # ---------------------------------------------------------------------------
 
 # initialization
-pf_line_list  = []
-b_line_list   = []
-cov_line_list = []
-legend_list   = []
 cov_at_pf_array_sss0 = np.zeros(b_max, float)
 pf_mean_array_sss0 = np.zeros(b_max, float)
 
@@ -126,26 +124,18 @@ cov_at_pf_array_sss5 = np.zeros(b_max, float)
 pf_mean_array_sss5 = np.zeros(b_max, float)
 
 # seed selection stragegy 0
-for i in range(0, b_max):
-    b_line_mp, pf_line_list_mp        = uutil.get_pf_line_and_b_line_from_MP(g_list_list_sss0[i], n_initial_samples)
-    pf_line_mean_mp, pf_line_cov_mp   = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp)
+# for i in range(0, b_max):
+#     b_line_mp, pf_line_list_mp        = uutil.get_pf_line_and_b_line_from_MP(g_list_list_sss0[i], n_initial_samples)
+#     pf_line_mean_mp, pf_line_cov_mp   = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp)
 
-    b_line_list.append(b_line_mp)
-    pf_line_list.append(pf_line_mean_mp)
-    cov_line_list.append(pf_line_cov_mp)
-    legend_list.append(r'MP (T =' + repr(i+1) + r') SSS0')
-    cov_at_pf_array_sss0[i] = pf_line_cov_mp[0]
-    pf_mean_array_sss0[i] = pf_line_mean_mp[0]
+#     cov_at_pf_array_sss0[i] = pf_line_cov_mp[0]
+#     pf_mean_array_sss0[i] = pf_line_mean_mp[0]
 
 # seed selection strategy 1
 for i in range(0, b_max):
     b_line_mp, pf_line_list_mp        = uutil.get_pf_line_and_b_line_from_MP(g_list_list_sss1[i], n_initial_samples)
     pf_line_mean_mp, pf_line_cov_mp   = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp)
 
-    b_line_list.append(b_line_mp)
-    pf_line_list.append(pf_line_mean_mp)
-    cov_line_list.append(pf_line_cov_mp)
-    legend_list.append(r'MP (T =' + repr(i+1) + r') SSS1')
     cov_at_pf_array_sss1[i] = pf_line_cov_mp[0]
     pf_mean_array_sss1[i] = pf_line_mean_mp[0]
 
@@ -154,10 +144,6 @@ for i in range(0, b_max):
     b_line_mp, pf_line_list_mp        = uutil.get_pf_line_and_b_line_from_MP(g_list_list_sss2[i], n_initial_samples)
     pf_line_mean_mp, pf_line_cov_mp   = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp)
 
-    b_line_list.append(b_line_mp)
-    pf_line_list.append(pf_line_mean_mp)
-    cov_line_list.append(pf_line_cov_mp)
-    legend_list.append(r'MP (T =' + repr(i+1) + r') SSS2')
     cov_at_pf_array_sss2[i] = pf_line_cov_mp[0]
     pf_mean_array_sss2[i] = pf_line_mean_mp[0]
 
@@ -166,10 +152,6 @@ for i in range(0, b_max):
     b_line_mp, pf_line_list_mp        = uutil.get_pf_line_and_b_line_from_MP(g_list_list_sss3[i], n_initial_samples)
     pf_line_mean_mp, pf_line_cov_mp   = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp)
 
-    b_line_list.append(b_line_mp)
-    pf_line_list.append(pf_line_mean_mp)
-    cov_line_list.append(pf_line_cov_mp)
-    legend_list.append(r'MP (T =' + repr(i+1) + r') SSS3')
     cov_at_pf_array_sss3[i] = pf_line_cov_mp[0]
     pf_mean_array_sss3[i] = pf_line_mean_mp[0]
 
@@ -178,10 +160,6 @@ for i in range(0, b_max):
     b_line_mp, pf_line_list_mp        = uutil.get_pf_line_and_b_line_from_MP(g_list_list_sss4[i], n_initial_samples)
     pf_line_mean_mp, pf_line_cov_mp   = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp)
 
-    b_line_list.append(b_line_mp)
-    pf_line_list.append(pf_line_mean_mp)
-    cov_line_list.append(pf_line_cov_mp)
-    legend_list.append(r'MP (T =' + repr(i+1) + r') SSS4')
     cov_at_pf_array_sss4[i] = pf_line_cov_mp[0]
     pf_mean_array_sss4[i] = pf_line_mean_mp[0]
 
@@ -190,10 +168,6 @@ for i in range(0, b_max):
     b_line_mp, pf_line_list_mp        = uutil.get_pf_line_and_b_line_from_MP(g_list_list_sss5[i], n_initial_samples)
     pf_line_mean_mp, pf_line_cov_mp   = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp)
 
-    b_line_list.append(b_line_mp)
-    pf_line_list.append(pf_line_mean_mp)
-    cov_line_list.append(pf_line_cov_mp)
-    legend_list.append(r'MP (T =' + repr(i+1) + r') SSS0')
     cov_at_pf_array_sss5[i] = pf_line_cov_mp[0]
     pf_mean_array_sss5[i] = pf_line_mean_mp[0]
 
@@ -207,31 +181,32 @@ cov_analytical = np.ones(b_max, float) * np.sqrt(pf_analytical**(-1/n_initial_sa
 # plot cov over b
 plt.figure()
 burn_in_list = [i for i in range(1, b_max+1)]
-plt.plot(burn_in_list, cov_analytical,'o', label=r'Analytical')
-# plt.plot(burn_in_list, cov_at_pf_array_sss0,'x', label=r'Seed Sel. Strat. 0')
-plt.plot(burn_in_list, cov_at_pf_array_sss1,'x', label=r'Seed Sel. Strat. 1')
-plt.plot(burn_in_list, cov_at_pf_array_sss2,'x', label=r'Seed Sel. Strat. 2')
-plt.plot(burn_in_list, cov_at_pf_array_sss3,'x', label=r'Seed Sel. Strat. 3')
-plt.plot(burn_in_list, cov_at_pf_array_sss4,'x', label=r'Seed Sel. Strat. 4')
-plt.plot(burn_in_list, cov_at_pf_array_sss5,'x', label=r'Seed Sel. Strat. 5')
+plt.plot(burn_in_list, cov_analytical,'.-', label=r'Analytical')
+# plt.plot(burn_in_list, cov_at_pf_array_sss0,'+-', label=r'Strategy 0')
+plt.plot(burn_in_list, cov_at_pf_array_sss1,'x-', label=r'Strategy 1')
+plt.plot(burn_in_list, cov_at_pf_array_sss2,'v-', label=r'Strategy 2')
+# plt.plot(burn_in_list, cov_at_pf_array_sss3,'*-', label=r'Strategy 3')
+# plt.plot(burn_in_list, cov_at_pf_array_sss4,'d-', label=r'Strategy 4')
+plt.plot(burn_in_list, cov_at_pf_array_sss5,'s-', label=r'Strategy 5')
 
 plt.legend()
 plt.xlabel(r'Burn-in, $N_b$')
 plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
-plt.savefig('burnin_study_cov_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
+if savepdf:
+    plt.savefig('burnin_study_cov_over_Nb_d1000.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # plot pf over b
 plt.figure()
-plt.plot(burn_in_list, pf_analytical,'o', label=r'Analytical')
-# plt.plot(burn_in_list, pf_mean_array_sss0,'x', label=r'Seed Sel. Strat. 0')
-plt.plot(burn_in_list, pf_mean_array_sss1,'x', label=r'Seed Sel. Strat. 1')
-plt.plot(burn_in_list, pf_mean_array_sss2,'x', label=r'Seed Sel. Strat. 2')
-plt.plot(burn_in_list, pf_mean_array_sss3,'x', label=r'Seed Sel. Strat. 3')
-plt.plot(burn_in_list, pf_mean_array_sss4,'x', label=r'Seed Sel. Strat. 4')
-plt.plot(burn_in_list, pf_mean_array_sss5,'x', label=r'Seed Sel. Strat. 5')
+plt.plot(burn_in_list, pf_analytical,'.-', label=r'Analytical')
+# plt.plot(burn_in_list, pf_mean_array_sss0,'+-', label=r'Strategy 0')
+plt.plot(burn_in_list, pf_mean_array_sss1,'x-', label=r'Strategy 1')
+plt.plot(burn_in_list, pf_mean_array_sss2,'v-', label=r'Strategy 2')
+# plt.plot(burn_in_list, pf_mean_array_sss3,'*-', label=r'Strategy 3')
+# plt.plot(burn_in_list, pf_mean_array_sss4,'d-', label=r'Strategy 4')
+plt.plot(burn_in_list, pf_mean_array_sss5,'s-', label=r'Strategy 5')
 
 plt.yscale('log')
 
@@ -240,9 +215,7 @@ plt.xlabel(r'Burn-in, $N_b$')
 plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
-plt.savefig('burnin_study_pf_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
-
-# uplt.plot_pf_over_b(b_line_list, pf_line_list, legend_list)
-# uplt.plot_cov_over_b(b_line_list, cov_line_list, legend_list)
+if savepdf:
+    plt.savefig('burnin_study_pf_over_Nb_d1000.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()

@@ -94,13 +94,12 @@ plt.legend(loc='upper left')
 # xaxis
 plt.xscale('log')
 plt.gca().invert_xaxis()
-
 plt.xlabel(r'Probability of failure, $p_f$')
 
 # yaxis
 plt.yscale('log')
 plt.ylim(5e3, 5e13)
-plt.ylabel(r'Computational cost, $t$')
+plt.ylabel(r'Computational cost, $N_{call}$')
 
 plt.tight_layout()
 plt.savefig('comp_time_pf.pdf', format='pdf', dpi=50, bbox_inches='tight')
@@ -158,7 +157,7 @@ plt.xlabel(r'Coefficient of variation, $\delta^2$')
 # yaxis
 plt.yscale('log')
 plt.ylim(5e3, 5e13)
-plt.ylabel(r'Computational cost, $t$')
+plt.ylabel(r'Computational cost, $N_{call}$')
 
 plt.tight_layout()
 plt.savefig('comp_time_cov.pdf', format='pdf', dpi=50, bbox_inches='tight')

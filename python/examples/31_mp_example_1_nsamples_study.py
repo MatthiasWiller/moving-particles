@@ -34,27 +34,24 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 100                     # number of samples
-d = 1000                      # number of dimensions
-
+# N = 10                     # number of samples
+d = 100                      # number of dimensions
+Nb = 5                  # burn-in
 sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
-n_simulations = 50          # number of simulations
+n_simulations = 100          # number of simulations
 
-burn_in_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-# burn_in_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-# burn_in_list = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-
-# seed_selection_list = [1, 2, 3, 4, 5]
-seed_selection_list = [2]
+nsamples_list = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+# nsamples_list = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+seed_selection_list = [5]
 
 
 for seed_selection_strategy in seed_selection_list:
-    for burnin in burn_in_list:
+    for N in nsamples_list:
 
         # file-name
-        filename = 'python/data/burnin_study_d1000/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
-                '_Nsim' + repr(n_simulations) + '_b' + repr(burnin) + '_' + sampling_method + \
+        filename = 'python/data/nsamples_study/mp_example_1_d' + repr(d) +'_N' + repr(N) + \
+                '_Nsim' + repr(n_simulations) + '_b' + repr(Nb) + '_' + sampling_method + \
                 '_sss' + repr(seed_selection_strategy)
 
         # limit-state function
@@ -97,9 +94,9 @@ for seed_selection_strategy in seed_selection_list:
 
         # initializing sampling method
         if sampling_method == 'mmh':
-            sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', burnin)
+            sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian', Nb)
         elif sampling_method == 'cs':
-            sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, burnin)
+            sampler = cs.CondSampling(sample_marg_PDF_list, 0.8, Nb)
 
         # initialization
         pf_list    = []

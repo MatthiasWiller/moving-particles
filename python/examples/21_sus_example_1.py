@@ -43,10 +43,10 @@ np.random.seed(0)
 n_samples_per_level = 1000          # number of samples per conditional level
 d                   = 10            # number of dimensions
 p0                  = 0.1           # Probability of each subset, chosen adaptively
-sampling_method     = 'acs'         # 'mmh' = Modified Metropolis Hastings
+sampling_method     = 'cs'         # 'mmh' = Modified Metropolis Hastings
                                     # 'cs'  = Conditional Sampling
                                     # 'acs' = adaptive Conditional Sampling
-n_simulations       = 10             # Number of Simulations
+n_simulations       = 100             # Number of Simulations
 
 # file-name
 filename = 'python/data/sus_example_1_d' + repr(d) +'_Nspl' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
@@ -152,5 +152,5 @@ print("> Coefficient of Variation (Analytical)\t=", round(cov_analytical, 8))
 # ---------------------------------------------------------------------------
 
 np.save(filename + '_g_list.npy', g_list)
-np.save(filename + '_theta_list.npy', theta_list)
+# np.save(filename + '_theta_list.npy', theta_list)
 print("\n> File was successfully saved as:", filename)

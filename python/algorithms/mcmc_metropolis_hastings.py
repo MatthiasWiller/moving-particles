@@ -51,7 +51,7 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
 
     # initialize theta
     theta               = np.zeros((d, N), float)
-    theta[:, 0]         = initial_theta
+    theta[:, 0]         = initial_theta[:, 0]
 
     # initialization
     i                   = 1
