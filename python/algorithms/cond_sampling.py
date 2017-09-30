@@ -70,8 +70,8 @@ class CondSampling:
         theta_seed = np.random.permutation(theta_seed)
 
         for k in range(0, Nc):
-            msg = "> > Sampling Level ... [" + repr(int(k/Nc*100)) + "%]"
-            print(msg)
+            # msg = "> > Sampling Level ... [" + repr(int(k/Nc*100)) + "%]"
+            # print(msg)
 
             # generate states of Markov chain
             theta_temp, g_temp = self.sample_markov_chain(theta_seed[k, :], Ns, LSF, b)

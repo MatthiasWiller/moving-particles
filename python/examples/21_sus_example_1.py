@@ -19,7 +19,6 @@
 import time as timer
 
 import numpy as np
-import matplotlib.pyplot as plt
 import scipy.stats as scps
 
 import algorithms.sus as sus
@@ -40,16 +39,16 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-n_samples_per_level = 1000          # number of samples per conditional level
-d                   = 10            # number of dimensions
-p0                  = 0.1           # Probability of each subset, chosen adaptively
-sampling_method     = 'cs'         # 'mmh' = Modified Metropolis Hastings
-                                    # 'cs'  = Conditional Sampling
-                                    # 'acs' = adaptive Conditional Sampling
-n_simulations       = 100             # Number of Simulations
+n_samples_per_level = 6000  # number of samples per conditional level
+d                   = 10    # number of dimensions
+p0                  = 0.1   # Probability of each subset, chosen adaptively
+sampling_method     = 'cs'  # 'mmh' = Modified Metropolis Hastings
+                            # 'cs'  = Conditional Sampling
+                            # 'acs' = adaptive Conditional Sampling
+n_simulations       = 100   # Number of Simulations
 
 # file-name
-filename = 'python/data/sus_example_1_d' + repr(d) +'_Nspl' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
+filename = 'python/data/sus_example_1_d' + repr(d) +'_N' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
 
 # limit-state function
 #beta = 5.1993       # for pf = 10^-7
@@ -106,9 +105,9 @@ theta_list  = []
 g_list      = []
 
 print('\n> START Sampling')
-startTime = timer.time()
+start_time = timer.time()
 
-for i in range(0, n_simulations):
+for sim in range(0, n_simulations):
     # perform SubSim
     p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampler)
 
@@ -116,10 +115,11 @@ for i in range(0, n_simulations):
     p_F_SS_list.append(p_F_SS)
     theta_list.append(theta)
     g_list.append(g)
-    print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
+    # print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
+    uutil.print_simulation_progress(sim, n_simulations, start_time)
 
 
-print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
+# print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
 
 # computing cov
 print('\n> START Computing C.O.V')

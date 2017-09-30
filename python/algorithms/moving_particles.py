@@ -154,7 +154,7 @@ def mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection
 
         m_array[id_min] = m_array[id_min] + 1
         m = np.sum(m_array)
-        print('m:', m, '| g =', g_temp)
+        # print('m:', m, '| g =', g_temp)
 
     pf_hat = (1 - 1/N)**m
     acc_rate = acc / m

@@ -29,8 +29,8 @@ np.random.seed(1)
 
 
 # target pdf 
-# c = 0 # correlation rho = 0
-c = 1 # correlation rho = -0.40
+c = 0 # correlation rho = 0
+# c = 1 # correlation rho = -0.40
 target_PDF = lambda x: (1 - c*(1-x[0]-x[1])+c*c*x[0]*x[1])*np.exp(-(x[0]+x[1]+c*x[0]*x[1]))
 
 
@@ -46,7 +46,7 @@ sample_prop_PDF = lambda param: scps.norm.rvs(param, sig, 2) # draw the componen
 f_prop_PDF      = lambda x, param: scps.multivariate_normal.pdf(x, param, cov) # PDF
 
 
-initial_theta   = [1.5, 1.5]     # initial theta
+initial_theta   = np.array([1.5, 1.5]).reshape(-1,1)    # initial theta
 n_samples       = int(1e4)       # number of samples
 burnInPeriod    = 1000            # defines burn-in-period of samples
 lagPeriod       = 5              # only log every n-th value
@@ -60,17 +60,12 @@ lagPeriod       = 5              # only log every n-th value
 # apply mcmc-method
 theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f_prop_PDF, burnInPeriod, lagPeriod)
 
+plt.figure()
+plt.scatter(theta[0,:], theta[1,:])
+plt.show()
+
 # OUTPUT
 print('E[X1] =', round(theta[0,:].mean(), 5))
 print('E[X2] =', round(theta[1,:].mean(), 5))
 
-np.save('python/data/samples_2D_exp_pdf_mh.npy', theta)
-
-# plot samples
-#uplt.plot_hist(theta[0,:], target_PDF, 2)
-#uplt.plot_scatter_with_contour(theta, target_PDF)
-# uplt.plot_mixing(theta[0, :1000])
-# uplt.plot_scatter_with_hist(theta[:, :5000], target_PDF)
-# uplt.plot_autocorr(theta[0,:], 50, 1)
-# uplt.plot_autocorr(theta[1,:], 50, 2)
-# plt.show()
+# np.save('python/data/samples_2D_exp_pdf_mh.npy', theta)

@@ -39,15 +39,15 @@ target_PDF = lambda x: (1 - c*(1-x[0]-x[1])+c*c*x[0]*x[1])*np.exp(-(x[0]+x[1]+c*
 
 
 initial_theta   = np.array([1.5, 1.5]).reshape(-1,1)    # initial theta
-n_samples       = int(1e5)       # number of samples
-burnInPeriod    = 5000            # defines burn-in-period of samples
+n_samples       = int(1e4)       # number of samples
+burnInPeriod    = 1000            # defines burn-in-period of samples
 lagPeriod       = 5              # only log every n-th value
 rho_k           = 0.8
 
 #test configuration
-n_samples    = 1000
-burnInPeriod = 100
-lagPeriod    = 2
+# n_samples    = 1000
+# burnInPeriod = 100
+# lagPeriod    = 2
 
 
 # transformation to/from U-space
@@ -85,24 +85,14 @@ initial_theta_u = transform_X2U(initial_theta)
 # apply mcmc-method
 theta_u = cs.cond_sampling(initial_theta_u, n_samples, rho_k, burnInPeriod, lagPeriod)
 
-plt.figure()
-plt.scatter(theta_u[0,:], theta_u[1,:])
-
 # transform chain from U to X
 theta_x = transform_U2X(theta_u)
 
 plt.figure()
+plt.scatter(theta_u[0,:], theta_u[1,:])
+
+plt.figure()
 plt.scatter(theta_x[0,:], theta_x[1,:])
-
-
-# x_new = np.linspace(-5,10,50)
-# plt.figure()
-# plt.plot(x_new, CDF(x_new))
-
-# x_new_new = np.linspace(0,1,50)
-# plt.figure()
-# plt.plot(x_new_new, CDF_inv(x_new_new))
-
 
 plt.show()
 
@@ -110,13 +100,5 @@ plt.show()
 print('E[X1] =', round(theta_x[0,:].mean(), 5))
 print('E[X2] =', round(theta_x[1,:].mean(), 5))
 
-np.save('python/data/samples_2D_pdf_cs.npy', theta_x)
+np.save('python/data/samples_2D_exp_pdf_cs.npy', theta_x)
 
-# plot samples
-#uplt.plot_hist(theta[0,:], target_PDF, 2)
-#uplt.plot_scatter_with_contour(theta, target_PDF)
-# uplt.plot_mixing(theta[0, :1000])
-# uplt.plot_scatter_with_hist(theta[:, :5000], target_PDF)
-# uplt.plot_autocorr(theta[0,:], 50, 1)
-# uplt.plot_autocorr(theta[1,:], 50, 2)
-# plt.show()

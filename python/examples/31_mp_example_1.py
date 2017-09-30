@@ -8,21 +8,19 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-09
 # ---------------------------------------------------------------------------
 """
-
+import time as timer
 import numpy as np
 import scipy.stats as scps
-
-import matplotlib.pyplot as plt
 
 import algorithms.moving_particles as mp
 
 import algorithms.modified_metropolis as mmh
 import algorithms.cond_sampling as cs
 
-import utilities.plots as uplt
+import utilities.util as uutil
 
 print("RUN 31_mp_example_1.py")
 
@@ -34,9 +32,9 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 1000                     # number of samples
+N = 695                     # number of samples
 d = 10                      # number of dimensions
-Nb = 20                       # burn-in
+Nb = 5                      # burn-in
 sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
 seed_selection_strategy = 2 # 
@@ -96,29 +94,24 @@ pf_list    = []
 theta_list = []
 g_list     = []
 
+
+start_time = timer.time()
 for sim in range(0, n_simulations):
     pf_hat, theta_temp, g_temp, acc_rate, m_array = \
         mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
-
-    # pf_hat, theta_temp, g_temp, acc_rate, m_list = \
-    #     mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
-
-    # pf_hat, theta_temp, g_temp, acc_rate, m = \
-    #     mp.mp(N, LSF, sampler, sample_marg_PDF_list)
     
     # save simulation in list
     pf_list.append(pf_hat)
     g_list.append(g_temp)
     theta_list.append(theta_temp)
 
+    uutil.print_simulation_progress(sim, n_simulations, start_time)
+
 
 pf_sim_array = np.asarray(pf_list)
 pf_mean      = np.mean(pf_sim_array)
 pf_sigma     = np.std(pf_sim_array)
 
-# uplt.plot_m_with_poisson_dist(m_list, pf_analytical)
-# uplt.plot_mp_pf(N, g_list[0], analytical_CDF)
-# plt.show()
 
 # ---------------------------------------------------------------------------
 # RESULTS
@@ -130,7 +123,7 @@ print("> Probability of Failure (Analytical) \t\t\t=", round(pf_analytical, 10))
 print("> Pf mean \t=", pf_mean)
 print("> Pf sigma \t=", pf_sigma)
 print("> C.O.V. \t=", pf_sigma/pf_mean)
-print("m = ", np.sum(m_array))
+print("> m = \t\t", np.sum(m_array))
 
 # ---------------------------------------------------------------------------
 # SAVE RESULTS

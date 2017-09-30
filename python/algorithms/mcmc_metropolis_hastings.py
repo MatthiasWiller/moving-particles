@@ -73,7 +73,9 @@ def metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop_PDF, f
 
         # alpha(x,y) = min[p(y)/p(x) * q(y,x) / q(x,y), 1]
         r = np.minimum(alpha, 1)
-
+        if theta_star[0] < 0 or theta_star[1] < 0:
+            r = 0
+        
         # accept or reject sample
         if (np.random.uniform(0, 1, 1) <= r):
             theta[:, i] = theta_star

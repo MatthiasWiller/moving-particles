@@ -11,7 +11,7 @@
 # Version 2017-07
 # ---------------------------------------------------------------------------
 """
-
+import time as timer
 import numpy as np
 
 # ---------------------------------------------------------------------------
@@ -221,3 +221,15 @@ def get_mean_and_cov_pf_from_SUS(g_list_list, number_of_samples_per_level, p0):
     pf_mean = np.mean(pf_array)
     pf_cov = np.std(pf_array)/pf_mean
     return pf_mean, pf_cov
+
+# ---------------------------------------------------------------------------
+def print_simulation_progress(current_iteration, total_number_of_iterations, start_time=0):
+    progress_percent = current_iteration/total_number_of_iterations*100
+
+    string = '[' + repr(int(progress_percent)) + '%]' 
+    if start_time != 0 and progress_percent != 0:
+        time_until_now = timer.time() - start_time
+        remaining_time = time_until_now *( 100/(progress_percent) - 1)
+        string = string + ' Time remaining = ' + repr(round(remaining_time, 2)) + ' s'
+
+    print(string)
