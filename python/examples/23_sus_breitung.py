@@ -40,7 +40,7 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 500          # number of samples per conditional level
+N = 5000          # number of samples per conditional level
 p0                  = 0.1          # Probability of each subset, chosen adaptively
 sampling_method     = 'cs'         # 'mmh' = Modified Metropolis Hastings
                                    # 'cs'  = Conditional Sampling
@@ -49,7 +49,7 @@ n_simulations       = 100          # Number of Simulations
 
 
 # file-name
-filename = 'python/data/sus_breitung_b_Nspl' + repr(N) + \
+filename = 'python/data/sus_breitung_b_N' + repr(N) + \
            '_Nsim' + repr(n_simulations) + '_' + sampling_method
 
 # limit-state function

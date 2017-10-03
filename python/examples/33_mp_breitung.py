@@ -11,7 +11,7 @@
 # Version 2017-07
 # ---------------------------------------------------------------------------
 """
-
+import time as timer
 import numpy as np
 
 import algorithms.modified_metropolis as mmh
@@ -19,6 +19,7 @@ import algorithms.cond_sampling as cs
 
 import algorithms.moving_particles as mp
 
+import utilities.util as uutil
 
 print("RUN 35_mp_breitung.py")
 
@@ -30,12 +31,12 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 100                     # number of samples
-b = 20                      # burn-in
+N = 478                     # number of samples
+b = 5                      # burn-in
 sampling_method  = 'cs'    # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
-seed_selection_strategy = 1 # seed selection strategy
-n_simulations = 5           # number of simulations
+seed_selection_strategy = 2 # seed selection strategy
+n_simulations = 100           # number of simulations
 
 # file-name
 filename = 'python/data/mp_breitung_N' + repr(N) + '_Nsim' + repr(n_simulations) + \
@@ -43,7 +44,6 @@ filename = 'python/data/mp_breitung_N' + repr(N) + '_Nsim' + repr(n_simulations)
 
 # reference value
 pf_analytical = 3.17 * 10**-5
-
 
 # limit-state function
 # LSF = lambda x: np.minimum(5-x[0], 4+x[1])
@@ -87,6 +87,8 @@ theta_list = []
 g_list     = []
 m_list     = []
 
+
+start_time = timer.time()
 for sim in range(0, n_simulations):
     pf_hat, theta_temp, g_temp, acc_rate, m_array = \
         mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
@@ -95,6 +97,8 @@ for sim in range(0, n_simulations):
     g_list.append(g_temp)
     theta_list.append(theta_temp)
     m_list.append(m_array)
+
+    uutil.print_simulation_progress(sim, n_simulations, start_time)
 
 pf_sim_array = np.asarray(pf_list)
 pf_mean      = np.mean(pf_sim_array)
@@ -118,7 +122,7 @@ print("> C.O.V. \t=", pf_sigma/pf_mean)
 # ---------------------------------------------------------------------------
 
 np.save(filename + '_g_list.npy', g_list)
-np.save(filename + '_theta_list.npy', theta_list)
-np.save(filename + '_m_list.npy', m_list)
+# np.save(filename + '_theta_list.npy', theta_list)
+# np.save(filename + '_m_list.npy', m_list)
 
 # print('\n> File was successfully saved as:', filename)

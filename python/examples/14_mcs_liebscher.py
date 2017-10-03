@@ -79,5 +79,5 @@ print("\n> Time needed for Monte Carlo Simulation =", round(timer.time() - start
 # ---------------------------------------------------------------------------
 
 np.save(filename + '_g_list.npy', g_list)
-np.save(filename + '_theta_list.npy', theta_list)
+# np.save(filename + '_theta_list.npy', theta_list)
 print("\n> File was successfully saved as:", filename)

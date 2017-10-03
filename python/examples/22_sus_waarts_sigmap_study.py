@@ -33,17 +33,17 @@ np.random.seed(0)
 # parameters
 N = 1000                 # number of samples per level
 p0 = 0.1                 # Probability of each subset, chosen adaptively
-sampling_method = 'cs'   # 'mmh' = Modified Metropolis Hastings
+sampling_method = 'mmh'   # 'mmh' = Modified Metropolis Hastings
                          # 'cs'  = Conditional Sampling
                          # 'acs' = adaptive Conditional Sampling
 n_simulations = 100      # number of simulations
 
-sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-# sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,\
-#                 1.2, 1.4, 1.6, 1.8, 2.0, \
-#                 2.2, 2.4, 2.6, 2.8, 3.0, \
-#                 3.2, 3.4, 3.6, 3.8, 4.0, \
-#                 4.2, 4.4, 4.6, 4.8, 5.0]
+# sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,\
+                1.2, 1.4, 1.6, 1.8, 2.0, \
+                2.2, 2.4, 2.6, 2.8, 3.0, \
+                3.2, 3.4, 3.6, 3.8, 4.0, \
+                4.2, 4.4, 4.6, 4.8, 5.0]
 iii = 0
 for sigma_p in sigma_p_list:
 

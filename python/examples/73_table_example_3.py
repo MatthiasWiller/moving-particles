@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# File to compare LSF calls for example 2 (Waarts)
+# File to compare LSF calls for example 3 (Breitung)
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -47,34 +47,21 @@ np.random.seed(0)
 p0 = 0.1
 Nb = 5
 # cov = [0.1, 0.2, 0.3]
-N_mp  = [100, 200, 100]   # seed = (0, 0, 0)
-N_sus = [6000, 1500, 530] # seed = (0, 0, 3)
-
-
-# limit-state function
-#beta = 5.1993       # for pf = 10^-7
-#beta = 4.7534       # for pf = 10^-6
-#beta = 4.2649       # for pf = 10^-5
-#beta = 3.7190       # for pf = 10^-4
-beta = 3.0902       # for pf = 10^-3
-#beta = 2.3263       # for pf = 10^-2
-LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
-
-# analytical CDF
-analytical_CDF = lambda x: scps.norm.cdf(x, beta)
+N_mp  = [1450, 370, 170]   # seed = (0, 0, 3)
+N_sus = [13500, 3600, 1550] # seed = (2, 1, 4)
 
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
 # ---------------------------------------------------------------------------
-direction = 'python/data/example2/table_data/'
+direction = 'python/data/example3/table_data/'
 
-g_list_sus1 = np.load(direction + 'sus_waarts_d10_N' + repr(N_sus[0]) + '_Nsim100_cs_g_list.npy')
-g_list_sus2 = np.load(direction + 'sus_waarts_d10_N' + repr(N_sus[1]) + '_Nsim100_cs_g_list.npy')
-g_list_sus3 = np.load(direction + 'sus_waarts_d10_N' + repr(N_sus[2]) + '_Nsim100_cs_g_list.npy')
+g_list_sus1 = np.load(direction + 'sus_breitung_N' + repr(N_sus[0]) + '_Nsim100_cs_g_list.npy')
+g_list_sus2 = np.load(direction + 'sus_breitung_N' + repr(N_sus[1]) + '_Nsim100_cs_g_list.npy')
+g_list_sus3 = np.load(direction + 'sus_breitung_N' + repr(N_sus[2]) + '_Nsim100_cs_g_list.npy')
 
-g_list_mp1 = np.load(direction + 'mp_waarts_d10_N' + repr(N_mp[0]) + '_Nsim100_b5_cs_sss2_g_list.npy')
-g_list_mp2 = np.load(direction + 'mp_waarts_d10_N' + repr(N_mp[1]) + '_Nsim100_b5_cs_sss2_g_list.npy')
-g_list_mp3 = np.load(direction + 'mp_waarts_d10_N' + repr(N_mp[2]) + '_Nsim100_b5_cs_sss2_g_list.npy')
+g_list_mp1 = np.load(direction + 'mp_breitung_N' + repr(N_mp[0]) + '_Nsim100_b5_cs_sss2_g_list.npy')
+g_list_mp2 = np.load(direction + 'mp_breitung_N' + repr(N_mp[1]) + '_Nsim100_b5_cs_sss2_g_list.npy')
+g_list_mp3 = np.load(direction + 'mp_breitung_N' + repr(N_mp[2]) + '_Nsim100_b5_cs_sss2_g_list.npy')
 
 
 # ---------------------------------------------------------------------------

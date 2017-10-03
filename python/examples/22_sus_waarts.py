@@ -41,7 +41,7 @@ np.random.seed(1)
 # ---------------------------------------------------------------------------
 
 # parameters
-n_samples_per_level = 1500         # number of samples per conditional level
+n_samples_per_level = 370         # number of samples per conditional level
 p0                  = 0.1          # Probability of each subset, chosen adaptively
 sampling_method     = 'cs'         # 'mmh' = Modified Metropolis Hastings
                                    # 'cs'  = Conditional Sampling

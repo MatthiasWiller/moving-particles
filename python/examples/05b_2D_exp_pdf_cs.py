@@ -23,7 +23,6 @@ import scipy.stats as scps
 import scipy.integrate as integrate
 import scipy.interpolate as interpolate
 
-import utilities.plots as uplt
 import algorithms.mcmc_metropolis_hastings as mh
 import algorithms.mcmc_cond_sampling as cs
 

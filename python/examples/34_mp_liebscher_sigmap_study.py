@@ -15,6 +15,8 @@
 import time as timer
 import numpy as np
 
+import scipy.stats as scps
+
 import algorithms.moving_particles as mp
 
 import algorithms.modified_metropolis as mmh
@@ -44,23 +46,41 @@ sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, \
                 3.2, 3.4, 3.6, 3.8, 4.0, \
                 4.2, 4.4, 4.6, 4.8, 5.0]
 
-direction = 'python/data/example3/sigma_p_study_mp/'
+direction = 'python/data/example4/sigma_p_study_mp/'
 
 iii = 0
 for sigma_p in sigma_p_list:
 
     iii = iii+1
     # file-name
-    filename = direction + 'mp_breitung_N' + repr(N) + \
+    filename = direction + 'mp_liebscher_N' + repr(N) + \
             '_Nsim' + repr(n_simulations) + '_b' + repr(Nb) + '_' + sampling_method + \
             '_sss' + repr(seed_selection_strategy) + '_sigmap' + repr(iii)
 
+    # parameters for beta-distribution
+    p = 6.0
+    q = 6.0
+    beta_distr = scps.beta(p, q, loc=-2, scale=8)
+
+    # transformation to/from U-space
+    phi     = lambda x: scps.norm.cdf(x)
+    phi_inv = lambda x: scps.norm.ppf(x)
+
+    #CDF     = lambda x: scps.beta.cdf(x, p, q)
+    CDF     = lambda x: beta_distr.cdf(x)
+    #CDF_inv = lambda x: scps.beta.ppf(x, p, q)
+    CDF_inv = lambda x: beta_distr.ppf(x)
+
+    transform_U2X = lambda u: CDF_inv(phi(u))
+    transform_X2U = lambda x: phi_inv(CDF(x))
+
     # limit-state function
-    # LSF = lambda x: np.minimum(5-x[0], 4+x[1])
-    LSF = lambda x: np.minimum(5-x[0], 1/(1+np.exp(-2*(x[1]+4)))-0.5)
+    z   = lambda x: 8* np.exp(-(x[0]**2 + x[1]**2)) + 2* np.exp(-((x[0]-5)**2 + (x[1]-4)**2)) + 1 + x[0]*x[1]/10
+    #LSF = lambda x: 7.5 - z(x)
+    LSF = lambda u: 7.5 - z(transform_U2X(u))
 
     # reference solution from paper
-    pf_mcs       = 3.17e-5
+    pf_mcs       = 4.05e-3
 
     # ---------------------------------------------------------------------------
     # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
@@ -105,6 +125,10 @@ for sigma_p in sigma_p_list:
         pf_hat, theta_temp, g_temp, acc_rate, m_array = \
             mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
         
+        # transform samples back from u to x-space
+        # for j in range(0, len(theta_temp)):
+        #     theta_temp[j] = transform_U2X(theta_temp[j])
+
         # save simulation in list
         pf_list.append(pf_hat)
         g_list.append(g_temp)

@@ -52,7 +52,7 @@ for sigma_p in sigma_p_list:
 
     iii = iii+1
     # file-name
-    filename = 'sus_breitung_N' + repr(N) + \
+    filename = direction + 'sus_breitung_N' + repr(N) + \
             '_Nsim' + repr(n_simulations) + '_' + sampling_method + \
             '_sigmap' + repr(iii)
 

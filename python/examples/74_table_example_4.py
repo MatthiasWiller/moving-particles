@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# File to produce plots for example 1 
+# File to compare LSF calls for example 4 (Liebscher)
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -35,7 +35,7 @@ matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 import utilities.plots as uplt
 import utilities.util as uutil
 
-print("RUN 41_plot_example_1.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)
@@ -44,26 +44,24 @@ np.random.seed(0)
 # STANDARD INPUT
 # ---------------------------------------------------------------------------
 
-savepdf = False
-
 p0 = 0.1
 Nb = 5
 # cov = [0.1, 0.2, 0.3]
-N_mp  = [694, 200, 100]   # seed = (1, 0, 0)
-N_sus = [6000, 1500, 750] # seed = (0, 1, 3)
+N_mp  = [1450, 370, 170]   # seed = (0, 0, 0)
+N_sus = [13500, 3600, 1550] # seed = (0, 0, 0)
 
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
 # ---------------------------------------------------------------------------
-direction = 'python/data/example1/table_data/'
+direction = 'python/data/example4/table_data/'
 
-g_list_sus1 = np.load(direction + 'sus_example_1_d10_N' + repr(N_sus[0]) + '_Nsim100_cs_g_list.npy')
-g_list_sus2 = np.load(direction + 'sus_example_1_d10_N' + repr(N_sus[1]) + '_Nsim100_cs_g_list.npy')
-g_list_sus3 = np.load(direction + 'sus_example_1_d10_N' + repr(N_sus[2]) + '_Nsim100_cs_g_list.npy')
+g_list_sus1 = np.load(direction + 'sus_liebscher_N' + repr(N_sus[0]) + '_Nsim100_cs_g_list.npy')
+g_list_sus2 = np.load(direction + 'sus_liebscher_N' + repr(N_sus[1]) + '_Nsim100_cs_g_list.npy')
+g_list_sus3 = np.load(direction + 'sus_liebscher_N' + repr(N_sus[2]) + '_Nsim100_cs_g_list.npy')
 
-g_list_mp1 = np.load(direction + 'mp_example_1_d10_N' + repr(N_mp[0]) + '_Nsim100_b5_cs_sss2_g_list.npy')
-g_list_mp2 = np.load(direction + 'mp_example_1_d10_N' + repr(N_mp[1]) + '_Nsim100_b5_cs_sss2_g_list.npy')
-g_list_mp3 = np.load(direction + 'mp_example_1_d10_N' + repr(N_mp[2]) + '_Nsim100_b5_cs_sss2_g_list.npy')
+g_list_mp1 = np.load(direction + 'mp_liebscher_N' + repr(N_mp[0]) + '_Nsim100_b5_cs_sss2_g_list.npy')
+g_list_mp2 = np.load(direction + 'mp_liebscher_N' + repr(N_mp[1]) + '_Nsim100_b5_cs_sss2_g_list.npy')
+g_list_mp3 = np.load(direction + 'mp_liebscher_N' + repr(N_mp[2]) + '_Nsim100_b5_cs_sss2_g_list.npy')
 
 
 # ---------------------------------------------------------------------------

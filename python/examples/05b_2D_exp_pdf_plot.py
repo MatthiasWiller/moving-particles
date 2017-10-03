@@ -23,11 +23,21 @@ import matplotlib.pyplot as plt
 import utilities.plots as uplt
 import utilities.stats as ustat
 
+import matplotlib
+import matplotlib.pyplot as plt
+
+from matplotlib.pyplot import cm
+from matplotlib import rcParams
+from matplotlib import ticker
+from matplotlib.ticker import NullFormatter
+
+from mpl_toolkits.mplot3d import Axes3D
+
 matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['font.size'] = 22
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
 
-savepdf = False
+savepdf = True
 
 
 # load data
@@ -44,19 +54,19 @@ c = 0 # correlation rho = 0
 target_PDF = lambda x: (1 - c*(1-x[0]-x[1])+c*c*x[0]*x[1])*np.exp(-(x[0]+x[1]+c*x[0]*x[1]))
 
 
-
 # OUTPUT
 print('E[X1] =', round(theta[0,:].mean(), 5))
 print('E[X2] =', round(theta[1,:].mean(), 5))
 
 ustat.get_acceptance_rate(theta)
 
-
+# ---------------------------------------------------------------------------
 # PLOTS
+# ---------------------------------------------------------------------------
 
-# Mixing
-matplotlib.rcParams['font.size'] = 26
-n_samples = len(theta)
+# MIXING --------------------------------------------------------------------
+matplotlib.rcParams['font.size'] = 24
+n_samples = 1000
 
 plt.figure()
 plt.plot(theta[0,:1000], color='navy')
@@ -71,8 +81,8 @@ plt.tight_layout()
 if savepdf:
     plt.savefig('plot_mixing_' + proposal + '.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
-# Autocorrelation 1
-matplotlib.rcParams['font.size'] = 26
+# AUTOCORRELATION 1 --------------------------------------------------------------------
+matplotlib.rcParams['font.size'] = 24
 
 # compute sample autocorrelation
 lag = 50
@@ -91,7 +101,7 @@ for k in range(0, lag):
 
 # plot results
 plt.figure()
-plt.plot(rho[:22], '.')
+plt.plot(rho[:20], '.')
 
 # set labels
 plt.xlabel(r'Lag, $k$')
@@ -102,11 +112,11 @@ plt.yticks([0, 0.5, 1])
 plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 plt.tight_layout()
 if savepdf:
-    plt.savefig('plot_autocorr_1_'+proposal+'.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot_autocorr_1_' + proposal + '.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
-# Autocorrelation 2
-matplotlib.rcParams['font.size'] = 26
+# AUTOCORRELATION 2 --------------------------------------------------------------------
+matplotlib.rcParams['font.size'] = 24
 
 # compute sample autocorrelation
 lag = 50
@@ -125,7 +135,7 @@ for k in range(0, lag):
 
 # plot results
 plt.figure()
-plt.plot(rho[:22], '.')
+plt.plot(rho[:20], '.')
 
 # set labels
 plt.xlabel(r'Lag, $k$')
@@ -138,16 +148,13 @@ plt.tight_layout()
 if savepdf:
     plt.savefig('plot_autocorr_2_'+proposal+'.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
-plt.show()
 
-
-# PLOT SCATTER WITH HISTOGRAMS
-
-x = theta
+# PLOT SCATTER WITH HISTOGRAMS ----------------------------------------------------------------
+x = theta[:,:5000]
 nullfmt = NullFormatter()         # no labels
 
 n_grid = 100
-xx       = np.linspace(-5, 5, n_grid)
+xx       = np.linspace(0, 5, n_grid)
 X, Y    = np.meshgrid(xx, xx)
 Z = np.zeros((n_grid, n_grid))
 for i in range(0, len(X)):
@@ -188,7 +195,7 @@ axScatter.scatter(x[0, :], x[1, :], marker='o', facecolors='None', \
 binwidth = 0.10
 
 # choose limits of the plot
-lowerlim = -8
+lowerlim = -1
 upperlim = 8
 
 # set limits of scatter plot
@@ -213,8 +220,8 @@ axHistx.set_xlim(axScatter.get_xlim())
 axHisty.set_ylim(axScatter.get_ylim())
 
 # set labels
-axHistx.set_ylabel(r'$f_{X_1}(x)$')
-axHisty.set_xlabel(r'$f_{X_2}(x)$')
+axHistx.set_ylabel(r'$f_{X_2}(x_2)$')
+axHisty.set_xlabel(r'$f_{X_1}(x_1)$')
 
 axScatter.set_xlabel(r'$x_1$')
 axScatter.set_ylabel(r'$x_2$')
@@ -226,11 +233,38 @@ axHistx.set_ylim([0, 0.8])
 axHisty.set_xticks([0,0.5])
 axHisty.set_xlim([0,0.8])
 
-axScatter.set_xticks([-5,0,5])
-axScatter.set_yticks([-5,0,5])
+axScatter.set_xticks([0, 5])
+axScatter.set_yticks([0, 5])
 
 if savepdf:
     # tight layout not possible here !
-    plt.savefig('plot_scatter_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot_scatter_with_hist_' + proposal + '.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+
+
+# PLOT PDF in 3D ---------------------------------------------------------------------
+fig = plt.figure()
+
+ax = fig.gca(projection='3d')
+ax.plot_surface(X, Y, Z, rstride=20, cstride=20, cmap=cm.pink_r, antialiased=False, alpha=1.0)
+ax.plot_wireframe(X, Y, Z, rstride=20, cstride=20, linewidth=0.5, color='black', alpha=1.0)
+ax.view_init(elev=35, azim=-35)
+
+# axes and title config
+axx = ax.set_xlabel('$x_1$', labelpad=15)
+ax.xaxis.set_rotate_label(False) # disable automatic rotation
+axy = ax.set_ylabel('$x_2$', rotation = 0, labelpad=15)
+ax.yaxis.set_rotate_label(False)
+axz = ax.set_zlabel('$f(x_1, x_2)$',rotation=93, labelpad=7)
+ax.zaxis.set_rotate_label(False)
+# ax.set_xlim3d(min_x, max_x)
+# ax.set_ylim3d(min_y, max_y)
+ax.set_xticks([0, 5])
+ax.set_yticks([0, 5])
+ax.set_zticks([0.5, 1.0])
+
+if savepdf:
+    plt.savefig('plot_multivariate_PDF_3D.pdf', format='pdf', dpi=50, bbox_inches='tight', pad_inches=0.4)
+
 
 plt.show()

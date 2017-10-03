@@ -68,4 +68,5 @@ plt.show()
 print('E[X1] =', round(theta[0,:].mean(), 5))
 print('E[X2] =', round(theta[1,:].mean(), 5))
 
-# np.save('python/data/samples_2D_exp_pdf_mh.npy', theta)
+np.save('python/data/samples_2D_exp_pdf_mh.npy', theta)
+print("\n> File was successfully saved!")

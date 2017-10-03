@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# File to produce plots for example 1 
+# File to produce plots for examples 1-4
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -36,11 +36,10 @@ np.random.seed(0)
 # STANDARD INPUT
 # ---------------------------------------------------------------------------
 
-plotpdf = False
-example = 2
+savepdf = True
+example = 3
 
 # parameters
-N  = 100       # MP: Number of initial samples 
 Nb = 5        # MP: max number of burnins
 
 # nsamples_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -50,7 +49,6 @@ nsamples_list = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
 # ---------------------------------------------------------------------------
 # EXAMPLE INPUT
 # ---------------------------------------------------------------------------
-
 
 if example == 1:
     # limit-state function
@@ -99,7 +97,7 @@ elif example == 4:
     LSF = lambda x: 7.5 - z(x)
 
     # reference solution from paper/MCS
-    pf_ref = 4.05e-3
+    pf_ref = 4.42e-3
 
     # example_name
     example_name = 'liebscher'
@@ -107,7 +105,7 @@ elif example == 4:
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
 # ---------------------------------------------------------------------------
-direction = 'python/data/example' + repr(example) + '/nsamples_study/'
+direction = 'python/data/example' + repr(example) + '/nsamples_study_mp/'
 
 g_list_list_sss0 = []
 g_list_list_sss1 = []
@@ -118,32 +116,32 @@ g_list_list_sss5 = []
 
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +\
+    g_list_mp_tmp = np.load(direction + 'mp_' + example_name + '_N'+ repr(N) +\
                                         '_Nsim100_b'+ repr(Nb) +'_cs_sss0_g_list.npy')
     g_list_list_sss0.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +\
+    g_list_mp_tmp = np.load(direction + 'mp_' + example_name + '_N'+ repr(N) +\
                                         '_Nsim100_b'+ repr(Nb) +'_cs_sss1_g_list.npy')
     g_list_list_sss1.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +\
+    g_list_mp_tmp = np.load(direction + 'mp_' + example_name + '_N'+ repr(N) +\
                                         '_Nsim100_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
     g_list_list_sss2.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +\
+    g_list_mp_tmp = np.load(direction + 'mp_' + example_name + '_N'+ repr(N) +\
                                         '_Nsim100_b'+ repr(Nb) +'_cs_sss3_g_list.npy')
     g_list_list_sss3.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +\
+    g_list_mp_tmp = np.load(direction + 'mp_' + example_name + '_N'+ repr(N) +\
                                         '_Nsim100_b'+ repr(Nb) +'_cs_sss4_g_list.npy')
     g_list_list_sss4.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +\
+    g_list_mp_tmp = np.load(direction + 'mp_' + example_name + '_N'+ repr(N) +\
                                         '_Nsim100_b'+ repr(Nb) +'_cs_sss5_g_list.npy')
     g_list_list_sss5.append(g_list_mp_tmp)
 
@@ -199,8 +197,8 @@ for i in range(0, len(nsamples_list)):
 
 # seed selection strategy 5
 for i in range(0, len(nsamples_list)):
-    pf_mean_array_sss4[i], cov_at_pf_array_sss4[i] = \
-        uutil.get_mean_and_cov_pf_from_MP(g_list_list_sss4[i], nsamples_list[i])
+    pf_mean_array_sss5[i], cov_at_pf_array_sss5[i] = \
+        uutil.get_mean_and_cov_pf_from_MP(g_list_list_sss5[i], nsamples_list[i])
 
 # analytical expression
 pf_ref = np.ones(len(nsamples_list), float) * pf_ref
@@ -213,8 +211,8 @@ for i in range(0,len(nsamples_list)):
 # ---------------------------------------------------------------------------
 # plot cov over b
 plt.figure()
-plt.plot(nsamples_list, cov_ref,'.-', label=r'MP analytical', color='C0')
-plt.plot(nsamples_list, cov_at_pf_array_sss0,'+-', label=r'Strategy 0', color='C1')
+plt.plot(nsamples_list, cov_ref,'-', label=r'MP analytical', color='C0')
+# plt.plot(nsamples_list, cov_at_pf_array_sss0,'+-', label=r'Strategy 0', color='C1')
 plt.plot(nsamples_list, cov_at_pf_array_sss1,'x-', label=r'Strategy 1', color='C2')
 plt.plot(nsamples_list, cov_at_pf_array_sss2,'v-', label=r'Strategy 2', color='C3')
 # plt.plot(nsamples_list, cov_at_pf_array_sss3,'s-', label=r'Strategy 3', color='C4')
@@ -226,14 +224,14 @@ plt.xlabel(r'Number of samples, $N$')
 plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
-if plotpdf:
-    plt.savefig('nsamples_study_cov_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
+if savepdf:
+    plt.savefig('nsamples_study_cov_over_b_mp.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # plot pf over b
 plt.figure()
-plt.plot(nsamples_list, pf_ref,'.-', label=r'analytical', color='C0')
-plt.plot(nsamples_list, pf_mean_array_sss0,'+-', label=r'Strategy 0', color='C1')
+plt.plot(nsamples_list, pf_ref,'-', label=r'analytical', color='C0')
+# plt.plot(nsamples_list, pf_mean_array_sss0,'+-', label=r'Strategy 0', color='C1')
 plt.plot(nsamples_list, pf_mean_array_sss1,'x-', label=r'Strategy 1', color='C2')
 plt.plot(nsamples_list, pf_mean_array_sss2,'v-', label=r'Strategy 2', color='C3')
 # plt.plot(nsamples_list, pf_mean_array_sss3,'s-', label=r'Strategy 3', color='C4')
@@ -241,13 +239,15 @@ plt.plot(nsamples_list, pf_mean_array_sss2,'v-', label=r'Strategy 2', color='C3'
 plt.plot(nsamples_list, pf_mean_array_sss5,'*-', label=r'Strategy 5', color='C6')
 
 plt.yscale('log')
+if example == 3:
+    plt.ylim([1e-5, 2e-4])
 
 plt.legend()
 plt.xlabel(r'Number of samples, $N$')
 plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
-if plotpdf:
-    plt.savefig('nsamples_study_pf_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
+if savepdf:
+    plt.savefig('nsamples_study_pf_over_b_mp.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()

@@ -92,11 +92,4 @@ print('E[X1] =', round(theta_x[0,:].mean(), 5))
 print('E[X2] =', round(theta_x[1,:].mean(), 5))
 
 np.save('python/data/samples_2D_pdf_cs.npy', theta_x)
-
-# plot samples
-#uplt.plot_hist(theta[0,:], target_PDF, 2)
-# uplt.plot_scatter_with_contour(theta_x, target_PDF)
-# uplt.plot_mixing(theta[0, :1000])
-# uplt.plot_scatter_with_hist(theta[:, :5000], target_PDF)
-# uplt.plot_autocorr(theta[0,:], 50, 1)
-# uplt.plot_autocorr(theta[1,:], 50, 2)
+print("\n> File was successfully saved!")

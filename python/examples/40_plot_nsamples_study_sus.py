@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# File to produce plots for example 1 
+# File to produce plots for examples 1-4
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -36,20 +36,21 @@ np.random.seed(0)
 # STANDARD INPUT
 # ---------------------------------------------------------------------------
 
-savepdf = True
-example = 4
+plotpdf = True
+example = 3
 
 # parameters
-N = 100       # MP: Number of initial samples 
+p0 = 0.1       # SUS: Probability of each subset, chosen adaptively
 
-burn_in_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+# nsamples_list = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+nsamples_list = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000, 5000]
 
 # ---------------------------------------------------------------------------
 # EXAMPLE INPUT
 # ---------------------------------------------------------------------------
 
+
 if example == 1:
-    d = 10
     # limit-state function
     #beta = 5.1993       # for pf = 10^-7
     #beta = 4.7534       # for pf = 10^-6
@@ -77,6 +78,7 @@ elif example == 2:
     # example_name
     example_name = 'waarts'
 
+
 elif example == 3:
     # limit-state function
     # LSF = lambda x: np.minimum(5-x[0], 4+x[1])
@@ -100,87 +102,70 @@ elif example == 4:
     # example_name
     example_name = 'liebscher'
 
-
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
 # ---------------------------------------------------------------------------
-direction = 'python/data/example' + repr(example) + '/burnin_study/'
+direction = 'python/data/example' + repr(example) + '/nsamples_study_sus/'
 
 g_list_list = []
 
-for Nb in burn_in_list:
-    g_list_mp_tmp = np.load(direction + 'mp_' + example_name +'_N100_Nsim100_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
+for N in nsamples_list:
+    g_list_mp_tmp = np.load(direction + 'sus_' + example_name + '_N'+ repr(N) +'_Nsim100_cs_g_list.npy')
     g_list_list.append(g_list_mp_tmp)
+
 
 # ---------------------------------------------------------------------------
 # POST-PROCESSING
 # ---------------------------------------------------------------------------
 
 # initialization
-cov_at_pf_array = np.zeros(len(burn_in_list), float)
-pf_mean_array = np.zeros(len(burn_in_list), float)
+cov_at_pf_array = np.zeros(len(nsamples_list), float)
+pf_mean_array   = np.zeros(len(nsamples_list), float)
 
-for i in range(0, len(burn_in_list)):
-    pf_mean_array[i], cov_at_pf_array[i] = uutil.get_mean_and_cov_pf_from_MP(g_list_list[i], N)
+for i in range(0, len(nsamples_list)):
+    pf_mean_array[i], cov_at_pf_array[i] = \
+        uutil.get_mean_and_cov_pf_from_SUS(g_list_list[i], nsamples_list[i], p0)
 
 # analytical expression
-pf_ref  = np.ones(len(burn_in_list), float) * pf_ref
-cov_ref = np.ones(len(burn_in_list), float) * np.sqrt(pf_ref**(-1/N)-1)
+pf_ref = np.ones(len(nsamples_list), float) * pf_ref
+# cov_ref = np.zeros(len(nsamples_list), float)
+# for i in range(0, len(nsamples_list)):
+#     cov_ref[i] = np.sqrt(pf_ref[i]**(-1/nsamples_list[i])-1)
 
 # ---------------------------------------------------------------------------
 # PLOTS
 # ---------------------------------------------------------------------------
 # plot cov over b
 plt.figure()
-plt.plot(burn_in_list, cov_ref,'-', label=r'MP analytical')
-plt.plot(burn_in_list, cov_at_pf_array,'+-', label=r'MP Strategy 2')
+plt.plot(nsamples_list, cov_at_pf_array,'+-', label=r'SuS', color='C1')
 
 plt.legend()
-plt.xlabel(r'Burn-in, $N_b$')
+plt.xlabel(r'Number of samples, $N$')
 plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
-if savepdf:
-    plt.savefig('burnin_study_cov_over_Nb.pdf', format='pdf', dpi=50, bbox_inches='tight')
+if plotpdf:
+    plt.savefig('nsamples_study_cov_over_b_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # plot pf over b
 plt.figure()
-plt.plot(burn_in_list, pf_ref,'-', label=r'Reference (MCS)')
-plt.plot(burn_in_list, pf_mean_array,'v-', label=r'MP Strategy 2')
-
-# plt.yticks([])
+plt.plot(nsamples_list, pf_ref,'-', label=r'Reference (MCS)', color='C0')
+plt.plot(nsamples_list, pf_mean_array,'+-', label=r'SuS', color='C1')
 
 
 plt.yscale('log')
-
 if example == 2:
     plt.ylim([2e-3, 3e-3])
-
 if example == 3:
-    plt.ylim([2e-5, 4e-5])
-
-if example == 4:
-    plt.ylim([1e-3, 1e-2])
-
-# ax = plt.gca()
-# ax.set_yscale('log')
-# ax.set_ylim([1e-3, 1e-2])
-# ax.set_yticks([0.01, 0.001])
-# ax.get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-
-# yticks = ax.yaxis.get_major_ticks()
-# for i in range(1, len(yticks)-1):
-#     print(i)
-#     yticks[i].label1.set_visible(False)
-
+    plt.ylim([1e-5, 2e-4])
 
 plt.legend()
-plt.xlabel(r'Burn-in, $N_b$')
+plt.xlabel(r'Number of samples, $N$')
 plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
-if savepdf:
-    plt.savefig('burnin_study_pf_over_Nb.pdf', format='pdf', dpi=50, bbox_inches='tight')
+if plotpdf:
+    plt.savefig('nsamples_study_pf_over_b_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()
