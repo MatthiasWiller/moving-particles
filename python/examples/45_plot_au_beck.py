@@ -43,7 +43,7 @@ n_initial_samples   = 100       # MP: Number of initial samples
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
 # ---------------------------------------------------------------------------
-direction = 'python/data/'
+direction = 'python/data/example5/fixed_ncall_data/'
 
 mcs_data = np.loadtxt(direction + 'mcs_au_beck_N10000000.txt', delimiter=',')
 # g_list_mcs = mcs_data[:,1]

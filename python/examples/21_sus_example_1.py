@@ -39,7 +39,7 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-n_samples_per_level = 6000  # number of samples per conditional level
+n_samples_per_level = 1000  # number of samples per conditional level
 d                   = 10    # number of dimensions
 p0                  = 0.1   # Probability of each subset, chosen adaptively
 sampling_method     = 'cs'  # 'mmh' = Modified Metropolis Hastings
@@ -48,15 +48,17 @@ sampling_method     = 'cs'  # 'mmh' = Modified Metropolis Hastings
 n_simulations       = 100   # Number of Simulations
 
 # file-name
-filename = 'python/data/sus_example_1_d' + repr(d) +'_N' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
+filename = 'python/data/sus_example_1_d' + repr(d) +'_N' + repr(n_samples_per_level) + \
+           '_Nsim' + repr(n_simulations) + '_' + sampling_method + '_pf1e-12'
 
 # limit-state function
-#beta = 5.1993       # for pf = 10^-7
-#beta = 4.7534       # for pf = 10^-6
-#beta = 4.2649       # for pf = 10^-5
-#beta = 3.7190       # for pf = 10^-4
-beta = 3.0902       # for pf = 10^-3
-#beta = 2.3263       # for pf = 10^-2
+beta = 7.0345       # for pf = 10^-12
+# beta = 5.9978       # for pf = 10^-9
+# beta = 4.7534       # for pf = 10^-6
+# beta = 4.2649       # for pf = 10^-5
+# beta = 3.7190       # for pf = 10^-4
+# beta = 3.0902       # for pf = 10^-3
+# beta = 2.3263       # for pf = 10^-2
 LSF  = lambda u: u.sum(axis=0)/np.sqrt(d) + beta
 
 # analytical CDF
@@ -152,5 +154,5 @@ print("> Coefficient of Variation (Analytical)\t=", round(cov_analytical, 8))
 # ---------------------------------------------------------------------------
 
 np.save(filename + '_g_list.npy', g_list)
-# np.save(filename + '_theta_list.npy', theta_list)
+np.save(filename + '_theta_list.npy', theta_list)
 print("\n> File was successfully saved as:", filename)

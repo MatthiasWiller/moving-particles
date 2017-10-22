@@ -181,7 +181,7 @@ cov_analytical = np.ones(b_max, float) * np.sqrt(pf_analytical**(-1/n_initial_sa
 # plot cov over b
 plt.figure()
 burn_in_list = [i for i in range(1, b_max+1)]
-plt.plot(burn_in_list, cov_analytical,'.-', label=r'Analytical')
+plt.plot(burn_in_list, cov_analytical,'-', label=r'Analytical')
 # plt.plot(burn_in_list, cov_at_pf_array_sss0,'+-', label=r'Strategy 0')
 plt.plot(burn_in_list, cov_at_pf_array_sss1,'x-', label=r'Strategy 1')
 plt.plot(burn_in_list, cov_at_pf_array_sss2,'v-', label=r'Strategy 2')
@@ -195,18 +195,18 @@ plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
 if savepdf:
-    plt.savefig('burnin_study_cov_over_Nb_d1000.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('burnin_study_cov_over_Nb.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # plot pf over b
 plt.figure()
-plt.plot(burn_in_list, pf_analytical,'.-', label=r'Analytical')
+plt.plot(burn_in_list, pf_analytical,'-', label=r'Analytical')
 # plt.plot(burn_in_list, pf_mean_array_sss0,'+-', label=r'Strategy 0')
-plt.plot(burn_in_list, pf_mean_array_sss1,'x-', label=r'Strategy 1')
+# plt.plot(burn_in_list, pf_mean_array_sss1,'x-', label=r'Strategy 1')
 plt.plot(burn_in_list, pf_mean_array_sss2,'v-', label=r'Strategy 2')
 # plt.plot(burn_in_list, pf_mean_array_sss3,'*-', label=r'Strategy 3')
 # plt.plot(burn_in_list, pf_mean_array_sss4,'d-', label=r'Strategy 4')
-plt.plot(burn_in_list, pf_mean_array_sss5,'s-', label=r'Strategy 5')
+# plt.plot(burn_in_list, pf_mean_array_sss5,'s-', label=r'Strategy 5')
 
 plt.yscale('log')
 
@@ -216,6 +216,6 @@ plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
 if savepdf:
-    plt.savefig('burnin_study_pf_over_Nb_d1000.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('burnin_study_pf_over_Nb.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()

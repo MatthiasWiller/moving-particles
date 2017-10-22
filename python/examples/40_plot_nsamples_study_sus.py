@@ -37,7 +37,7 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 plotpdf = True
-example = 3
+example = 4
 
 # parameters
 p0 = 0.1       # SUS: Probability of each subset, chosen adaptively
@@ -137,7 +137,7 @@ pf_ref = np.ones(len(nsamples_list), float) * pf_ref
 # ---------------------------------------------------------------------------
 # plot cov over b
 plt.figure()
-plt.plot(nsamples_list, cov_at_pf_array,'+-', label=r'SuS', color='C1')
+plt.plot(nsamples_list, cov_at_pf_array,'+-', label=r'SuS', color='C2')
 
 plt.legend()
 plt.xlabel(r'Number of samples, $N$')
@@ -145,13 +145,13 @@ plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
 if plotpdf:
-    plt.savefig('nsamples_study_cov_over_b_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('nsamples_study_cov_over_N_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # plot pf over b
 plt.figure()
 plt.plot(nsamples_list, pf_ref,'-', label=r'Reference (MCS)', color='C0')
-plt.plot(nsamples_list, pf_mean_array,'+-', label=r'SuS', color='C1')
+plt.plot(nsamples_list, pf_mean_array,'+-', label=r'SuS', color='C2')
 
 
 plt.yscale('log')
@@ -159,6 +159,8 @@ if example == 2:
     plt.ylim([2e-3, 3e-3])
 if example == 3:
     plt.ylim([1e-5, 2e-4])
+if example == 4:
+    plt.ylim([3e-3, 6e-3])
 
 plt.legend()
 plt.xlabel(r'Number of samples, $N$')
@@ -166,6 +168,6 @@ plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
 if plotpdf:
-    plt.savefig('nsamples_study_pf_over_b_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('nsamples_study_pf_over_N_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()

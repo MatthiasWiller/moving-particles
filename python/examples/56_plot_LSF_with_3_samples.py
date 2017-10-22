@@ -27,9 +27,9 @@ from matplotlib import ticker
 
 # INPUT 
 
-example = 2
-# savepdf = False
+example = 3
 savepdf = True
+# savepdf = True
 
 # load data
 direction = 'python/data/'
@@ -278,6 +278,29 @@ elif example == 3:
     if savepdf:
         plt.savefig('example'+ repr(example) +'_lsf_w_samples_2D.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
+
+    fig = plt.figure()
+
+    for i in range(0, len(sample_id_list)):
+        sample = sample_id_list[i]
+        theta = np.array(theta_list[sample])
+        m = theta.shape[0]
+        g = np.zeros(m)
+        for j in range(0,m):
+            g[j] = LSF(theta[j, :])
+
+        plt.plot(g, linestyle[i])
+
+
+        
+
+    plt.xlabel(r'$m$')
+    plt.ylabel(r'Limit state function value, $g(X)$')
+
+    plt.tight_layout()
+    if savepdf:
+        plt.savefig('example' + repr(example) + '_lsf_over_m.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    
     plt.show()
 
 

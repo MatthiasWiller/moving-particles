@@ -73,7 +73,7 @@ for N in nsamples_list:
     LSF = lambda u: 7.5 - z(transform_U2X(u))
 
     # reference solution from paper
-    pf_mcs       = 4.05e-3
+    pf_mcs       = 4.42e-3
 
     # ---------------------------------------------------------------------------
     # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)

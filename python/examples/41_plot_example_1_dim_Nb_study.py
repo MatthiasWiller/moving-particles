@@ -48,10 +48,9 @@ n_samples_per_level = 1000      # SUS: number of samples per conditional level
 p0                  = 0.1       # SUS: Probability of each subset, chosen adaptively
 
 n_initial_samples   = 100       # MP: Number of initial samples 
-b_max               = 10        # MP: max number of burnins
 
-# burn_in_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-burn_in_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+burn_in_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+# burn_in_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 dim_list = [10, 100, 1000]
 
@@ -79,15 +78,15 @@ g_list_list_d1000 = []
 
 
 for Nb in burn_in_list:
-    g_list_mp_tmp = np.load(direction + 'burnin_study_d10/mp_example_1_d10_N100_Nsim50_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'burnin_study_d10/mp_example_1_d10_N100_Nsim100_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
     g_list_list_d10.append(g_list_mp_tmp)
 
 for Nb in burn_in_list:
-    g_list_mp_tmp = np.load(direction + 'burnin_study_d100/mp_example_1_d100_N100_Nsim50_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'burnin_study_d100/mp_example_1_d100_N100_Nsim100_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
     g_list_list_d100.append(g_list_mp_tmp)
 
 for Nb in burn_in_list:
-    g_list_mp_tmp = np.load(direction + 'burnin_study_d1000/mp_example_1_d1000_N100_Nsim50_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'burnin_study_d1000/mp_example_1_d1000_N100_Nsim100_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
     g_list_list_d1000.append(g_list_mp_tmp)
 
 
@@ -131,16 +130,15 @@ for i in range(0, len(burn_in_list)):
     pf_mean_array_d1000[i] = pf_line_mean_mp[0]
 
 # analytical expression
-pf_analytical = np.ones(b_max, float) * analytical_CDF(0)
-cov_analytical = np.ones(b_max, float) * np.sqrt(pf_analytical**(-1/n_initial_samples)-1)
+pf_analytical = np.ones(len(burn_in_list), float) * analytical_CDF(0)
+cov_analytical = np.ones(len(burn_in_list), float) * np.sqrt(pf_analytical**(-1/n_initial_samples)-1)
 
 # ---------------------------------------------------------------------------
 # PLOTS
 # ---------------------------------------------------------------------------
 # plot cov over b
 plt.figure()
-burn_in_list = [i for i in range(1, b_max+1)]
-plt.plot(burn_in_list, cov_analytical,'.-', label=r'Analytical')
+plt.plot(burn_in_list, cov_analytical,'-', label=r'Analytical')
 plt.plot(burn_in_list, cov_at_pf_array_d10,'+-', label=r'd=10')
 plt.plot(burn_in_list, cov_at_pf_array_d100,'x-', label=r'd=100')
 plt.plot(burn_in_list, cov_at_pf_array_d1000,'v-', label=r'd=1000')
@@ -157,7 +155,7 @@ if savepdf:
 
 # plot pf over b
 plt.figure()
-plt.plot(burn_in_list, pf_analytical,'.-', label=r'Analytical')
+plt.plot(burn_in_list, pf_analytical,'-', label=r'Analytical')
 plt.plot(burn_in_list, pf_mean_array_d10,'+-', label=r'd=10')
 plt.plot(burn_in_list, pf_mean_array_d100,'x-', label=r'd=100')
 plt.plot(burn_in_list, pf_mean_array_d1000,'v-', label=r'd=1000')

@@ -29,7 +29,7 @@ matplotlib.rcParams['text.usetex'] = True
 # ---------------------------------------------------------------------------
 
 savepdf = True
-example = 3
+example = 4
 
 
 # ---------------------------------------------------------------------------
@@ -97,6 +97,8 @@ for i in range(0, len(nsamples_list_sus)):
 direction = 'python/data/example' + repr(example) + '/nsamples_study_mp/'
 nsamples_list_mp = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, \
                 30, 40, 50, 60, 70, 80, 90, 100]
+if example == 4:
+    nsamples_list_mp = [100, 200, 300, 400, 500]
 
 ncall_points_mp = np.zeros(len(nsamples_list_mp))
 cov_points_mp = np.zeros(len(nsamples_list_mp))
@@ -126,11 +128,11 @@ ncall_line_mp  = moving_particles(pf_ref, delta_line, Nb)
 
 plt.figure()
 plt.plot(ncall_line_mcs, delta_line, color='C0', label='MCS')
-plt.plot(ncall_line_sus, delta_line, color='C1', label='SuS')
-plt.plot(ncall_line_mp, delta_line, color='C2', label='MP')
+plt.plot(ncall_line_sus, delta_line, color='C2', label='SuS')
+plt.plot(ncall_line_mp, delta_line, color='C1', label='MP')
 
-plt.plot(ncall_points_sus, cov_points_sus, '.', color='C1')
-plt.plot(ncall_points_mp, cov_points_mp, '.', color='C2' )
+plt.plot(ncall_points_sus, cov_points_sus, '.', color='C2')
+plt.plot(ncall_points_mp, cov_points_mp, '.', color='C1' )
 
 # legend
 plt.legend()

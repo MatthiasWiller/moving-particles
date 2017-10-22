@@ -40,7 +40,7 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 5000          # number of samples per conditional level
+N = 1000          # number of samples per conditional level
 p0                  = 0.1          # Probability of each subset, chosen adaptively
 sampling_method     = 'cs'         # 'mmh' = Modified Metropolis Hastings
                                    # 'cs'  = Conditional Sampling
@@ -88,7 +88,7 @@ f_marg_PDF_list.append(f_marg_PDF)
 if sampling_method == 'mmh':
      sampler = mmh.ModifiedMetropolisHastings(sample_marg_PDF_list, f_marg_PDF_list, 'gaussian')
 elif sampling_method == 'cs':
-    sampler = cs.CondSampling(sample_marg_PDF_list, 0.8)
+    sampler = cs.CondSampling(sample_marg_PDF_list, 0)
 elif sampling_method == 'acs':
     sampler = acs.AdaptiveCondSampling(sample_marg_PDF_list, 0.1)
 

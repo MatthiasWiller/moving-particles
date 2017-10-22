@@ -53,7 +53,7 @@ n_initial_samples   = 100       # MP: Number of initial samples
 
 
 if sampling_method == 'cs':
-    sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     mtxt = r'CS'
 
 elif sampling_method == 'mmh':
@@ -203,26 +203,33 @@ plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
 if savepdf:
-    plt.savefig('sigma_p_study_cov_over_b_' + sampling_method + '_' + algorithm + '.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('sigma_p_study_cov_over_sigma_' + sampling_method + '_' + algorithm + '.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 # plot pf over d
 plt.figure()
 if algorithm == 'mp':
+    # plt.plot(sigma_p_list, pf_ref,'-', label=r'Analytical', color='C0')
     plt.plot(sigma_p_list, pf_ref,'-', label=r'Reference (MCS)', color='C0')
     plt.plot(sigma_p_list, pf_mean_array_mp,'+-', label=r'MP with '+mtxt, color='C1')
 elif algorithm == 'sus':
+    # plt.plot(sigma_p_list, pf_ref,'-', label=r'Analytical', color='C0')
     plt.plot(sigma_p_list, pf_ref,'-', label=r'Reference (MCS)', color='C0')
     plt.plot(sigma_p_list, pf_mean_array_sus,'x-', label=r'SuS with '+mtxt, color='C2')
 elif algorithm == 'susvsmp':
+    # plt.plot(sigma_p_list, pf_ref,'-', label=r'Analytical', color='C0')
     plt.plot(sigma_p_list, pf_ref,'-', label=r'Reference (MCS)', color='C0')
     plt.plot(sigma_p_list, pf_mean_array_mp,'+-', label=r'MP with '+mtxt, color='C1')
     plt.plot(sigma_p_list, pf_mean_array_sus,'x-', label=r'SuS with '+mtxt, color='C2')
 
 plt.yscale('log')
+if example == 1:
+    plt.ylim([6e-4, 2e-3])
 if example == 2:
     plt.ylim([2e-3, 3e-3])
 if example == 3:
     plt.ylim([1e-5, 1e-4])
+if example == 4:
+    plt.ylim([3e-3, 6e-3])
 
 plt.legend()
 plt.xlabel(r'Standard deviation, $\sigma_P$')
@@ -230,6 +237,6 @@ plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
 if savepdf:
-    plt.savefig('sigma_p_study_pf_over_b_' + sampling_method + '_' + algorithm + '.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('sigma_p_study_pf_over_sigma_' + sampling_method + '_' + algorithm + '.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()

@@ -31,8 +31,9 @@ import algorithms.sus as sus
 import SDOF as sdof
 
 import utilities.stats as ustat
+import utilities.util as uutil
 
-print("RUN 24_sus_au_beck.py")
+print("RUN 25_sus_au_beck.py")
 
 # set seed for randomization
 np.random.seed(0)
@@ -57,21 +58,25 @@ W = lambda theta: np.sqrt(2*np.pi*S/dt)*theta   # random excitation
 # ---------------------------------------------------------------------------
 
 # parameters
-n_samples_per_level = 500          # number of samples per conditional level
+n_samples_per_level = 1000          # number of samples per conditional level
 p0                  = 0.1          # Probability of each subset, chosen adaptively
-sampling_method     = 'acs'         # 'mmh' = Modified Metropolis Hastings
+sampling_method     = 'cs'         # 'mmh' = Modified Metropolis Hastings
                                     # 'cs'  = Conditional Sampling
                                     # 'acs' = adaptive Conditional Sampling
-n_simulations       = 2             # Number of Simulations
+n_simulations       = 100             # Number of Simulations
 
 
 # file-name
-filename = 'python/data/sus_au_beck_Nspl' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
+direction = 'python/data/'
+filename = direction + 'sus_au_beck_N' + repr(n_samples_per_level) + '_Nsim' + repr(n_simulations) + '_' + sampling_method
 
 
 # limit-state function
 max_thresh = 2.4    # See Fig.(1) Ref.(1)
 lsf = lambda theta: sdof.LSF(theta, t, W, max_thresh)
+
+# reference solution from MCS
+pf_mcs = 0
 
 # ---------------------------------------------------------------------------
 # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)
@@ -114,9 +119,8 @@ g_list       = []
 
 
 print('\n> START Sampling')
-startTime = timer.time()
-
-for i in range(0, n_simulations):
+start_time = timer.time()
+for sim in range(0, n_simulations):
     # perform SubSim
     p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, lsf, sampler)
 
@@ -124,10 +128,11 @@ for i in range(0, n_simulations):
     p_F_SS_list.append(p_F_SS)
     theta_list.append(theta)
     g_list.append(g)
-    print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
+
+    uutil.print_simulation_progress(sim, n_simulations, start_time)
 
 
-print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
+print("\n> Time needed for Sampling =", round(timer.time() - start_time, 2), "s")
 
 # computing cov
 print('\n> START Computing C.O.V')
@@ -149,7 +154,7 @@ cov_estimation = sigma_pf_ss/mu_pf_ss
 
 print("\nSTART Results:")
 print("> Probability of Failure (SubSim Est.)\t=", round(mu_pf_ss, 8))
-print("> Probability of Failure (MCS) \t\t=", round(mu_pf_mcs, 8))
+print("> Probability of Failure (Monte Carlo) \t\t=", round(pf_mcs, 8))
 print("> Coefficient of Variation (Estimation)\t=", round(cov_estimation, 8))
 print("> Coefficient of Variation (Analytical)\t=", round(cov_analytical, 8))
 
@@ -159,5 +164,5 @@ print("> Coefficient of Variation (Analytical)\t=", round(cov_analytical, 8))
 # ---------------------------------------------------------------------------
 
 np.save(filename + '_g_list.npy', g_list)
-np.save(filename + '_theta_list.npy', theta_list)
+# np.save(filename + '_theta_list.npy', theta_list)
 print("\n> File was successfully saved as:", filename)

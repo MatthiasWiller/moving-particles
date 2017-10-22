@@ -222,6 +222,31 @@ def get_mean_and_cov_pf_from_SUS(g_list_list, number_of_samples_per_level, p0):
     pf_cov = np.std(pf_array)/pf_mean
     return pf_mean, pf_cov
 
+
+# ---------------------------------------------------------------------------
+def get_pf_array_from_MP(g_list_list, number_of_samples):
+    nsim = len(g_list_list)
+    pf_array = np.zeros(nsim)
+    for i in range(0, nsim):
+        m = len(g_list_list[i]) - number_of_samples
+        pf_array[i] = (1 - 1/number_of_samples)**m
+
+    return pf_array
+
+
+# ---------------------------------------------------------------------------
+def get_pf_array_from_SUS(g_list_list, number_of_samples_per_level, p0):
+    nsim = len(g_list_list)
+    pf_array = np.zeros(nsim)
+    for i in range(0, nsim):
+        nlvl = len(g_list_list[i])
+        g_lvl = np.array(g_list_list[i][-1])
+        n_fail = np.ones(number_of_samples_per_level, float)
+        n_fail = n_fail[g_lvl<0]
+        pf_array[i] = p0**(nlvl-1)*np.sum(n_fail)/number_of_samples_per_level
+
+    return pf_array
+
 # ---------------------------------------------------------------------------
 def print_simulation_progress(current_iteration, total_number_of_iterations, start_time=0):
     progress_percent = current_iteration/total_number_of_iterations*100

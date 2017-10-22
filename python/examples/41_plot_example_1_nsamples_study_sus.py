@@ -36,7 +36,7 @@ np.random.seed(0)
 # STANDARD INPUT
 # ---------------------------------------------------------------------------
 
-plotpdf = True
+savepdf = True
 
 # parameters
 d  = 10        # number of dimensions
@@ -97,33 +97,34 @@ for i in range(0,len(nsamples_list)):
 # ---------------------------------------------------------------------------
 # PLOTS
 # ---------------------------------------------------------------------------
-# plot cov over b
+# plot cov over N
 plt.figure()
-plt.plot(nsamples_list, cov_at_pf_array,'+-', label=r'SuS', color='C1')
+plt.plot(nsamples_list, cov_at_pf_array,'+-', label=r'SuS', color='C2')
 
 plt.legend()
 plt.xlabel(r'Number of samples, $N$')
 plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
-if plotpdf:
-    plt.savefig('nsamples_study_cov_over_b_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
+if savepdf:
+    plt.savefig('nsamples_study_cov_over_N_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
-# plot pf over b
+# plot pf over N
 plt.figure()
-plt.plot(nsamples_list, pf_analytical,'.-', label=r'analytical', color='C0')
-plt.plot(nsamples_list, pf_mean_array,'+-', label=r'SuS', color='C1')
+plt.plot(nsamples_list, pf_analytical,'-', label=r'analytical', color='C0')
+plt.plot(nsamples_list, pf_mean_array,'+-', label=r'SuS', color='C2')
 
 
 plt.yscale('log')
+plt.ylim([6e-4, 2e-3])
 
 plt.legend()
 plt.xlabel(r'Number of samples, $N$')
 plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
-if plotpdf:
-    plt.savefig('nsamples_study_pf_over_b_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
+if savepdf:
+    plt.savefig('nsamples_study_pf_over_N_sus.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()

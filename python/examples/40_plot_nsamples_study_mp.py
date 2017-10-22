@@ -37,7 +37,7 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 savepdf = True
-example = 3
+example = 4
 
 # parameters
 Nb = 5        # MP: max number of burnins
@@ -45,7 +45,8 @@ Nb = 5        # MP: max number of burnins
 # nsamples_list = [2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 # nsamples_list = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 nsamples_list = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-
+if example == 4:
+    nsamples_list = [100, 200, 300, 400, 500]
 # ---------------------------------------------------------------------------
 # EXAMPLE INPUT
 # ---------------------------------------------------------------------------
@@ -115,10 +116,10 @@ g_list_list_sss4 = []
 g_list_list_sss5 = []
 
 
-for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_' + example_name + '_N'+ repr(N) +\
-                                        '_Nsim100_b'+ repr(Nb) +'_cs_sss0_g_list.npy')
-    g_list_list_sss0.append(g_list_mp_tmp)
+# for N in nsamples_list:
+#     g_list_mp_tmp = np.load(direction + 'mp_' + example_name + '_N'+ repr(N) +\
+#                                         '_Nsim100_b'+ repr(Nb) +'_cs_sss0_g_list.npy')
+#     g_list_list_sss0.append(g_list_mp_tmp)
 
 for N in nsamples_list:
     g_list_mp_tmp = np.load(direction + 'mp_' + example_name + '_N'+ repr(N) +\
@@ -171,9 +172,9 @@ pf_mean_array_sss5 = np.zeros(len(nsamples_list), float)
 
 
 # seed selection stragegy 0
-for i in range(0, len(nsamples_list)):
-    pf_mean_array_sss0[i], cov_at_pf_array_sss0[i] = \
-        uutil.get_mean_and_cov_pf_from_MP(g_list_list_sss0[i], nsamples_list[i])
+# for i in range(0, len(nsamples_list)):
+#     pf_mean_array_sss0[i], cov_at_pf_array_sss0[i] = \
+#         uutil.get_mean_and_cov_pf_from_MP(g_list_list_sss0[i], nsamples_list[i])
 
 # seed selection strategy 1
 for i in range(0, len(nsamples_list)):
@@ -225,12 +226,12 @@ plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
 if savepdf:
-    plt.savefig('nsamples_study_cov_over_b_mp.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('nsamples_study_cov_over_N_mp.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # plot pf over b
 plt.figure()
-plt.plot(nsamples_list, pf_ref,'-', label=r'analytical', color='C0')
+plt.plot(nsamples_list, pf_ref,'-', label=r'Reference (MCS)', color='C0')
 # plt.plot(nsamples_list, pf_mean_array_sss0,'+-', label=r'Strategy 0', color='C1')
 plt.plot(nsamples_list, pf_mean_array_sss1,'x-', label=r'Strategy 1', color='C2')
 plt.plot(nsamples_list, pf_mean_array_sss2,'v-', label=r'Strategy 2', color='C3')
@@ -241,6 +242,8 @@ plt.plot(nsamples_list, pf_mean_array_sss5,'*-', label=r'Strategy 5', color='C6'
 plt.yscale('log')
 if example == 3:
     plt.ylim([1e-5, 2e-4])
+if example == 4:
+    plt.ylim([3e-3, 6e-3])
 
 plt.legend()
 plt.xlabel(r'Number of samples, $N$')
@@ -248,6 +251,6 @@ plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
 if savepdf:
-    plt.savefig('nsamples_study_pf_over_b_mp.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('nsamples_study_pf_over_N_mp.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()

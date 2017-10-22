@@ -71,7 +71,7 @@ analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
 # ---------------------------------------------------------------------------
-direction = 'python/data/nsamples_study/'
+direction = 'python/data/example1/nsamples_study_mp/'
 
 g_list_list_sss0 = []
 g_list_list_sss1 = []
@@ -82,27 +82,27 @@ g_list_list_sss5 = []
 
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss0_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss0_g_list.npy')
     g_list_list_sss0.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss1_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss1_g_list.npy')
     g_list_list_sss1.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss2_g_list.npy')
     g_list_list_sss2.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss3_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss3_g_list.npy')
     g_list_list_sss3.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss4_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss4_g_list.npy')
     g_list_list_sss4.append(g_list_mp_tmp)
 
 for N in nsamples_list:
-    g_list_mp_tmp = np.load(direction + 'mp_example_1_d100_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss5_g_list.npy')
+    g_list_mp_tmp = np.load(direction + 'mp_example_1_d10_N'+ repr(N) +'_Nsim100_b'+ repr(Nb) +'_cs_sss5_g_list.npy')
     g_list_list_sss5.append(g_list_mp_tmp)
 
 
@@ -194,7 +194,7 @@ for i in range(0,len(nsamples_list)):
 # ---------------------------------------------------------------------------
 # plot cov over b
 plt.figure()
-plt.plot(nsamples_list, cov_analytical,'.-', label=r'MP analytical', color='C0')
+plt.plot(nsamples_list, cov_analytical,'-', label=r'MP analytical', color='C0')
 plt.plot(nsamples_list, cov_at_pf_array_sss0,'+-', label=r'Strategy 0', color='C1')
 plt.plot(nsamples_list, cov_at_pf_array_sss1,'x-', label=r'Strategy 1', color='C2')
 plt.plot(nsamples_list, cov_at_pf_array_sss2,'v-', label=r'Strategy 2', color='C3')
@@ -208,12 +208,12 @@ plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
 if plotpdf:
-    plt.savefig('nsamples_study_cov_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('nsamples_study_cov_over_N.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # plot pf over b
 plt.figure()
-plt.plot(nsamples_list, pf_analytical,'.-', label=r'analytical', color='C0')
+plt.plot(nsamples_list, pf_analytical,'-', label=r'analytical', color='C0')
 plt.plot(nsamples_list, pf_mean_array_sss0,'+-', label=r'Strategy 0', color='C1')
 plt.plot(nsamples_list, pf_mean_array_sss1,'x-', label=r'Strategy 1', color='C2')
 plt.plot(nsamples_list, pf_mean_array_sss2,'v-', label=r'Strategy 2', color='C3')
@@ -229,6 +229,6 @@ plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
 if plotpdf:
-    plt.savefig('nsamples_study_pf_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('nsamples_study_pf_over_N.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()

@@ -50,6 +50,8 @@ p0                  = 0.1       # SUS: Probability of each subset, chosen adapti
 n_initial_samples   = 100       # MP: Number of initial samples
 b                   = 20        # MP: burnin
 
+algorithm = 'sus'
+
 sigma_p_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
 n_sigma = len(sigma_p_list)
@@ -141,7 +143,7 @@ cov_analytical = np.ones(n_sigma, float) * np.sqrt(pf_analytical**(-1/n_initial_
 # plot cov over standard deviation
 plt.figure()
 
-plt.plot(sigma_p_list, cov_analytical,'o-', label=r'MP analytical', color='C0')
+plt.plot(sigma_p_list, cov_analytical,'-', label=r'MP analytical', color='C0')
 plt.plot(sigma_p_list, cov_at_pf_array_mp,'+-', label=r'MP with CS', color='C1')
 # plt.plot(sigma_p_list, cov_at_pf_array_sus,'x-', label=r'SuS with CS', color='C2')
 
@@ -153,12 +155,12 @@ plt.ylabel(r'Coefficient of variation, $\hat{\delta}_{p_f}$')
 
 plt.tight_layout()
 if savepdf:
-    plt.savefig('sigma_p_study_cov_over_b_cs.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('sigma_p_study_cov_over_sigma_cs_' + algorithm + '.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 # plot pf over d
 
 plt.figure()
-plt.plot(sigma_p_list, pf_analytical,'o-', label=r'analytical', color='C0')
+plt.plot(sigma_p_list, pf_analytical,'-', label=r'analytical', color='C0')
 plt.plot(sigma_p_list, pf_mean_array_mp,'+-', label=r'MP with CS', color='C1')
 # plt.plot(sigma_p_list, pf_mean_array_sus,'x-', label=r'SuS with CS', color='C2')
 
@@ -170,6 +172,6 @@ plt.ylabel(r'Probability of failure, $\hat{p}_f$')
 
 plt.tight_layout()
 if savepdf:
-    plt.savefig('sigma_p_study_pf_over_b_cs.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('sigma_p_study_pf_over_sigma_cs_' + algorithm + '.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 plt.show()
