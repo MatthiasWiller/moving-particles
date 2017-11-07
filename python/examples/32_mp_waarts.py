@@ -32,11 +32,11 @@ np.random.seed(0)
 # ---------------------------------------------------------------------------
 
 # parameters
-N = 10                     # number of samples
+N = 100                     # number of samples
 Nb = 5                     # burn-in
 sampling_method  = 'cs'     # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
-n_simulations = 100         # number of simulations
+n_simulations = 10         # number of simulations
 seed_selection_strategy = 2 # seed selection strategy
 
 # file-name
@@ -122,6 +122,6 @@ print("> C.O.V. \t=", pf_sigma/pf_mean)
 # SAVE RESULTS
 # ---------------------------------------------------------------------------
 
-np.save(filename + '_g_list.npy', g_list)
+# np.save(filename + '_g_list.npy', g_list)
 # np.save(filename + '_theta_list.npy', theta_list)
 print('\n> File was successfully saved as:', filename)

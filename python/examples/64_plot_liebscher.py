@@ -41,7 +41,7 @@ np.random.seed(0)
 # STANDARD INPUT
 # ---------------------------------------------------------------------------
 
-savepdf = True
+savepdf = False
 
 # limit state function
 pf_mcs = 4.05

@@ -90,3 +90,5 @@ class SeedSelector:
             self.seed_matrix[seed_id, active_path_id] = 0
             self.seed_matrix[active_path_id, seed_id] = 0
         
+    def checksum(self):
+        print('checksum =', np.sum(self.seed_matrix))

@@ -95,4 +95,8 @@ print('cov = 0.1 | SUS ncall =', round(ncall_sus1, 0), '| MP ncall =', round(nca
 print('cov = 0.2 | SUS ncall =', round(ncall_sus2, 0), '| MP ncall =', round(ncall_mp2, 0))
 print('cov = 0.3 | SUS ncall =', round(ncall_sus3, 0), '| MP ncall =', round(ncall_mp3, 0))
 print('-----------------------------------------------------')
+print('cov = 0.1 | SUS pf =', repr(pf_mean_sus1), '| MP pf =', repr(pf_mean_mp1))
+print('cov = 0.2 | SUS pf =', repr(pf_mean_sus2), '| MP pf =', repr(pf_mean_mp2))
+print('cov = 0.3 | SUS pf =', repr(pf_mean_sus3), '| MP pf =', repr(pf_mean_mp3))
+print('-----------------------------------------------------')
 print('Thank you for the music!')

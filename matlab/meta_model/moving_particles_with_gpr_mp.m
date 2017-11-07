@@ -6,10 +6,10 @@ rng(0);
 %% input parameters
 Nsim = 10;
 Nfail = 10;
-Nb = 20;
-q = -4;
+Nb = 5;
+q = 0;
 
-Nmp = 1000;
+Nmp = 500;
 
 % limit state function
 d = 2;

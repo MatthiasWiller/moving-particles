@@ -43,8 +43,10 @@ np.random.seed(0)
 
 savepdf = True
 
-N_sus = [1000]
+N_sus = [1100]
 N_mp = [100, 50, 25]
+
+threshold = 2.2
 
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
@@ -83,19 +85,19 @@ b_line_mcs                        = mcs_data[:, 0]
 pf_line_mcs                       = mcs_data[:, 1]
 
 b_line_sus, pf_line_list_sus      = uutil.get_pf_line_and_b_line_from_SUS(g_list_sus, 0.1, N_sus[0])
-b_line_sus = 2.4 - b_line_sus
+b_line_sus = threshold - b_line_sus
 pf_line_mean_sus, pf_line_cov_sus = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_sus)
 
 b_line_mp1, pf_line_list_mp1      = uutil.get_pf_line_and_b_line_from_MP(g_list_mp1, N_mp[0])
-b_line_mp1 = 2.4 - b_line_mp1
+b_line_mp1 = threshold - b_line_mp1
 pf_line_mean_mp1, pf_line_cov_mp1 = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp1)
 
 b_line_mp2, pf_line_list_mp2      = uutil.get_pf_line_and_b_line_from_MP(g_list_mp2, N_mp[1])
-b_line_mp2 = 2.4 - b_line_mp2
+b_line_mp2 = threshold - b_line_mp2
 pf_line_mean_mp2, pf_line_cov_mp2 = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp2)
 
 b_line_mp3, pf_line_list_mp3      = uutil.get_pf_line_and_b_line_from_MP(g_list_mp3, N_mp[2])
-b_line_mp3 = 2.4 - b_line_mp3
+b_line_mp3 = threshold - b_line_mp3
 pf_line_mean_mp3, pf_line_cov_mp3 = uutil.get_mean_and_cov_from_pf_lines(pf_line_list_mp3)
 
 # ---------------------------------------------------------------------------

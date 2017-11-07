@@ -45,7 +45,6 @@ savepdf = False
 
 # limit state function
 
-pf_mcs = 2.275e-3
 
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS

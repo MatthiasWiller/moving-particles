@@ -57,10 +57,10 @@ cost_mp  = moving_particles(X,Y, 5)
 # plotting
 fig  = plt.figure()
 
-plt.contour(X, Y, cost_mc, [1e5], colors='k')
-plt.contour(X, Y, cost_sus1, [1e5], colors='b')
+plt.contour(X, Y, cost_mc, [1e3], colors='C0')
+plt.contour(X, Y, cost_sus1, [1e3], colors='C2')
 # plt.contour(X, Y, cost_sus2, [1e5], colors='m')
-plt.contour(X, Y, cost_mp, [1e5], label=r'MP', colors='r')
+plt.contour(X, Y, cost_mp, [1e3], label=r'MP', colors='C1')
 
 # legend
 # plt.legend(loc='upper left')

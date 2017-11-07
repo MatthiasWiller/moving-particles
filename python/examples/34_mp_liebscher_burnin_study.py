@@ -76,8 +76,8 @@ for seed_selection_strategy in seed_selection_list:
         #LSF = lambda x: 7.5 - z(x)
         LSF = lambda u: 7.5 - z(transform_U2X(u))
 
-        # reference solution from paper
-        pf_mcs       = 4.05e-3
+        # reference solution from mcs
+        pf_mcs       = 4.42e-3
 
         # ---------------------------------------------------------------------------
         # INPUT FOR MONTE CARLO SIMULATION (LEVEL 0)

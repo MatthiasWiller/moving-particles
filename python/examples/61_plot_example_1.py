@@ -61,9 +61,9 @@ analytical_CDF = lambda x: scps.norm.cdf(x, beta)
 # ---------------------------------------------------------------------------
 # LOAD RESULTS FROM SIMULATIONS
 # ---------------------------------------------------------------------------
-direction = 'python/data/'
+direction = 'python/data/example1/fixed_ncall_data/'
 
-g_list_sus     = np.load(direction + 'sus_example_1_d10_Nspl1000_Nsim100_cs_g_list.npy')
+g_list_sus     = np.load(direction + 'sus_example_1_d10_N1000_Nsim100_cs_g_list.npy')
 
 g_list_mp1     = np.load(direction + 'mp_example_1_d10_N104_Nsim100_b5_cs_sss2_g_list.npy')
 g_list_mp2     = np.load(direction + 'mp_example_1_d10_N53_Nsim100_b10_cs_sss2_g_list.npy')

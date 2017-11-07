@@ -1,10 +1,13 @@
 clc; clear all; close all;
 
-%% input parameters
-Nsim = 10;
-q = -4;
+rng(0,'twister');
 
-Nmp = 2000;
+%% input parameters
+Nsim = 20;
+q = 0;
+Nb = 5;
+
+Nmp = 100;
 %% LSF
 % example 1
 % LSF = @(u) sum(u)/sqrt(d) + 3.0902;
@@ -21,7 +24,7 @@ pf_vec = zeros(1, Nsim);
 
 
 for i = 1:Nsim
-  [pf, Ncall] = mp(LSF, q, Nmp, 10);
+  [pf, Ncall] = mp(LSF, q, Nmp, Nb);
   Ncall_vec(i) = Ncall;
   pf_vec(i) = pf;
 end
