@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Adaptive Conditional Sampling algorithm function
+# Adaptive Conditional Sampling algorithm
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,24 +8,11 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
-# ---------------------------------------------------------------------------
-# Input:
-# * theta0          : seed of the Markov-chain
-# * Ns              : number of samples of Markov-chain (including seed)
-# * sample_marg_PDF : function to sample from marginal pdf
-# * LSF             : limit state function
-# * b               : threshold level of the limit state function
-# * rho_k           : correlation coefficient between two sample-states
-# ---------------------------------------------------------------------------
-# Output:
-# * theta   : samples of Markov-chain generated from the seed (theta0)
-# * g       : corresponding evaluations of the limit-state function g(x)
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
-# 1."Bayesian post-processor and other enhancements of Subset Simulation
-#    for estimating failure probabilites in high dimension"
-#    Zuev, Beck, Au, Katafygiotis (2012)
+# 1."MCMC algorithms for Subset Simulation"
+#    Papaioannou, Betz, Zwirglmaier, Straub (2015)
 # ---------------------------------------------------------------------------
 """
 

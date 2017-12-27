@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."Simulation and the Monte Carlo method"
@@ -143,8 +143,8 @@ print('E[X2] =', round(theta_x[1,:].mean(), 5))
 np.save('python/data/samples_2D_pdf_cs.npy', theta_x)
 
 # plot samples
-#uplt.plot_hist(theta[0,:], target_PDF, 2)
-#uplt.plot_scatter_with_contour(theta, target_PDF)
+# uplt.plot_hist(theta[0,:], target_PDF, 2)
+# uplt.plot_scatter_with_contour(theta, target_PDF)
 # uplt.plot_mixing(theta[0, :1000])
 # uplt.plot_scatter_with_hist(theta[:, :5000], target_PDF)
 # uplt.plot_autocorr(theta[0,:], 50, 1)

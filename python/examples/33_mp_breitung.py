@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Moving Particles Waarts example
+# Moving Particles Waarts Example 3
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 import time as timer
@@ -21,7 +21,7 @@ import algorithms.moving_particles as mp
 
 import utilities.util as uutil
 
-print("RUN 35_mp_breitung.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)
@@ -92,6 +92,7 @@ start_time = timer.time()
 for sim in range(0, n_simulations):
     pf_hat, theta_temp, g_temp, acc_rate, m_array = \
         mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
+    
     # save simulation in list
     pf_list.append(pf_hat)
     g_list.append(g_temp)

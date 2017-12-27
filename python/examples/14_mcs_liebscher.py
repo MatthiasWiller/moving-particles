@@ -8,19 +8,18 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
 import time as timer
-
 import numpy as np
 import scipy.stats as scps
 
 import algorithms.mcs as mcs
 
 
-print("RUN 12_mcs_liebscher.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)

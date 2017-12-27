@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Metropolis-Hastings algorithm function
+# Metropolis-Hastings algorithm
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,19 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
-# ---------------------------------------------------------------------------
-# Input:
-# * target_PDF      : function to be sampled
-# * f_prop_PDF      : proposal PDF function
-# * sample_prop_PDF : proposal PDF sampling
-# * initial_theta   : initial sample to run the Markov chain
-# * n_samples       : total number of simulated samples
-# * burnInPeriod    : burn-in of samples
-# * lagPeriod       : to perform thinning of the Markov chain sequence
-# ---------------------------------------------------------------------------
-# Output:
-# * theta : samples distributed according to 'target_PDF'
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."Simulation and the Monte Carlo method"
@@ -28,12 +16,8 @@
 # ---------------------------------------------------------------------------
 """
 
-import numpy as np
-import matplotlib.mlab as mlab
-import matplotlib.pyplot as plt
-
 import time as timer
-
+import numpy as np
 
 def cond_sampling(initial_theta, n_samples, rho_k, burnInPeriod, lagPeriod):
     print(">==========================================================================")

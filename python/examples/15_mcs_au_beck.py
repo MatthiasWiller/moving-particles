@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# File for performing MCS on 
+# File for performing MCS on Example 5 (SDOF)
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,12 +8,11 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
 import time as timer
-
 import numpy as np
 
 import algorithms.mcs as mcs
@@ -21,7 +20,7 @@ import algorithms.mcs as mcs
 import SDOF as sdof
 
 
-print("RUN 14_mcs_au_beck.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)

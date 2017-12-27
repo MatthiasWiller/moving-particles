@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Subset Simulation Method example
+# Subset Simulation Method Example 5
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."MCMC algorithms for Subset Simulation"
@@ -19,7 +19,6 @@
 """
 
 import time as timer
-
 import numpy as np
 
 import algorithms.modified_metropolis as mmh
@@ -33,7 +32,7 @@ import SDOF as sdof
 import utilities.stats as ustat
 import utilities.util as uutil
 
-print("RUN 25_sus_au_beck.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)

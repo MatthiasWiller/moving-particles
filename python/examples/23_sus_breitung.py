@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Subset Simulation Method example
+# Subset Simulation Method Example 3
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."MCMC algorithms for Subset Simulation"

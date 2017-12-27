@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
@@ -20,7 +20,7 @@ from matplotlib.ticker import NullFormatter
 import scipy.stats as scps
 
 import utilities.plots as uplt
-import algorithms.metropolis_hastings as mh
+import algorithms.mcmc_metropolis_hastings as mh
 
 
 

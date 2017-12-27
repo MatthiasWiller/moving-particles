@@ -17,7 +17,6 @@
 """
 
 import time as timer
-
 import numpy as np
 import scipy.stats as scps
 
@@ -29,7 +28,7 @@ import algorithms.adaptive_cond_sampling as acs
 import utilities.stats as ustat
 import utilities.util as uutil
 
-print("RUN 21_sus_example_1.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)
@@ -117,7 +116,6 @@ for sim in range(0, n_simulations):
     p_F_SS_list.append(p_F_SS)
     theta_list.append(theta)
     g_list.append(g)
-    # print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
     uutil.print_simulation_progress(sim, n_simulations, start_time)
 
 

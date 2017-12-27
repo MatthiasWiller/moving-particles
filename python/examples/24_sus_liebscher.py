@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."MCMC algorithms for Subset Simulation"
@@ -31,8 +31,9 @@ import algorithms.adaptive_cond_sampling as acs
 import algorithms.sus as sus
 
 import utilities.stats as ustat
+import utilities.util as uutil
 
-print("RUN 22_sus_liebscher.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)
@@ -121,13 +122,10 @@ g_list       = []
 
 
 print('\n> START Sampling')
-startTime = timer.time()
-
-
-
-for i in range(0, n_simulations):
+start_time = timer.time()
+for sim in range(0, n_simulations):
     # perform SubSim
-    p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampling_method)
+    p_F_SS, theta, g = sus.subsetsim(p0, n_samples_per_level, LSF, sampler)
 
     # transform samples back from u to x-space
     for j in range(0, len(theta)):
@@ -137,10 +135,11 @@ for i in range(0, n_simulations):
     p_F_SS_list.append(p_F_SS)
     theta_list.append(theta)
     g_list.append(g)
-    print("> [", i+1, "] Subset Simulation Estimator \t=", p_F_SS)
+    
+    uutil.print_simulation_progress(sim, n_simulations, start_time)
 
 
-print("\n> Time needed for Sampling =", round(timer.time() - startTime, 2), "s")
+print("\n> Time needed for Sampling =", round(timer.time() - start_time, 2), "s")
 
 # computing cov
 print('\n> START Computing C.O.V')

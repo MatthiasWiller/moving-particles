@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# File for performing MCS
+# File for performing MCS for Example 1
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,18 +8,16 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
 import time as timer
-
 import numpy as np
 
 import algorithms.mcs as mcs
 
-
-print("RUN 11_mcs_example_1.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)

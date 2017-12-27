@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
@@ -20,7 +20,7 @@ import algorithms.cond_sampling as cs
 
 import algorithms.moving_particles as mp
 
-print("RUN 32_mp_liebscher.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)
@@ -103,6 +103,7 @@ pf_list    = []
 theta_list = []
 g_list     = []
 
+start_time = timer.time()
 for sim in range(0, n_simulations):
     pf_hat, theta_temp, g_temp, acc_rate, m_list = \
         mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
@@ -115,6 +116,8 @@ for sim in range(0, n_simulations):
     pf_list.append(pf_hat)
     g_list.append(g_temp)
     theta_list.append(theta_temp)
+
+    uutil.print_simulation_progress(sim, n_simulations, start_time)
 
 
 pf_sim_array = np.asarray(pf_list)

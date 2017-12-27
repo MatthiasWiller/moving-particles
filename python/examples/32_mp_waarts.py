@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
@@ -22,7 +22,7 @@ import algorithms.moving_particles as mp
 
 import utilities.util as uutil
 
-print("RUN 33_mp_waarts.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)

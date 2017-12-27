@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-09
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 import time as timer
@@ -22,7 +22,7 @@ import algorithms.cond_sampling as cs
 
 import utilities.util as uutil
 
-print("RUN 31_mp_example_1.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)

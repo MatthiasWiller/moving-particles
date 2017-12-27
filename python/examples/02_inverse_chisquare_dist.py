@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."Markov Chain Monte Carlo and Gibbs Sampling"
@@ -20,7 +20,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import utilities.plots as uplt
-import algorithms.metropolis as ma
+import algorithms.mcmc_metropolis as ma
 
 # INPUT 
 
@@ -52,4 +52,3 @@ uplt.plot_mixing(theta)
 uplt.plot_autocorr(theta, 400)
 
 plt.show()
-

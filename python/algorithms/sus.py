@@ -8,23 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
-# ---------------------------------------------------------------------------
-# Input:
-# * p0                  : conditional failure probability
-# * n_samples_per_level : number of samples per conditional level
-# * sample_marg_PDF     : function to sample from marginal pdf
-# * f_marg_PDF          : marginal pdf
-# * sample_prop_PDF     : function to sample from proposal pdf
-# * f_prop_PDF          : proposal pdf
-# * LSF                 : limit state function
-# * sampler             : sampling algorithm (cs = Cond. Sampling,
-#                         mmh = Modified Metropolis Hastings)
-# ---------------------------------------------------------------------------
-# Output:
-# * p_F_SS  : estimator of the failure probability
-# * theta   : list of samples distributed according to 'marginal pdf'
-# * g       : list of corresponding evaluations of the limit-state function g(theta)
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."Bayesian post-processor and other enhancements of Subset Simulation

@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Monte Carlo Simulation function
+# Monte Carlo Simulation
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,17 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-06
-# ---------------------------------------------------------------------------
-# Input:
-# * N               : number of samples
-# * sample_marg_PDF : function to sample from marginal pdf
-# * LSF             : limit state function
-# ---------------------------------------------------------------------------
-# Output:
-# * pf_mcs      : estimator of the failure probability
-# * theta_list  : list of samples distributed according to 'marginal pdf'
-# * g_list      : list of corresponding evaluations of the limit-state function g(theta)
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 

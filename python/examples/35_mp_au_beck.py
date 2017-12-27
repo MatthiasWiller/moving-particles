@@ -8,13 +8,11 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-import scipy.stats as scps
 
 import algorithms.moving_particles as mp
 
@@ -23,7 +21,7 @@ import algorithms.cond_sampling as cs
 
 import SDOF as sdof
 
-print("RUN 34_mp_au_beck.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)
@@ -52,6 +50,7 @@ N = 100                     # number of samples
 b = 30                      # burn-in
 sampling_method  = 'mmh'    # 'mmh' = Modified Metropolis Hastings
                             # 'cs'  = Conditional Sampling
+seed_selection_strategy = 2 # seed selection strategy
 n_simulations = 2           # number of simulations
 
 # file-name
@@ -98,12 +97,17 @@ pf_list    = []
 theta_list = []
 g_list     = []
 
+start_time = timer.time()
 for sim in range(0, n_simulations):
-    pf_hat, theta_temp, g_temp, acc_rate, m_list = mp.mp_one_particle(N, LSF, sampler, sample_marg_PDF_list)
+    pf_hat, theta_temp, g_temp, acc_rate, m_list = \
+        mp.mp_with_seed_selection(N, LSF, sampler, sample_marg_PDF_list, seed_selection_strategy)
+    
     # save simulation in list
     pf_list.append(pf_hat)
     g_list.append(g_temp)
     theta_list.append(theta_temp)
+
+    uutil.print_simulation_progress(sim, n_simulations, start_time)
 
 pf_sim_array = np.asarray(pf_list)
 pf_mean      = np.mean(pf_sim_array)

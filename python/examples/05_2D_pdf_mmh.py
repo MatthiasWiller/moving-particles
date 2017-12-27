@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."Simulation and the Monte Carlo method"

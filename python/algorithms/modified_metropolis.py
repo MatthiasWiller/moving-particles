@@ -1,6 +1,6 @@
 """
 # ---------------------------------------------------------------------------
-# Modified Metropolis Hastings algorithm function
+# Modified Metropolis Hastings algorithm
 # ---------------------------------------------------------------------------
 # Created by:
 # Matthias Willer (matthias.willer@tum.de)
@@ -8,20 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
-# ---------------------------------------------------------------------------
-# Input:
-# * theta0          : seed of the Markov-chain
-# * N               : number of samples of Markov-chain (including seed)
-# * f_marg_PDF      : marginal pdf
-# * sample_prop_PDF : function to sample from proposal pdf
-# * f_prop_PDF      : proposal pdf
-# * LSF             : limit state function
-# * b               : threshold level of the limit state function
-# ---------------------------------------------------------------------------
-# Output:
-# * theta   : samples of Markov-chain generated from the seed (theta0)
-# * g       : corresponding evaluations of the limit-state function g(x)
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."Bayesian post-processor and other enhancements of Subset Simulation

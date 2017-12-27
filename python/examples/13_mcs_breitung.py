@@ -8,18 +8,16 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-07
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
 import time as timer
-
 import numpy as np
 
 import algorithms.mcs as mcs
 
-
-print("RUN 15_mcs_breitung.py")
+print("RUN file")
 
 # set seed for randomization
 np.random.seed(0)
