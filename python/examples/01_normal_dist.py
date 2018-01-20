@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
@@ -16,8 +16,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as scps
 
-import plots.user_plot as uplt
-import algorithms.metropolis as ma
+import utilities.plots as uplt
+import algorithms.mcmc_metropolis as ma
 
 # INPUT 
 

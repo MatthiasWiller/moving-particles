@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
@@ -26,7 +26,10 @@ from mpl_toolkits.mplot3d import Axes3D
 # create figure object with LaTeX font
 matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['font.size'] = 22
+# matplotlib.rcParams['font.size'] = 30 # for R(x)_corr
+# matplotlib.rcParams['font.size'] = 36 # for minipage with 3 plots 
 matplotlib.rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+
 
 # -----------------------------------------------------------------------------------------
 # histogram plot
@@ -43,44 +46,50 @@ def plot_hist(x, target_PDF=0, dimension=1):
     # add a 'best fit' line
     if((target_PDF != 0) and (dimension == 1)):
         # for 1D case
-        y = target_PDF(bins)
-        plt.plot(bins, y, '--', color='red')
+        x_bins = np.arange(-10,20,0.05)
+        y = target_PDF(x_bins)
+        plt.plot(x_bins, y, '-', color='red')
 
     if((target_PDF != 0) and (dimension == 2)):
         # for 2D case
         y = compute_marginal_PDF(target_PDF, bins, 0)
-        plt.plot(bins, y, '--', color='red')
+        plt.plot(bins, y, '-', color='red')
 
-    plt.ylim(0,1)
-    plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
-    plt.title(r'Histogram of $\theta$')
-    plt.xlabel(r'$\theta_1$')
+    # plt.ylim(0,1)
+    # plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+
+
+    # set labels
+    plt.xlabel(r'$x$')
     plt.ylabel(r'Frequency $p$')
     plt.tight_layout()
-    #plt.savefig('plot_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    # plt.savefig('plot_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # -----------------------------------------------------------------------------------------
 # plot values of index
 def plot_mixing(x):
-
+    matplotlib.rcParams['font.size'] = 26
     n_samples = len(x)
 
     plt.figure()
     plt.plot(x, color='navy')
 
-    plt.title(r'Iterations of the MCMC')
+    # set labels
     plt.xlabel(r'Number of samples, $n$')
-    plt.ylabel(r'$\theta_1$')
+    plt.ylabel(r'$x_1$')
     plt.xlim(0, n_samples)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
 
     plt.tight_layout()
-    #plt.savefig('plot_mixing.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot_mixing.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
 
 # -----------------------------------------------------------------------------------------
 # plot of the estimated autocorrelation of samples
-def plot_autocorr(x, lag):
+def plot_autocorr(x, lag, id=0):
+
+    matplotlib.rcParams['font.size'] = 26
 
     # compute sample autocorrelation
     n_samples   = len(x)
@@ -97,15 +106,19 @@ def plot_autocorr(x, lag):
 
     # plot results
     plt.figure()
-    plt.plot(rho, '.')
+    plt.plot(rho[:22], '.')
 
-    plt.title(r'Sample autocorrelation')
+
+    # set labels
     plt.xlabel(r'Lag, $k$')
     plt.ylabel(r'$\hat{R}(k)')
     plt.xlim(0, lag)
+    plt.ylim(0, 1)
+    plt.yticks([0, 0.5, 1])
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
     plt.tight_layout()
-    #plt.savefig('plot_autocorr.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot_autocorr_'+str(id)+'.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
 
 # -----------------------------------------------------------------------------------------
 # make a nice scatter plot with contour lines of the pdf and samples    
@@ -122,7 +135,8 @@ def plot_scatter_with_contour(theta, target_PDF):
     plt.scatter(theta[0,:], theta[1,:], s=1, color='blue', marker='o', linestyle='None')
 
     #ax.plot_surface(theta[0,:], theta[1,:], target_PDF(theta) )
-    plt.title(r'Contour plot')
+
+    # set labels
     plt.xlabel(r'$x_1$')
     plt.ylabel(r'$x_2$')
     plt.xticks([-2, 0, 2, 4, 6, 8])
@@ -131,6 +145,7 @@ def plot_scatter_with_contour(theta, target_PDF):
     plt.gca().set_aspect('equal', adjustable='box')
     #plt.tight_layout()
     #plt.savefig('plot_scatter_with_contour.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
 
 # -----------------------------------------------------------------------------------------
 # plot surface with samples
@@ -193,10 +208,9 @@ def plot_surface_with_samples(theta, g, f, g_max_global):
     ax.set_xlim3d(min_x, max_x)
     ax.set_ylim3d(min_y, max_y)
     ax.set_zlim3d(min_z, max_z)
-    ttl = ax.set_title('Benchmark Study')
-    ttl.set_position([.5, 0.95])
 
     plt.tight_layout()
+
 
 # -----------------------------------------------------------------------------------------
 # plot the surface of a 2D pdf in 3D
@@ -208,20 +222,27 @@ def plot_surface_custom(target_PDF):
     plt.figure()
     ax = plt.gca(projection='3d')
 
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.pink)
+    # ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.pink)
+    ax.plot_surface(X, Y, Z, rstride=3, cstride=3, cmap=cm.pink_r, antialiased=False, alpha=1.0)
+    # # ax.plot_surface(X, Y, Z, rstride=3, cstride=3, cmap=cm.pink_r, antialiased=True)
 
-    ttl = ax.set_title('Target distribution')
-    ttl.set_position([.5, 0.95])
+    ax.plot_wireframe(X, Y, Z, rstride=3, cstride=3, linewidth=0.5, color='black', alpha=1.0)
+
+    # ttl = ax.set_title('Target distribution')
+    # ttl.set_position([.5, 0.95])
     ax.view_init(elev=45, azim=40)
     ax.set_xlim3d(-2, 8)
     ax.set_ylim3d(-2, 8)
-    ax.set_zlim3d(0, 0.25)
-    ax.xaxis._axinfo['label']['space_factor'] = 20
-    ax.yaxis._axinfo['label']['space_factor'] = 20
-    ax.zaxis._axinfo['label']['space_factor'] = 20
+    ax.set_zlim3d(0, .6)
+    ax.set_xlabel(r'x_1')
+    ax.set_ylabel(r'x_2')
+    ax.set_zlabel(r'f(x)')
+    ax.xaxis._axinfo['label']['space_factor'] = 40
+    ax.yaxis._axinfo['label']['space_factor'] = 40
+    ax.zaxis._axinfo['label']['space_factor'] = 40
 
     plt.tight_layout()
-    #plt.savefig('plot3d.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot3d.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
 
 # -----------------------------------------------------------------------------------------
@@ -229,6 +250,11 @@ def plot_surface_custom(target_PDF):
 def plot_scatter_with_hist(x, target_PDF=0):
 
     nullfmt = NullFormatter()         # no labels
+
+    xx       = np.linspace(-2, 8, 100)
+    X, Y    = np.meshgrid(xx, xx)
+    Z       = target_PDF([X, Y])
+
 
     # definitions for the axes
     left, width         = 0.1, 0.65
@@ -251,6 +277,9 @@ def plot_scatter_with_hist(x, target_PDF=0):
     # no labels
     axHistx.xaxis.set_major_formatter(nullfmt)
     axHisty.yaxis.set_major_formatter(nullfmt)
+
+    # the contour
+    axScatter.contour(X, Y, Z, 5, cmap=cm.jet)
 
     # the scatter plot
     axScatter.scatter(x[0, :], x[1, :], marker='o', facecolors='None', \
@@ -284,8 +313,26 @@ def plot_scatter_with_hist(x, target_PDF=0):
     axHistx.set_xlim(axScatter.get_xlim())
     axHisty.set_ylim(axScatter.get_ylim())
 
+    # set labels
+    axHistx.set_ylabel(r'$f_{X_1}(x)$')
+    axHisty.set_xlabel(r'$f_{X_2}(x)$')
+
+    axScatter.set_xlabel(r'$x_1$')
+    axScatter.set_ylabel(r'$x_2$')
+
+    # set ticks and limits
+    axHistx.set_yticks([0, 0.5])
+    axHistx.set_ylim([0, 0.7])
+
+    axHisty.set_xticks([0,0.5])
+    axHisty.set_xlim([0,0.7])
+
+    axScatter.set_xticks([0,2,4,6])
+    axScatter.set_yticks([0,2,4,6])
+
     # tight layout not possible here !
-    #plt.savefig('plot_scatter_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    plt.savefig('plot_scatter_with_hist.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
 
 # -----------------------------------------------------------------------------------------
 # Helper function to compute the marginal pdf of a 2D multivariate pdf
@@ -325,124 +372,6 @@ def compute_marginal_PDF(target_PDF, bins, dimension):
 
 
 # ---------------------------------------------------------------------------
-# plot subset-simulation
-def plot_sus_list(g_list, p0, N, pf_sus_array, analytical_CDF=0):
-    # create figure
-    fig = plt.figure()
-
-    # some constants
-    Nc    = int(N*p0)
-    n_sim = len(g_list)
-
-    # initialization
-    n_levels = np.zeros(n_sim, int)
-
-    # count number of levels
-    for i in range(0, n_sim):
-        n_levels[i] = len(g_list[i])
-
-    # find most often encountered n_levels
-    count_n_levels   = np.bincount(n_levels)
-    most_often_level = np.nanargmax(count_n_levels)
-    n_levels         = most_often_level
-
-    # delete all other levels
-    for i in reversed(range(0, n_sim)):
-        if len(g_list[i]) != most_often_level:
-            g_list.pop(i)
-    
-    n_sim_effective = len(g_list)
-
-    print('The number of effective samples was successfully reduced from', n_sim, 'to', n_sim_effective, '!')
-
-    # set up Pf_line
-    Pf_line       = np.zeros((n_levels, Nc), float)
-    Pf_line[0, :] = np.linspace(p0, 1, Nc)
-    for i in range(1, n_levels):
-        Pf_line[i, :] = Pf_line[i-1, :]*p0
-    
-    # initialize matrices and list
-    b_line_mean_matrix  = np.zeros((n_levels, Nc), float)
-    b_line_sigma_matrix = np.zeros((n_levels, Nc), float)
-
-    b_line_list_all_levels = []
-
-    # loop over all (effective) simulations to get the b_line
-    for sim in range(0, n_sim_effective):
-        b_line_list = []
-        g           = g_list[sim]
-
-        b_line      = np.zeros((n_levels, Nc), float)
-
-        # loop over all levels and get b_line
-        for level in range(0, n_levels):
-            g_sorted          = np.sort(g[level])
-            b_line[level, :]  = np.percentile(g_sorted, Pf_line[0, :]*100)
-        
-        b_line_array_temp = b_line.reshape(-1)
-        b_line_array_temp = np.sort(b_line_array_temp)
-        b_line_list_all_levels.append(b_line_array_temp)
-    
-    # reshape and sort the matrices
-    Pf_line = np.asarray(Pf_line).reshape(-1)
-    Pf_line = np.sort(Pf_line)
-
-    b_line_matrix = np.asarray(b_line_list_all_levels)
-
-    b_line_mean_array  = np.mean(b_line_matrix, axis=0)
-    b_line_sigma_array = np.std(b_line_matrix, axis=0)
-
-    b_line_max = b_line_mean_array + 5*b_line_sigma_array
-    b_line_min = b_line_mean_array - 5*b_line_sigma_array
-
-    # exact line and exact point (with analytical_CDF) 
-    if analytical_CDF!=0:
-        max_lim         = np.max(np.asarray(g))
-        b_exact_line    = np.linspace(0, max_lim, 140)
-        pf_exact_line   = analytical_CDF(b_exact_line)
-
-        pf_exact_point  = analytical_CDF(0)        
-
-    # set y-axis to log-scale
-    plt.yscale('log')
-
-    # plotting
-
-    # * plot exact line
-    if analytical_CDF != 0:
-        plt.plot(b_exact_line, pf_exact_line, '-', color='red', label=r'Exact')
-
-    # * plot line of estimator
-    plt.plot(b_line_mean_array, Pf_line, '--', color='navy', label=r'SuS mu')
-    label_text = r'$\mu \pm 5\sigma$ (' + repr(n_sim_effective) + r' sim)'
-    plt.fill_betweenx(Pf_line, b_line_min, b_line_max, color='powderblue', label=label_text)    
-
-    # * plot intermediate steps (b)
-    #plt.plot(b, Pf, marker='o', markerfacecolor='none', markeredgecolor='black',\
-    #                markersize='8', linestyle='none', label=r'Intermediate levels')
-
-    # * plot exact point
-    if analytical_CDF != 0:
-        plt.plot(0, pf_exact_point, marker='x', color='red',\
-                    markersize='10', linestyle='none', label=r'Pf Exact')
-
-    # * plot point of estimation of failure probability
-    plt.plot(0, np.mean(pf_sus_array), marker='x', color='navy',\
-                    markersize='10', linestyle='none', label=r'Pf SuS')
-
-    # add legend
-    matplotlib.rcParams['legend.fontsize'] = 12
-    plt.legend(loc='lower right')
-
-    # set titles
-    plt.title(r'Failure probability estimate')
-    plt.xlabel(r'Limit state function values $b$')
-    plt.ylabel(r'$P(g(x) \leq b)$')
-    plt.tight_layout()
-    #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
-
-
-# ---------------------------------------------------------------------------
 # plot cov over pf
 def plot_cov_over_pf(pf_line, cov_mmh, cov_cs, cov_acs):
      # create figure
@@ -470,187 +399,86 @@ def plot_cov_over_pf(pf_line, cov_mmh, cov_cs, cov_acs):
     matplotlib.rcParams['legend.fontsize'] = 12
     plt.legend(loc='upper right')
 
-    # set titles
-    plt.title(r'Coefficient of Variation')
+    # set labels
     plt.xlabel(r'Target Probability of Failure $P_f$')
     plt.ylabel(r'Coefficient of Variation $\delta$')
     plt.tight_layout()
     #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
 
+
 # ---------------------------------------------------------------------------
-# plot sus trails
-def plot_sus_trails(g_list, p0, N, analytical_CDF):
+def plot_m_with_poisson_dist(m_list, pf):
+    # set up the distribution of m
+    m_array = np.asarray(m_list)
+    m_dist = np.bincount(m_array)
+    N = len(m_array.reshape(-1))
+    m_dist = m_dist/N    
+
+    # parameter for poisson distribution
+    lam     = -np.log(pf)
+    poisson = lambda k: lam**k * np.exp(-lam) / np.math.factorial(k)
+
+    x = np.linspace(0, len(m_dist)-1, len(m_dist))
+    y = np.zeros(len(m_dist), float)
+    for i in range(0, len(m_dist)):
+        y[i] = poisson(x[i])
+    
     # create figure
     fig = plt.figure()
 
-    # some constants
-    Nc    = int(N*p0)
-    n_sim = len(g_list)
+    # plot results
+    plt.plot(y)
+    plt.plot(m_dist)
 
-    # initialization
-    n_levels = np.zeros(n_sim, int)
 
-    # count number of levels
-    for i in range(0, n_sim):
-        n_levels[i] = len(g_list[i])
+# ---------------------------------------------------------------------------
+def plot_pf_over_b(b_line_list, pf_line_list, legend_list):
+    plt.figure()
 
-    # find max n_levels
-    n_levels = np.amax(n_levels)
+    # initilize colors
+    colors = ['blue', 'fuchsia', 'green', 'red', 'navy', 'skyblue', 'orange', 'yellow']
 
-    # set up Pf_line
-    Pf_line       = np.zeros((n_levels, Nc), float)
-    Pf_line[0, :] = np.linspace(p0, 1, Nc)
-    for i in range(1, n_levels):
-        Pf_line[i, :] = Pf_line[i-1, :]*p0
-    
-    # initialization
-    b_line_list_all_sims = []
-
-    # loop over all (effective) simulations to get the b_line
-    for sim in range(0, n_sim):
-        b_line_list = []
-        g           = g_list[sim]
-
-        n_levels    = len(g)
-
-        b_line      = np.zeros((n_levels, Nc), float)
-
-        # loop over all levels and get b_line
-        for level in range(0, n_levels):
-            g_sorted          = np.sort(g[level])
-            b_line[level, :]  = np.percentile(g_sorted, Pf_line[0, :]*100)
-        
-        b_line_array_temp = b_line.reshape(-1)
-        b_line_array_temp = np.sort(b_line_array_temp)
-        b_line_list_all_sims.append(b_line_array_temp)
-    
-    # reshape and sort the matrices
-    Pf_line = np.asarray(Pf_line).reshape(-1)
-    Pf_line = np.sort(Pf_line)
-        
-    # exact line and (with analytical_CDF) 
-    if analytical_CDF!=0:
-        max_lim         = np.max(np.asarray(g))
-        b_exact_line    = np.linspace(0, max_lim, 140)
-        pf_exact_line   = analytical_CDF(b_exact_line)
-
-        pf_exact_point  = analytical_CDF(0)        
+    # plot all lines
+    for i in range(0, len(b_line_list)):
+        plt.plot(b_line_list[i], pf_line_list[i], '--', color=colors[np.mod(i, len(colors))], label=legend_list[i])
 
     # set y-axis to log-scale
     plt.yscale('log')
-
-    # plotting
-
-    # * plot sus trails
-    colors = ['blue', 'fuchsia', 'green', 'red', 'navy', 'skyblue', 'orange', 'yellow']
-
-    for b_line_sim in b_line_list_all_sims:
-        n_elements = len(b_line_sim)
-        n_color = int(n_elements/Nc)
-        plt.plot(b_line_sim, Pf_line[-n_elements:], '--', color=colors[n_color])
-
-    # * plot exact line
-    if analytical_CDF != 0:
-        plt.plot(b_exact_line, pf_exact_line, '-', color='yellow', label=r'Exact')
-
-
-    # * plot exact point
-    if analytical_CDF != 0:
-        plt.plot(0, pf_exact_point, marker='x', color='yellow',\
-                    markersize='10', linestyle='none', label=r'Pf Exact')
-
-    # set titles
-    plt.title(r'Failure probability estimate')
-    plt.xlabel(r'Limit state function values $b$')
-    plt.ylabel(r'$P(g(x) \leq b)$')
-    plt.tight_layout()
-    #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
-
-
-# ---------------------------------------------------------------------------
-# plot cov_b over pf
-def plot_cov_b_over_pf(g_list, p0, N):
-    # create figure
-    fig = plt.figure()
-
-    # some constants
-    Nc    = int(N*p0)
-    n_sim = len(g_list)
-
-    # initialization
-    n_levels = np.zeros(n_sim, int)
-
-    # count number of levels
-    for i in range(0, n_sim):
-        n_levels[i] = len(g_list[i])
-
-    # find most often encountered n_levels
-    count_n_levels   = np.bincount(n_levels)
-    most_often_level = np.nanargmax(count_n_levels)
-    n_levels         = most_often_level
-
-    # delete all other levels
-    for i in reversed(range(0, n_sim)):
-        if len(g_list[i]) != most_often_level:
-            g_list.pop(i)
-    
-    n_sim_effective = len(g_list)
-
-    print('The number of effective samples was successfully reduced from', n_sim, 'to', n_sim_effective, '!')
-
-    # set up Pf_line
-    Pf_line       = np.zeros((n_levels, Nc), float)
-    Pf_line[0, :] = np.linspace(p0, 1, Nc)
-    for i in range(1, n_levels):
-        Pf_line[i, :] = Pf_line[i-1, :]*p0
-    
-    # initialize matrices and list
-    b_line_mean_matrix  = np.zeros((n_levels, Nc), float)
-    b_line_sigma_matrix = np.zeros((n_levels, Nc), float)
-
-    b_line_list_all_sims = []
-
-    # loop over all (effective) simulations to get the b_line
-    for sim in range(0, n_sim_effective):
-        b_line_list = []
-        g           = g_list[sim]
-
-        b_line      = np.zeros((n_levels, Nc), float)
-
-        # loop over all levels and get b_line
-        for level in range(0, n_levels):
-            g_sorted          = np.sort(g[level])
-            b_line[level, :]  = np.percentile(g_sorted, Pf_line[0, :]*100)
-        
-        b_line_array_temp = b_line.reshape(-1)
-        b_line_array_temp = np.sort(b_line_array_temp)
-        b_line_list_all_sims.append(b_line_array_temp)
-    
-    # reshape and sort the matrices
-    Pf_line = np.asarray(Pf_line).reshape(-1)
-    Pf_line = np.sort(Pf_line)
-
-    b_line_matrix = np.asarray(b_line_list_all_sims)
-
-    b_line_mean_array  = np.mean(b_line_matrix, axis=0)
-    b_line_sigma_array = np.std(b_line_matrix, axis=0)
-
-    cov_line_array = np.abs( b_line_sigma_array / b_line_mean_array )
-
-    # set x-axis to log-scale
-    plt.xscale('log')
-
-    # plotting
-    plt.plot(Pf_line, cov_line_array, '--', color='navy', label=r'$\delta$ of b')
-    
 
     # add legend
     matplotlib.rcParams['legend.fontsize'] = 12
     plt.legend(loc='lower right')
 
-    # set titles
-    plt.title(r'Failure probability estimate')
-    plt.xlabel(r'$P(g(x) \leq b)$')
-    plt.ylabel(r'$\delta$')
+    # set labels
+    plt.xlabel(r'Limit state function values $b$')
+    plt.ylabel(r'$P(g(x) \leq b)$')
     plt.tight_layout()
-    #plt.savefig('plot_sus_estimation.pdf', format='pdf', dpi=50, bbox_inches='tight')
+    #plt.savefig('plot_pf_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+
+# ---------------------------------------------------------------------------   
+def plot_cov_over_b(b_line_list, cov_line_list, legend_list):
+    plt.figure()
+
+    # initilize colors
+    colors = ['blue', 'fuchsia', 'green', 'red', 'navy', 'skyblue', 'orange', 'yellow', 'black', 'brown']
+
+    # plot all lines
+    for i in range(0, len(cov_line_list)):
+        plt.plot(b_line_list[i], cov_line_list[i], '--', color=colors[np.mod(i, len(colors))], label=legend_list[i])
+
+    # add legend
+    matplotlib.rcParams['legend.fontsize'] = 12
+    plt.legend(loc='upper right')
+
+    # set labels
+    plt.xlabel(r'Limit state function values $b$')
+    plt.ylabel(r'$C.O.V.$')
+    plt.tight_layout()
+    #plt.savefig('plot_cov_over_b.pdf', format='pdf', dpi=50, bbox_inches='tight')
+
+
+# ---------------------------------------------------------------------------
+def plot_cov_ober_pf(b_line_list, cov_line_list, legend_list):
+
+    return True

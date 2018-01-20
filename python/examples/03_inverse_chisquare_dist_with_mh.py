@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-10
 # ---------------------------------------------------------------------------
 # References:
 # 1."Markov Chain Monte Carlo and Gibbs Sampling"
@@ -20,8 +20,8 @@ import numpy as np
 import scipy.stats as scps
 import matplotlib.pyplot as plt
 
-import plots.user_plot as uplt
-import algorithms.metropolis_hastings as mh
+import utilities.plots as uplt
+import algorithms.mcmc_metropolis_hastings as mh
 
 # INPUT 
 
@@ -51,8 +51,8 @@ theta = mh.metropolis_hastings(initial_theta, n_samples, target_PDF, sample_prop
 # OUTPUT
 
 # plot samples
-uplt.plot_hist(theta[0,:], target_PDF, 1)
-uplt.plot_mixing(theta[0,:])
-uplt.plot_autocorr(theta[0,:], 400)
+uplt.plot_hist(theta[0, :], target_PDF, 1)
+uplt.plot_mixing(theta[0, :])
+uplt.plot_autocorr(theta[0, :], 400)
 
 plt.show()

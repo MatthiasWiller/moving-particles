@@ -8,7 +8,7 @@
 # Technische Universitat Munchen
 # www.era.bgu.tum.de
 # ---------------------------------------------------------------------------
-# Version 2017-05
+# Version 2017-10
 # ---------------------------------------------------------------------------
 """
 
@@ -75,3 +75,21 @@ def cov_analytical(theta, g, p0, N, pf_sus):
     delta_sus = np.sqrt(np.sum(delta**2))
 
     return delta_sus
+
+
+# compute acceptance rate
+def get_acceptance_rate(theta):
+    N = theta.shape[1]
+
+    a = np.zeros(N, float)
+
+    a[0] = 1 # first sample is always accepted
+
+    for i in range(1,N):
+        if (theta[:, i] == theta[:, i-1]).all():
+            a[i] = 0
+        else:
+            a[i] = 1
+
+    a_rate = np.mean(a)
+    print('acceptance rate =', a_rate)
